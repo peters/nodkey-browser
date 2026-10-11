@@ -1,0 +1,48 @@
+@import 'tailwindcss';
+@import './tokens.css';
+
+@theme inline {
+  --color-background: var(--nk-background);
+  --color-card: var(--nk-card);
+  --color-ink: var(--nk-ink);
+  --color-muted: var(--nk-muted);
+  --color-rule: var(--nk-rule);
+  --color-accent: var(--nk-accent);
+  --color-on-accent: var(--nk-on-accent);
+  --color-low: var(--nk-low);
+  --color-soft: var(--nk-soft);
+  --color-destructive: var(--nk-destructive);
+  --color-tile1: var(--nk-tile1);
+  --color-tile2: var(--nk-tile2);
+  --color-tile3: var(--nk-tile3);
+  --color-tile4: var(--nk-tile4);
+  --font-display: 'Bricolage Grotesque', ui-sans-serif, system-ui, sans-serif;
+  --font-sans: system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+  --radius-tile: 20px;
+  --radius-field: 10px;
+  --radius-button: 12px;
+}
+
+@layer base {
+  html,
+  body {
+    background: var(--color-background);
+    color: var(--color-ink);
+    font-family: var(--font-sans);
+    font-size: 14px;
+  }
+
+  :focus-visible {
+    outline: 3px solid var(--color-accent);
+    outline-offset: 2px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    transition-duration: 0.01ms !important;
+  }
+}

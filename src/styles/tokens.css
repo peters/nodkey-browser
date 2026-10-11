@@ -1,0 +1,49 @@
+/*
+ * Flis, Nodkey's design (peters/nodkey docs/design/flis-spec.md): the same colour roles in light
+ * and dark as the iPhone app.
+ */
+
+@font-face {
+  font-family: 'Bricolage Grotesque';
+  src: url('/fonts/bricolage-latin.woff2') format('woff2');
+  font-weight: 200 800;
+  font-display: swap;
+  unicode-range: U+0000-017F, U+2000-206F, U+20AC, U+2122, U+2190-21FF;
+}
+
+:root {
+  color-scheme: light dark;
+  --nk-background: #fbfaf7;
+  --nk-card: #ffffff;
+  --nk-ink: #1d2433;
+  --nk-muted: #5f6878;
+  --nk-rule: #e3e6ea;
+  --nk-accent: #138a63;
+  --nk-on-accent: #ffffff;
+  --nk-low: #d9480f;
+  --nk-soft: #d8f3e6;
+  --nk-destructive: #d23b2a;
+  --nk-tile1: #c8efd9;
+  --nk-tile2: #ffd9c7;
+  --nk-tile3: #cfe3ff;
+  --nk-tile4: #e5dbff;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --nk-background: #11141a;
+    --nk-card: #1a1f27;
+    --nk-ink: #eef1f5;
+    --nk-muted: #9aa3b2;
+    --nk-rule: #2a303a;
+    --nk-accent: #5fd3a5;
+    --nk-on-accent: #052016;
+    --nk-low: #ff9466;
+    --nk-soft: #123628;
+    --nk-destructive: #ff6b5a;
+    --nk-tile1: #17402f;
+    --nk-tile2: #4a2a1e;
+    --nk-tile3: #1d3456;
+    --nk-tile4: #33295a;
+  }
+}

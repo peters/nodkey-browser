@@ -1,0 +1,7 @@
+/target
+/node_modules
+/dist
+/extension/wasm
+/src/wasm
+/public/_locales
+/tests/e2e/out

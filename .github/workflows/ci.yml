@@ -1,0 +1,33 @@
+name: CI
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-node@v6
+        with:
+          node-version-file: .nvmrc
+          cache: npm
+      - name: Read access to peters/nodkey-cli (private)
+        env:
+          TOKEN: ${{ secrets.NODKEY_CLI_TOKEN }}
+        run: |
+          test -n "$TOKEN" || { echo "Set the NODKEY_CLI_TOKEN secret (read access to peters/nodkey-cli)"; exit 1; }
+          git config --global url."https://x-access-token:${TOKEN}@github.com/peters/nodkey-cli".insteadOf https://github.com/peters/nodkey-cli
+      - name: Rust for WebAssembly
+        run: |
+          rustup target add wasm32-unknown-unknown
+          version=$(sed -n '/name = "wasm-bindgen"/{n;s/version = "\(.*\)"/\1/p}' Cargo.lock)
+          cargo install wasm-bindgen-cli --version "$version" --locked
+      - run: npm ci
+      - run: npm run validate
+      - run: cargo test --locked
+      - uses: actions/upload-artifact@v7
+        with:
+          name: nodkey-browser
+          path: dist/nodkey-*.zip

@@ -1,0 +1,7 @@
+target
+dist
+node_modules
+src/wasm
+package-lock.json
+public/_locales
+*.md

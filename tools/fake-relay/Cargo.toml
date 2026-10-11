@@ -1,0 +1,14 @@
+[package]
+name = "fake-relay"
+description = "Runs nodkey-cli's fake relay and phone for the extension's browser tests"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+publish.workspace = true
+
+[[bin]]
+name = "nodkey-fake-relay"
+path = "src/main.rs"
+
+[dependencies]
+nodkey-fake-relay.workspace = true

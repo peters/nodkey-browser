@@ -1,0 +1,70 @@
+// Builds the extension for both browsers: dist/chromium and dist/firefox (unpacked) plus a zip of
+// each in dist/. `--watch` rebuilds the pages and the background on change (for development).
+import { execFileSync } from 'node:child_process'
+import { cpSync, existsSync, mkdirSync, readFileSync, rmSync, writeFileSync } from 'node:fs'
+
+const watch = process.argv.includes('--watch')
+/** @param {string} cmd @param {string[]} args */
+const run = (cmd, args) => execFileSync(cmd, args, { stdio: 'inherit' })
+const pkg = JSON.parse(readFileSync('package.json', 'utf8'))
+
+if (!existsSync('src/wasm/nodkey.js')) run('node', ['scripts/wasm.mjs'])
+run('node', ['scripts/locales.mjs'])
+run('npx', ['vite', 'build', '--logLevel', 'warn'])
+run('npx', ['vite', 'build', '-c', 'vite.content.config.ts', '--logLevel', 'warn'])
+
+const common = {
+  manifest_version: 3,
+  name: '__MSG_extName__',
+  description: '__MSG_extDescription__',
+  default_locale: 'en',
+  version: pkg.version,
+  icons: {
+    16: 'icons/icon-16.png',
+    32: 'icons/icon-32.png',
+    48: 'icons/icon-48.png',
+    128: 'icons/icon-128.png',
+  },
+  action: {
+    default_popup: 'popup.html',
+    default_title: '__MSG_extName__',
+    default_icon: { 16: 'icons/icon-16.png', 32: 'icons/icon-32.png' },
+  },
+  options_ui: { page: 'options.html', open_in_tab: true },
+  permissions: ['storage', 'activeTab'],
+  host_permissions: ['<all_urls>'],
+  content_scripts: [
+    { matches: ['<all_urls>'], js: ['content.js'], all_frames: true, run_at: 'document_idle' },
+  ],
+  content_security_policy: {
+    extension_pages: "script-src 'self' 'wasm-unsafe-eval'; object-src 'self'",
+  },
+}
+
+const targets = {
+  chromium: {
+    ...common,
+    minimum_chrome_version: '137',
+    background: { service_worker: 'background.js', type: 'module' },
+  },
+  firefox: {
+    ...common,
+    background: { scripts: ['background.js'], type: 'module' },
+    browser_specific_settings: { gecko: { id: 'nodkey@kh-labs.dev', strict_min_version: '130.0' } },
+  },
+}
+
+for (const [name, manifest] of Object.entries(targets)) {
+  const out = `dist/${name}`
+  rmSync(out, { recursive: true, force: true })
+  mkdirSync(out, { recursive: true })
+  cpSync('dist/common', out, { recursive: true })
+  writeFileSync(`${out}/manifest.json`, `${JSON.stringify(manifest, null, 2)}\n`)
+  rmSync(`dist/nodkey-${name}-${pkg.version}.zip`, { force: true })
+  execFileSync('zip', ['-qr', `../nodkey-${name}-${pkg.version}.zip`, '.'], { cwd: out })
+}
+console.log(`built dist/chromium and dist/firefox (${pkg.version})`)
+if (watch) {
+  console.log('watching: npx vite build --watch')
+  run('npx', ['vite', 'build', '--watch', '--outDir', 'dist/chromium', '--emptyOutDir', 'false'])
+}
