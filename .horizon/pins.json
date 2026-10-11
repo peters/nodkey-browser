@@ -1,0 +1,15 @@
+{
+  "version": 1,
+  "pins": [
+    {
+      "arg": "NODE_VERSION",
+      "file": ".nvmrc",
+      "regex": "^([0-9]+\\.[0-9]+\\.[0-9]+)\\s*$"
+    },
+    {
+      "arg": "WASM_BINDGEN_VERSION",
+      "file": "Cargo.lock",
+      "regex": "name = \"wasm-bindgen\"\\nversion = \"([^\"]+)\""
+    }
+  ]
+}

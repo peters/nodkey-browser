@@ -31,3 +31,12 @@ jobs:
         with:
           name: nodkey-browser
           path: dist/nodkey-*.zip
+  horizon-pins:
+    name: Horizon worker pins
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          persist-credentials: false
+      - name: Verify Horizon worker pins
+        run: python3 .horizon/verify-pins.py
