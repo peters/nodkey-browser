@@ -15,6 +15,9 @@ describe('outcome texts', () => {
     expect(notApproved(null, 'save').message).toContain('only your iPhone can read it')
     expect(notApproved(answer({ error: 'paused' }), 'code').message).toContain('paused')
     expect(notApproved(answer({ error: 'unsupported_version' }), 'code').state).toBe('error')
+    expect(notApproved(answer({ error: 'unsupported_kind' }), 'save').message).toContain(
+      'Update Nodkey',
+    )
     expect(notApproved(answer({}), 'login').message).toContain('denied')
   })
 

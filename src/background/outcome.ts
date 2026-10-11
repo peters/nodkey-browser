@@ -16,7 +16,7 @@ export function notApproved(answer: Answer | null, kind: ActivityKind): Shown {
     return { state: 'expired', message: kind === 'save' ? t('saveKept') : t('actExpired') }
   }
   if (answer.error === 'paused') return { state: 'denied', message: t('actPaused') }
-  if (answer.error === 'unsupported_version')
+  if (answer.error === 'unsupported_version' || answer.error === 'unsupported_kind')
     return { state: 'error', message: t('actOldProtocol') }
   return { state: 'denied', message: kind === 'save' ? t('saveDenied') : t('actDenied') }
 }
