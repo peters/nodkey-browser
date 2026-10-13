@@ -19,7 +19,7 @@
     "pretest": "node scripts/wasm.mjs && cargo build --locked -q -p fake-relay",
     "test": "vitest run",
     "build": "node scripts/build.mjs",
-    "validate": "npm run lint && npm run format:check && npm run typecheck && npm test && npm run build",
+    "validate": "npm run wasm && npm run lint && npm run format:check && npm run typecheck && npm test && npm run build",
     "e2e": "node tests/e2e/run.mjs"
   },
   "dependencies": {
