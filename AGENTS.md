@@ -57,8 +57,8 @@ Shared company rules apply: `fintermobilityas/company` (checkout `~/github/compa
 
 ## CI
 
-CI needs the secret `NODKEY_CLI_TOKEN`: a fine-grained token with read access to
-`peters/nodkey-cli` contents, for the git dependency.
+CI needs the secret `NODKEY_CLI_DEPLOY_KEY`: the private half of a read-only deploy key of
+`peters/nodkey-cli` ("nodkey-browser CI (read-only)"), for the git dependency. CI fetches it over SSH.
 
 ## Publishing
 
