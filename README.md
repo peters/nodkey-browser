@@ -9,6 +9,9 @@ your phone, and nothing leaves it until you approve with Face ID.
   and the password.
 - **Fill a code.** The same in a two-step code field, also when the page has one
   box per digit.
+- **Use passkeys.** When a website asks for a passkey, Nodkey asks your iPhone.
+  You approve with Face ID and the iPhone signs. The passkey never leaves your
+  iPhone. Turn this off in the settings to use the passkeys of the browser.
 - **See what you approve.** The notification on your iPhone can show a picture
   of the page. It is encrypted so that only your iPhone can see it.
 - **Save new passwords.** When you sign up or change a password, the extension

@@ -145,6 +145,12 @@ function saveRelay() {
           :help="t('optScreenshotsHelp')"
           @update:model-value="set('requests', { screenshots: $event })"
         />
+        <NkToggle
+          :model-value="status.settings.passkeys"
+          :label="t('optPasskeys')"
+          :help="t('optPasskeysHelp')"
+          @update:model-value="set('requests', { passkeys: $event })"
+        />
         <StatusLine
           v-if="said('requests')"
           :state="said('requests')?.ok ? 'approved' : 'error'"

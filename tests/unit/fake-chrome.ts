@@ -33,6 +33,8 @@ export function installFakeChrome(): { local: Area; session: Area } {
   const session: Area = new Map()
   const chrome = {
     storage: { local: area(local), session: area(session) },
+    // Activity for a tab goes nowhere: there are no pages.
+    tabs: { sendMessage: () => Promise.resolve(undefined) },
     runtime: {
       id: 'test',
       getPlatformInfo: () => Promise.resolve({ os: 'linux', arch: 'x86-64' }),

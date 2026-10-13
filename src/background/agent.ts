@@ -118,14 +118,19 @@ export interface Ask {
   reason: string
   picture?: Picture | null
   save?: { url: string; username: string; title?: string; password: SealedBox }
+  /** The `passkey` object of a passkey request (`docs/agent-protocol.md`). */
+  passkey?: Record<string, unknown>
   client: ClientInfo
 }
 
 /** The result of a request: the phone's answer, or `null` when it did not answer in time. */
 export type Outcome = { answer: Answer; phone: Phone } | { answer: null; phone: Phone }
 
-/** Sends one request to the current phone and waits up to two minutes for the answer. */
-export async function ask(a: Ask, phone: Phone): Promise<Outcome> {
+/**
+ * Sends one request to the current phone and waits up to two minutes for the answer. After
+ * `signal` aborts, the wait ends as if the phone did not answer.
+ */
+export async function ask(a: Ask, phone: Phone, signal?: AbortSignal): Promise<Outcome> {
   const agent = await store.agent()
   if (!agent) throw new Error('no agent identity')
   const r = await relay(agent.agent_id)
@@ -144,6 +149,7 @@ export async function ask(a: Ask, phone: Phone): Promise<Outcome> {
     }
   }
   if (a.save) draft.save = a.save
+  if (a.passkey) draft.passkey = a.passkey
   const nowSeconds = Math.floor(Date.now() / 1000)
   const sealed = parseSealedRequest(
     seal_request(JSON.stringify(draft), agent.agent_id, phone.kem, nowSeconds),
@@ -163,7 +169,11 @@ export async function ask(a: Ask, phone: Phone): Promise<Outcome> {
     }
   }
   const box = await keepAlive(
-    pollUntil(REQUEST_MS - (Date.now() - started), (wait) => r.waitAnswer(sealed.request_id, wait)),
+    pollUntil(REQUEST_MS - (Date.now() - started), (wait) =>
+      signal?.aborted
+        ? Promise.resolve({ kind: 'gone' as const })
+        : r.waitAnswer(sealed.request_id, wait),
+    ),
   )
   if (!box) return { answer: null, phone }
   const pub = await keys.publicKeys()

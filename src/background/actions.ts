@@ -14,7 +14,7 @@ import { failed, notApproved, saved } from './outcome'
 import { capture } from './screenshot'
 import * as store from './store'
 
-const info = browserInfo(navigator.userAgent)
+export const info = browserInfo(navigator.userAgent)
 
 export function client(): ClientInfo {
   return {
@@ -28,7 +28,7 @@ export async function agentName(): Promise<string> {
   return (await store.agent())?.name ?? defaultAgentName(info)
 }
 
-async function publish(
+export async function publish(
   tabId: number,
   kind: ActivityKind,
   site: string,

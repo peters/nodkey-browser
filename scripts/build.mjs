@@ -4,14 +4,21 @@ import { execFileSync } from 'node:child_process'
 import { cpSync, existsSync, mkdirSync, readFileSync, rmSync, writeFileSync } from 'node:fs'
 
 const watch = process.argv.includes('--watch')
-/** @param {string} cmd @param {string[]} args */
-const run = (cmd, args) => execFileSync(cmd, args, { stdio: 'inherit' })
+/** @param {string} cmd @param {string[]} args @param {NodeJS.ProcessEnv} [env] */
+const run = (cmd, args, env = process.env) => execFileSync(cmd, args, { stdio: 'inherit', env })
 const pkg = JSON.parse(readFileSync('package.json', 'utf8'))
 
 if (!existsSync('src/wasm/nodkey.js')) run('node', ['scripts/wasm.mjs'])
 run('node', ['scripts/locales.mjs'])
 run('npx', ['vite', 'build', '--logLevel', 'warn'])
-run('npx', ['vite', 'build', '-c', 'vite.content.config.ts', '--logLevel', 'warn'])
+// The scripts in web pages: the content script, and the passkey bridge and page script that the
+// background registers while passkeys are on.
+for (const script of ['content', 'passkey-bridge', 'passkey-page']) {
+  run('npx', ['vite', 'build', '-c', 'vite.content.config.ts', '--logLevel', 'warn'], {
+    ...process.env,
+    NODKEY_SCRIPT: script,
+  })
+}
 
 const common = {
   manifest_version: 3,
@@ -31,7 +38,7 @@ const common = {
     default_icon: { 16: 'icons/icon-16.png', 32: 'icons/icon-32.png' },
   },
   options_ui: { page: 'options.html', open_in_tab: true },
-  permissions: ['storage', 'activeTab'],
+  permissions: ['storage', 'activeTab', 'scripting'],
   host_permissions: ['<all_urls>'],
   content_scripts: [
     { matches: ['<all_urls>'], js: ['content.js'], all_frames: true, run_at: 'document_idle' },

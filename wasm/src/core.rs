@@ -10,8 +10,9 @@
 //! `wasm32-unknown-unknown`.
 
 use nodkey_proto::{
-    AttachmentInfo, ClientInfo, ImageType, Kind, PairingClaimed, PublicKeys, Purpose, Request,
-    SaveLogin, SealedBox, VERSION, auth, b64u, check, client, code, dh,
+    AttachmentInfo, ClientInfo, ImageType, Kind, PairingClaimed, PasskeyAnswer, PasskeyOp,
+    PasskeyRequest, PublicKeys, Purpose, Request, SaveLogin, SealedBox, VERSION, auth, b64u, check,
+    client, code, dh, passkey, webauthn,
 };
 use serde::{Deserialize, Serialize};
 use zeroize::Zeroizing;
@@ -103,6 +104,8 @@ struct Draft {
     #[serde(default)]
     save: Option<SaveLogin>,
     #[serde(default)]
+    passkey: Option<PasskeyRequest>,
+    #[serde(default)]
     client: Option<ClientInfo>,
 }
 
@@ -113,7 +116,7 @@ struct Sealed {
 }
 
 /// Checks and seals a request to the phone. `draft_json` is
-/// `{kind, target, reason, agent, attachment?, save?, client?}`; returns
+/// `{kind, target, reason, agent, attachment?, save?, passkey?, client?}`; returns
 /// `{request_id, envelope}` where `envelope` is the body of `POST /v1/phones/{id}/requests`.
 pub fn seal_request(
     draft_json: &str,
@@ -133,6 +136,7 @@ pub fn seal_request(
         attachment: d.attachment,
         filter: None,
         save: d.save,
+        passkey: d.passkey,
         client: d.client.map(ClientInfo::tidy),
     };
     client::check_request(&request)?;
@@ -163,6 +167,26 @@ pub fn seal_attachment(
 ) -> Result<Vec<u8>, String> {
     let kem = b64u::decode_array::<32>(phone_kem).map_err(js)?;
     client::seal_attachment(request_id, agent_id, &kem, image).map_err(js)
+}
+
+/// `clientDataJSON` for a passkey call as WebAuthn makes it, in b64u. `op` is `get` or `create`;
+/// `origin` is the caller's origin as the browser reports it, never a value from the page.
+pub fn client_data_json(op: &str, challenge: &str, origin: &str) -> Result<String, String> {
+    let op = match op {
+        "get" => PasskeyOp::Get,
+        "create" => PasskeyOp::Create,
+        _ => return Err(format!("unknown passkey op {op}")),
+    };
+    let json = passkey::build_client_data_json(op, challenge, origin);
+    Ok(b64u::encode(json.as_bytes()))
+}
+
+/// The agent's check of an approved passkey answer: `request_json` is the request's `passkey`,
+/// `answer_json` the answer's `passkey`.
+pub fn check_passkey_answer(request_json: &str, answer_json: &str) -> Result<(), String> {
+    let request: PasskeyRequest = serde_json::from_str(request_json).map_err(js)?;
+    let answer: PasskeyAnswer = serde_json::from_str(answer_json).map_err(js)?;
+    webauthn::check_answer(&request, &answer)
 }
 
 fn open(

@@ -4,7 +4,7 @@
  * peters/nodkey-cli.
  */
 
-export type Kind = 'code' | 'login' | 'list' | 'insights' | 'cleanup' | 'save'
+export type Kind = 'code' | 'login' | 'list' | 'insights' | 'cleanup' | 'save' | 'passkey'
 export type Decision = 'approved' | 'denied' | 'expired'
 export type Scope = 'selected' | 'codes' | 'logins' | 'all'
 export type Saved = 'added' | 'updated' | 'unchanged'
@@ -31,7 +31,22 @@ export interface Answer {
   username?: string
   password?: string
   saved?: Saved
+  passkey?: PasskeyAnswer
   error?: string
+}
+
+/** The phone's passkey answer (base64url values): an assertion (get) or a new passkey (create). */
+export interface PasskeyAnswer {
+  credential_id: string
+  authenticator_data: string
+  /** Get: the DER ECDSA signature over `authenticator_data ‖ SHA-256(client_data_json)`. */
+  signature?: string
+  user_handle?: string
+  user_name?: string
+  /** Create: the attestation object (CBOR), the public key (SPKI DER) and its COSE algorithm. */
+  attestation_object?: string
+  public_key?: string
+  public_key_algorithm?: number
 }
 
 /** A paired phone, as kept in storage (public keys only). */
@@ -146,9 +161,36 @@ export function parseAnswer(json: string): Answer {
   if (v.saved !== undefined) {
     answer.saved = oneOf(v, 'saved', ['added', 'updated', 'unchanged'] as const)
   }
+  if (isObject(v.passkey)) answer.passkey = parsePasskeyAnswer(v.passkey)
   const error = optStr(v, 'error')
   if (error !== undefined) answer.error = error
   return answer
+}
+
+function optB64u(o: Record<string, unknown>, key: string): string | undefined {
+  const v = optStr(o, key)
+  if (v !== undefined && !B64U.test(v)) throw new ProtocolError(`${key} must be base64url`)
+  return v
+}
+
+function parsePasskeyAnswer(o: Record<string, unknown>): PasskeyAnswer {
+  const out: PasskeyAnswer = {
+    credential_id: str(o, 'credential_id'),
+    authenticator_data: str(o, 'authenticator_data'),
+  }
+  if (!B64U.test(out.credential_id) || !B64U.test(out.authenticator_data)) {
+    throw new ProtocolError('credential_id and authenticator_data must be base64url')
+  }
+  for (const key of ['signature', 'user_handle', 'attestation_object', 'public_key'] as const) {
+    const value = optB64u(o, key)
+    if (value !== undefined) out[key] = value
+  }
+  const userName = optStr(o, 'user_name')
+  if (userName !== undefined) out.user_name = userName
+  if (typeof o.public_key_algorithm === 'number') {
+    out.public_key_algorithm = o.public_key_algorithm
+  }
+  return out
 }
 
 /** Checks a paired phone from the WebAssembly module or storage. */

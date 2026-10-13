@@ -1,8 +1,9 @@
 // Runs the extension in real Chromium and Firefox on an isolated desktop, against nodkey-cli's
 // fake relay and phone and a synthetic test site: pair, fill a login, fill a code (one field and a
-// row of boxes), and save a new login. See docs/features/browser-e2e.md.
+// row of boxes), save a new login, and create and use a passkey that the site's server checks.
+// See docs/features/browser-e2e.md.
 //
-//   node tests/e2e/run.mjs [--browser chromium|firefox|both] [--keep] [--display :N]
+//   node tests/e2e/run.mjs [--browser chromium|firefox|both] [--keep] [--display :N] [--passkeys-only]
 //
 // Without --display it starts its own Xvfb + x11vnc (set NODKEY_E2E_TOOLS to an unpacked tools
 // root when x11vnc is not installed) and prints the VNC address for a Horizon Device panel.
@@ -21,6 +22,7 @@ const option = (name, fallback) => {
 }
 const which = option('--browser', 'both')
 const keep = args.includes('--keep')
+const passkeysOnly = args.includes('--passkeys-only')
 const root = resolve(import.meta.dirname, '../..')
 const run = `run-${Date.now()}`
 // Snap Chromium can only read under ~/snap/chromium; Firefox and logs use a private cache folder.
@@ -169,6 +171,94 @@ async function flow(name, browser, relay, site, agentName) {
   await sleep(3000)
 }
 
+/** Waits for the passkey page's status line to leave `busy`; fails on an error text. */
+async function passkeyStatus(tab, busy) {
+  const text = await waitFor(
+    'the passkey page',
+    async () => {
+      const t = await tab.$eval('#status', (el) => el.textContent ?? '')
+      return t === busy ? null : t
+    },
+    60_000,
+  )
+  if (text.startsWith('Error')) throw new Error(`passkey page: ${text}`)
+  return text
+}
+
+async function passkeyFlow(name, browser, relay, site) {
+  const tab = await browser.newPage()
+  await tab.bringToFront()
+  const seen = async () =>
+    (await (await relay.control('/_fake/seen')).json()).filter((s) => s.request.kind === 'passkey')
+  const before = (await seen()).length
+  const user = `${name.toLowerCase()}-passkey@example.com`
+  await tab.goto(`${site.base}/passkey`)
+
+  log(name, 'conditional passkey request: never reaches the phone')
+  const conditional = await tab.evaluate(async () => {
+    const available = await PublicKeyCredential.isConditionalMediationAvailable()
+    const controller = new AbortController()
+    const pending = navigator.credentials
+      .get({
+        mediation: 'conditional',
+        signal: controller.signal,
+        publicKey: { challenge: new Uint8Array(32) },
+      })
+      .then(
+        () => 'resolved',
+        (e) => e.name,
+      )
+    await new Promise((r) => setTimeout(r, 1000))
+    controller.abort(new DOMException('test', 'AbortError'))
+    return { available, outcome: await pending }
+  })
+  if (conditional.available !== false || conditional.outcome !== 'AbortError') {
+    throw new Error(`conditional request: ${JSON.stringify(conditional)}`)
+  }
+  if ((await seen()).length !== before) throw new Error('a conditional request reached the phone')
+
+  log(name, 'create a passkey')
+  await tab.$eval('#email', (el, v) => (el.value = v), user)
+  await tab.click('#create')
+  log(name, await passkeyStatus(tab, 'Creating'))
+  await sleep(2000)
+
+  log(name, 'sign in with the passkey')
+  await tab.click('#signin')
+  const signedIn = await passkeyStatus(tab, 'Signing in')
+  if (signedIn !== `Signed in as ${user}`) throw new Error(`passkey page: ${signedIn}`)
+  log(name, `${signedIn}: the server checked the ES256 signature`)
+  const requests = (await seen()).slice(before)
+  const origins = requests.map((s) => {
+    const cdj = Buffer.from(s.request.passkey.client_data_json, 'base64url').toString('utf8')
+    return JSON.parse(cdj).origin
+  })
+  if (requests.length !== 2 || origins.some((o) => o !== site.base)) {
+    throw new Error(`the phone saw ${JSON.stringify(origins)}`)
+  }
+  await sleep(2000)
+}
+
+/** Turns the passkey setting off: a new page load gets the browser's own WebAuthn again. */
+async function passkeysOff(name, browser, base, site) {
+  log(name, 'turn passkeys off')
+  const page = await extensionPage(browser, `${base}/options.html`)
+  const reply = await page.evaluate(() =>
+    chrome.runtime.sendMessage({ type: 'settings.set', patch: { passkeys: false } }),
+  )
+  if (!reply?.ok || reply.value.passkeys !== false) throw new Error('passkeys not turned off')
+  await page.close()
+  const tab = await browser.newPage()
+  const native = () =>
+    tab.evaluate(() => String(navigator.credentials.get).includes('[native code]'))
+  await waitFor('the browser passkeys', async () => {
+    await tab.goto(`${site.base}/passkey`)
+    return native()
+  })
+  log(name, 'the page has the browser passkeys again')
+  await tab.close()
+}
+
 async function chromium(env, site, relay) {
   const ext = join(chromiumHome, 'ext')
   mkdirSync(chromiumHome, { recursive: true })
@@ -263,13 +353,16 @@ async function main() {
       const c = await chromium(desktop.env, site.base, relay)
       open.push(c.browser)
       const name = await pairByDriver('Chromium', c.browser, c.base, relay)
-      await flow('Chromium', c.browser, relay, site.base, name)
+      if (!passkeysOnly) await flow('Chromium', c.browser, relay, site.base, name)
+      await passkeyFlow('Chromium', c.browser, relay, site)
+      await passkeysOff('Chromium', c.browser, c.base, site)
     }
     if (which === 'firefox' || which === 'both') {
       const f = await firefox(desktop.env)
       open.push(f.browser)
       const name = await pairByHand('Firefox', relay)
-      await flow('Firefox', f.browser, relay, site.base, name)
+      if (!passkeysOnly) await flow('Firefox', f.browser, relay, site.base, name)
+      await passkeyFlow('Firefox', f.browser, relay, site)
     }
     log('all flows passed')
     if (keep) {

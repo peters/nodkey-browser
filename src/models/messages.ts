@@ -6,7 +6,7 @@
 import type { Phone, Saved, SealedBox } from './protocol'
 
 /** What a request is about, as the person sees it. */
-export type ActivityKind = 'login' | 'code' | 'save'
+export type ActivityKind = 'login' | 'code' | 'save' | 'passkey'
 
 export type ActivityState = 'waiting' | 'approved' | 'denied' | 'expired' | 'error'
 
@@ -46,6 +46,8 @@ export interface Settings {
   screenshots: boolean
   offerSave: boolean
   neverSave: string[]
+  /** Answer the passkey requests of web pages with passkeys from the phone. */
+  passkeys: boolean
 }
 
 export const DEFAULT_RELAY = 'https://relay.nodkey.app'
@@ -55,6 +57,7 @@ export const DEFAULT_SETTINGS: Settings = {
   screenshots: true,
   offerSave: true,
   neverSave: [],
+  passkeys: true,
 }
 
 /** What the popup and options page need to draw themselves. */

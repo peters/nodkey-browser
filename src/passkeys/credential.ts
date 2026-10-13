@@ -1,0 +1,106 @@
+/**
+ * Builds the `PublicKeyCredential` a page gets from the phone's answer. The objects inherit from
+ * the browser's own prototypes, so `instanceof` works, and carry their values as own properties
+ * (the native getters only work on objects the browser made). Runs in the page.
+ */
+
+import type { PasskeyResult } from '../models/passkey'
+import { decode } from './b64u'
+
+/** Where the passkey lives: the phone, reached through the relay. Sorted, as WebAuthn asks. */
+export const TRANSPORTS = ['hybrid', 'internal']
+
+function buffer(b64u: string): ArrayBuffer {
+  const bytes = decode(b64u)
+  const out = new ArrayBuffer(bytes.length)
+  new Uint8Array(out).set(bytes)
+  return out
+}
+
+function protoOf(name: string): object {
+  const ctor = (globalThis as Record<string, unknown>)[name]
+  const proto = typeof ctor === 'function' ? (ctor as { prototype?: unknown }).prototype : null
+  return typeof proto === 'object' && proto !== null ? proto : Object.prototype
+}
+
+function make(name: string, values: Record<string, unknown>): object {
+  const props: PropertyDescriptorMap = {}
+  for (const [key, value] of Object.entries(values)) {
+    props[key] = { value, enumerable: false, configurable: true, writable: false }
+  }
+  return Object.create(protoOf(name), props) as object
+}
+
+/** A `PublicKeyCredential` (with its response) for an approved passkey call. */
+export function makeCredential(result: PasskeyResult): PublicKeyCredential {
+  const rawId = buffer(result.credentialId)
+  const clientDataJSON = buffer(result.clientDataJSON)
+  const authenticatorData = buffer(result.authenticatorData)
+  let response: object
+  let responseJSON: Record<string, unknown>
+  if (result.op === 'get') {
+    const signature = buffer(result.signature)
+    const userHandle = result.userHandle === undefined ? null : buffer(result.userHandle)
+    response = make('AuthenticatorAssertionResponse', {
+      clientDataJSON,
+      authenticatorData,
+      signature,
+      userHandle,
+    })
+    responseJSON = {
+      clientDataJSON: result.clientDataJSON,
+      authenticatorData: result.authenticatorData,
+      signature: result.signature,
+    }
+    if (result.userHandle !== undefined) responseJSON.userHandle = result.userHandle
+  } else {
+    const attestationObject = buffer(result.attestationObject)
+    const publicKey = buffer(result.publicKey)
+    const algorithm = result.publicKeyAlgorithm
+    response = make('AuthenticatorAttestationResponse', {
+      clientDataJSON,
+      attestationObject,
+      getAuthenticatorData: function getAuthenticatorData() {
+        return authenticatorData.slice(0)
+      },
+      getPublicKey: function getPublicKey() {
+        return publicKey.slice(0)
+      },
+      getPublicKeyAlgorithm: function getPublicKeyAlgorithm() {
+        return algorithm
+      },
+      getTransports: function getTransports() {
+        return [...TRANSPORTS]
+      },
+    })
+    responseJSON = {
+      clientDataJSON: result.clientDataJSON,
+      authenticatorData: result.authenticatorData,
+      transports: [...TRANSPORTS],
+      publicKey: result.publicKey,
+      publicKeyAlgorithm: algorithm,
+      attestationObject: result.attestationObject,
+    }
+  }
+  const credential = make('PublicKeyCredential', {
+    id: result.credentialId,
+    rawId,
+    type: 'public-key',
+    authenticatorAttachment: 'platform',
+    response,
+    getClientExtensionResults: function getClientExtensionResults() {
+      return {}
+    },
+    toJSON: function toJSON() {
+      return {
+        id: result.credentialId,
+        rawId: result.credentialId,
+        type: 'public-key',
+        authenticatorAttachment: 'platform',
+        response: { ...responseJSON },
+        clientExtensionResults: {},
+      }
+    },
+  })
+  return credential as PublicKeyCredential
+}

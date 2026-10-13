@@ -128,3 +128,13 @@ pub fn open_grant(
         code,
     ))
 }
+
+#[wasm_bindgen]
+pub fn client_data_json(op: &str, challenge: &str, origin: &str) -> Result<String, JsError> {
+    js(core::client_data_json(op, challenge, origin))
+}
+
+#[wasm_bindgen]
+pub fn check_passkey_answer(request_json: &str, answer_json: &str) -> Result<(), JsError> {
+    js(core::check_passkey_answer(request_json, answer_json))
+}

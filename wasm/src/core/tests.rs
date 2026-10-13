@@ -142,6 +142,46 @@ fn sealed_requests_open_on_the_phone() {
 }
 
 #[test]
+fn passkey_requests_and_answers() {
+    let v = vectors();
+    let w = &v["webauthn"];
+    let get = &w["get"];
+    // The same clientDataJSON bytes as the vectors (and thus as the phone expects).
+    let text: Value = serde_json::from_str(s(get, "client_data_json")).unwrap();
+    let cdj = client_data_json("get", s(&text, "challenge"), s(w, "origin")).unwrap();
+    assert_eq!(cdj, s(get, "client_data_json_b64u"));
+    assert!(client_data_json("delete", "AAEC", "https://a.example").is_err());
+
+    // A passkey request seals; one whose origin is not for the rp_id does not.
+    let phone = KeyPair::generate();
+    let agent_id = nodkey_proto::random_id();
+    let rp_id = s(w, "rp_id");
+    let request = json!({"op": "get", "rp_id": rp_id, "client_data_json": cdj,
+        "allow_credentials": [s(w, "credential_id")], "user_verification": "required"});
+    let draft = |target: &str, passkey: &Value| {
+        json!({"kind": "passkey", "target": target, "reason": "Sign in", "agent": "Firefox on Linux",
+            "passkey": passkey})
+        .to_string()
+    };
+    let kem = phone.public().kem_b64u();
+    assert!(seal_request(&draft(rp_id, &request), &agent_id, &kem, 1.7e9).is_ok());
+    let evil = client_data_json("get", "AAEC", "https://evil.example").unwrap();
+    let mut bad = request.clone();
+    bad["client_data_json"] = json!(evil);
+    assert!(seal_request(&draft(rp_id, &bad), &agent_id, &kem, 1.7e9).is_err());
+    assert!(seal_request(&draft("evil.example", &request), &agent_id, &kem, 1.7e9).is_err());
+
+    // The phone's answer from the vectors passes the agent's check; one for another site fails.
+    let answer = json!({"credential_id": s(w, "credential_id"),
+        "authenticator_data": s(get, "authenticator_data"), "signature": s(get, "signature"),
+        "user_handle": s(w, "user_handle")});
+    assert!(check_passkey_answer(&request.to_string(), &answer.to_string()).is_ok());
+    let mut other = request.clone();
+    other["rp_id"] = json!("other.example");
+    assert!(check_passkey_answer(&other.to_string(), &answer.to_string()).is_err());
+}
+
+#[test]
 fn auth_header_verifies() {
     let keys = KeyPair::generate();
     let id = nodkey_proto::random_id();

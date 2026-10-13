@@ -39,6 +39,11 @@ synthetic test site. It does not use the real relay or a real phone.
    5. Opens `/signup`, types a new user name and password and submits. Then it
       answers Save in the save question with the Enter key. The fake phone
       opens the sealed password, and the script compares it.
+   6. Opens `/passkey` and does [Passkeys](passkeys.md): a conditional request
+      that must not reach the phone, Create a passkey and Sign in with a
+      passkey. The server of the test site examines the passkey and the ES256
+      signature. In Chromium, the script then turns the passkey setting off and
+      makes sure that the page has the passkeys of the browser again.
 
    Result: The log shows `all flows passed`.
 
@@ -49,6 +54,8 @@ synthetic test site. It does not use the real relay or a real phone.
    desktop.
 
 ## Notes
+
+- `--passkeys-only` pairs and then does only step 6.
 
 - Chromium runs in Norwegian (`--lang=nb`) and Firefox in English. Thus the run
   shows two of the twelve languages.

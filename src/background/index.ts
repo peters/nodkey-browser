@@ -9,6 +9,7 @@ import { t } from '../i18n/t'
 import * as actions from './actions'
 import { finishPairing, rememberPhone, startPairing, unpair } from './agent'
 import { failed } from './outcome'
+import { answer as answerPasskey, syncPasskeyScripts } from './passkeys'
 import * as store from './store'
 
 const ready = init()
@@ -157,6 +158,39 @@ chrome.runtime.onMessage.addListener((msg: ToBackground, sender, sendResponse) =
   )
   return true
 })
+
+// Passkey calls come from the bridge content script on a port of their own; a closed port (the
+// page went away or aborted) cancels the wait for the phone.
+chrome.runtime.onConnect.addListener((port) => {
+  const sender = port.sender
+  if (port.name !== 'passkey' || sender?.id !== chrome.runtime.id || !sender.tab) return
+  if (isExtensionPage(sender)) {
+    port.disconnect()
+    return
+  }
+  const controller = new AbortController()
+  let started = false
+  port.onDisconnect.addListener(() => {
+    controller.abort()
+  })
+  port.onMessage.addListener((msg: { call?: unknown; sameOriginAncestors?: unknown }) => {
+    if (started) return
+    started = true
+    void ready
+      .then(() => answerPasskey(msg, sender, controller.signal))
+      .then((reply) => {
+        if (!controller.signal.aborted) port.postMessage(reply)
+      })
+  })
+})
+
+// The passkey scripts follow the setting and the pairing.
+chrome.storage.onChanged.addListener((changes, area) => {
+  if (area === 'local' && ('settings' in changes || 'phones' in changes)) {
+    void syncPasskeyScripts()
+  }
+})
+void syncPasskeyScripts()
 
 chrome.tabs.onRemoved.addListener((tabId) => {
   void chrome.storage.session.remove([`activity:${tabId}`, `offer:${tabId}`, `username:${tabId}`])
