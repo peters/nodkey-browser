@@ -139,7 +139,10 @@ export function relyingParty(rpId, origin) {
           { type: 'public-key', alg: -7 },
           { type: 'public-key', alg: -257 },
         ],
-        excludeCredentials: [...credentials.keys()].map((id) => ({ type: 'public-key', id })),
+        // Only this user's passkeys, as a real website does: Chromium and Firefox share the site.
+        excludeCredentials: [...credentials]
+          .filter(([, c]) => c.name === name)
+          .map(([id]) => ({ type: 'public-key', id })),
         authenticatorSelection: { residentKey: 'required', userVerification: 'required' },
         attestation: 'none',
       }
