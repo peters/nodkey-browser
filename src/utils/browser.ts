@@ -1,7 +1,7 @@
 /** Which browser and system the extension runs in, from the user agent string. */
 
 export interface BrowserInfo {
-  /** "Firefox", "Chrome", "Edge", "Brave", "Chromium". */
+  /** "Firefox", "Chrome", "Edge", "Brave", "Safari", "Chromium". */
   browser: string
   /** "Linux", "macOS", "Windows", "ChromeOS". */
   system: string
@@ -14,6 +14,7 @@ export function browserInfo(userAgent: string, brave = false): BrowserInfo {
   else if (/Edg\//.test(ua)) browser = 'Edge'
   else if (brave) browser = 'Brave'
   else if (/Chrome\//.test(ua)) browser = 'Chrome'
+  else if (/Version\/[\d.]+ .*Safari\//.test(ua)) browser = 'Safari'
   let system = 'Linux'
   if (/Mac OS X|Macintosh/.test(ua)) system = 'macOS'
   else if (/Windows/.test(ua)) system = 'Windows'

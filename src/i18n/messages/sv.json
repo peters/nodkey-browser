@@ -86,6 +86,7 @@
   "optSiteAccess": "Åtkomst till webbplatser",
   "optSiteAccessHelp": "Nodkey behöver åtkomst till webbplatser för att visa sin knapp i inloggningsfält och fylla i dem.",
   "optSiteAccessGrant": "Tillåt på alla webbplatser",
+  "optSiteAccessSafari": "I Safari: klicka på Nodkey i verktygsfältet och välj ”Tillåt alltid på alla webbplatser”. Eller öppna Safaris inställningar, Tillägg, Nodkey, Redigera webbplatser.",
   "optSiteAccessOk": "Nodkey kan fungera på alla webbplatser.",
   "optAdvanced": "Avancerat",
   "optRelay": "Reläadress",

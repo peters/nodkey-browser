@@ -1,0 +1,56 @@
+# The Mac app that carries the Nodkey extension into Safari (ADR-0008). Generate the Xcode
+# project with xcodegen; scripts/safari.sh does that on the Mac build host.
+name: NodkeySafari
+options:
+  bundleIdPrefix: com.fintermac
+  deploymentTarget:
+    macOS: '15.0'
+  developmentLanguage: en
+settings:
+  base:
+    DEVELOPMENT_TEAM: CVP9MN5358
+    MARKETING_VERSION: '0.1.0'
+    CURRENT_PROJECT_VERSION: '1'
+    SWIFT_VERSION: '6.0'
+    ENABLE_HARDENED_RUNTIME: YES
+    CODE_SIGN_STYLE: Manual
+    CODE_SIGN_IDENTITY: 'Apple Development'
+    ENABLE_USER_SCRIPT_SANDBOXING: NO
+targets:
+  NodkeySafari:
+    type: application
+    platform: macOS
+    sources:
+      - App
+    settings:
+      base:
+        PRODUCT_NAME: Nodkey for Safari
+        PRODUCT_BUNDLE_IDENTIFIER: com.fintermac.nodkey.safari
+        INFOPLIST_FILE: App/Info.plist
+        CODE_SIGN_ENTITLEMENTS: App/App.entitlements
+        ASSETCATALOG_COMPILER_APPICON_NAME: AppIcon
+        LD_RUNPATH_SEARCH_PATHS: '$(inherited) @executable_path/../Frameworks'
+    dependencies:
+      - target: NodkeySafariExtension
+  NodkeySafariExtension:
+    type: app-extension
+    platform: macOS
+    sources:
+      - Extension
+    settings:
+      base:
+        PRODUCT_NAME: Nodkey Extension
+        PRODUCT_BUNDLE_IDENTIFIER: com.fintermac.nodkey.safari.extension
+        INFOPLIST_FILE: Extension/Info.plist
+        CODE_SIGN_ENTITLEMENTS: Extension/Extension.entitlements
+    postCompileScripts:
+      # The web extension itself: the files `npm run build` writes to dist/safari.
+      - name: Copy the web extension
+        basedOnDependencyAnalysis: false
+        script: |
+          set -eu
+          src="${SRCROOT}/../dist/safari"
+          test -f "$src/manifest.json" || { echo "error: run npm run build first ($src is missing)"; exit 1; }
+          dst="${TARGET_BUILD_DIR}/${UNLOCALIZED_RESOURCES_FOLDER_PATH}"
+          mkdir -p "$dst"
+          rsync -a --delete --exclude 'Info.plist' --exclude '*.lproj' --exclude 'Assets.car' "$src/" "$dst/"

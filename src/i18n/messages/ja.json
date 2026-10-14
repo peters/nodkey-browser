@@ -86,6 +86,7 @@
   "optSiteAccess": "Web サイトへのアクセス",
   "optSiteAccessHelp": "サインイン欄にボタンを表示して入力するには、Nodkey に Web サイトへのアクセスが必要です。",
   "optSiteAccessGrant": "すべての Web サイトで許可",
+  "optSiteAccessSafari": "Safariのツールバーで「Nodkey」をクリックし、「すべてのWebサイトで常に許可」を選びます。またはSafariの設定で「機能拡張」>「Nodkey」>「Webサイトを編集」を開きます。",
   "optSiteAccessOk": "Nodkey はすべての Web サイトで使えます。",
   "optAdvanced": "詳細",
   "optRelay": "リレーのアドレス",

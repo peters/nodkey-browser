@@ -59,6 +59,12 @@ const targets = {
     background: { scripts: ['background.js'], type: 'module' },
     browser_specific_settings: { gecko: { id: 'nodkey@kh-labs.dev', strict_min_version: '130.0' } },
   },
+  // Safari loads the extension from the Mac app in safari/ (ADR-0008).
+  safari: {
+    ...common,
+    background: { service_worker: 'background.js', type: 'module' },
+    browser_specific_settings: { safari: { strict_min_version: '18.0' } },
+  },
 }
 
 for (const [name, manifest] of Object.entries(targets)) {
@@ -68,9 +74,12 @@ for (const [name, manifest] of Object.entries(targets)) {
   cpSync('dist/common', out, { recursive: true })
   writeFileSync(`${out}/manifest.json`, `${JSON.stringify(manifest, null, 2)}\n`)
   rmSync(`dist/nodkey-${name}-${pkg.version}.zip`, { force: true })
-  execFileSync('zip', ['-qr', `../nodkey-${name}-${pkg.version}.zip`, '.'], { cwd: out })
+  // Safari ships inside the Mac app, so it gets no zip.
+  if (name !== 'safari') {
+    execFileSync('zip', ['-qr', `../nodkey-${name}-${pkg.version}.zip`, '.'], { cwd: out })
+  }
 }
-console.log(`built dist/chromium and dist/firefox (${pkg.version})`)
+console.log(`built dist/chromium, dist/firefox and dist/safari (${pkg.version})`)
 if (watch) {
   console.log('watching: npx vite build --watch')
   run('npx', ['vite', 'build', '--watch', '--outDir', 'dist/chromium', '--emptyOutDir', 'false'])

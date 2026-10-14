@@ -86,6 +86,7 @@
   "optSiteAccess": "Accès aux sites web",
   "optSiteAccessHelp": "Nodkey a besoin d’accéder aux sites web pour afficher son bouton dans les champs de connexion et les remplir.",
   "optSiteAccessGrant": "Autoriser sur tous les sites",
+  "optSiteAccessSafari": "Dans Safari, cliquez sur Nodkey dans la barre d’outils et choisissez « Toujours autoriser sur tous les sites web ». Ou ouvrez Réglages de Safari, Extensions, Nodkey, Modifier les sites web.",
   "optSiteAccessOk": "Nodkey peut fonctionner sur tous les sites.",
   "optAdvanced": "Avancé",
   "optRelay": "Adresse du relais",

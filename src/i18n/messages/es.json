@@ -86,6 +86,7 @@
   "optSiteAccess": "Acceso a sitios web",
   "optSiteAccessHelp": "Nodkey necesita acceso a los sitios web para mostrar su botón en los campos de inicio de sesión y rellenarlos.",
   "optSiteAccessGrant": "Permitir en todos los sitios",
+  "optSiteAccessSafari": "En Safari, haz clic en Nodkey en la barra de herramientas y elige “Permitir siempre en todos los sitios web”. O abre Ajustes de Safari, Extensiones, Nodkey, Editar sitios web.",
   "optSiteAccessOk": "Nodkey puede funcionar en todos los sitios.",
   "optAdvanced": "Avanzado",
   "optRelay": "Dirección del relé",

@@ -1,0 +1,580 @@
+{
+  "sourceLanguage": "en",
+  "strings": {
+    "Nodkey for Safari": {
+      "shouldTranslate": false
+    },
+    "Sign in with logins, codes and passkeys from Nodkey on your iPhone. You approve every request with Face ID.": {
+      "comment": "Machine translation; needs native review before a store release.",
+      "localizations": {
+        "nb": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Logg inn med innlogginger, koder og passnøkler fra Nodkey på iPhonen din. Du godkjenner hver forespørsel med Face ID."
+          }
+        },
+        "sv": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Logga in med inloggningar, koder och nycklar från Nodkey på din iPhone. Du godkänner varje begäran med Face ID."
+          }
+        },
+        "da": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Log ind med logins, koder og adgangsnøgler fra Nodkey på din iPhone. Du godkender hver anmodning med Face ID."
+          }
+        },
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Melde dich mit Logins, Codes und Passkeys aus Nodkey auf deinem iPhone an. Du bestätigst jede Anfrage mit Face ID."
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Inicia sesión con accesos, códigos y llaves de acceso de Nodkey en tu iPhone. Apruebas cada solicitud con Face ID."
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Connectez-vous avec les identifiants, codes et clés d’identification de Nodkey sur votre iPhone. Vous approuvez chaque demande avec Face ID."
+          }
+        },
+        "it": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Accedi con credenziali, codici e passkey di Nodkey sul tuo iPhone. Approvi ogni richiesta con Face ID."
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Entre com logins, códigos e chaves-senha do Nodkey no seu iPhone. Você aprova cada pedido com o Face ID."
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "iPhoneのNodkeyにあるログイン情報、コード、パスキーでサインインします。すべてのリクエストはFace IDで承認します。"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "iPhone의 Nodkey에 있는 로그인 정보, 코드, 패스키로 로그인하세요. 모든 요청은 Face ID로 승인합니다."
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "使用 iPhone 上 Nodkey 中的登录信息、验证码和通行密钥登录。每个请求都由你用面容 ID 批准。"
+          }
+        }
+      }
+    },
+    "Nodkey is on in Safari.": {
+      "comment": "Machine translation; needs native review before a store release.",
+      "localizations": {
+        "nb": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Nodkey er på i Safari."
+          }
+        },
+        "sv": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Nodkey är på i Safari."
+          }
+        },
+        "da": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Nodkey er slået til i Safari."
+          }
+        },
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Nodkey ist in Safari aktiviert."
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Nodkey está activado en Safari."
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Nodkey est activé dans Safari."
+          }
+        },
+        "it": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Nodkey è attivo in Safari."
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "O Nodkey está ativado no Safari."
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "SafariでNodkeyはオンです。"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Safari에서 Nodkey가 켜져 있습니다."
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Nodkey 已在 Safari 中开启。"
+          }
+        }
+      }
+    },
+    "Nodkey is off in Safari.": {
+      "comment": "Machine translation; needs native review before a store release.",
+      "localizations": {
+        "nb": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Nodkey er av i Safari."
+          }
+        },
+        "sv": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Nodkey är av i Safari."
+          }
+        },
+        "da": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Nodkey er slået fra i Safari."
+          }
+        },
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Nodkey ist in Safari deaktiviert."
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Nodkey está desactivado en Safari."
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Nodkey est désactivé dans Safari."
+          }
+        },
+        "it": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Nodkey non è attivo in Safari."
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "O Nodkey está desativado no Safari."
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "SafariでNodkeyはオフです。"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Safari에서 Nodkey가 꺼져 있습니다."
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Nodkey 已在 Safari 中关闭。"
+          }
+        }
+      }
+    },
+    "Turn on Nodkey in Safari Settings, under Extensions.": {
+      "comment": "Machine translation; needs native review before a store release.",
+      "localizations": {
+        "nb": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Slå på Nodkey i Safari-innstillingene, under Utvidelser."
+          }
+        },
+        "sv": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Slå på Nodkey i Safaris inställningar, under Tillägg."
+          }
+        },
+        "da": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Slå Nodkey til i Safaris indstillinger under Udvidelser."
+          }
+        },
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Aktiviere Nodkey in den Safari-Einstellungen unter „Erweiterungen“."
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Activa Nodkey en los ajustes de Safari, en Extensiones."
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Activez Nodkey dans les réglages de Safari, sous Extensions."
+          }
+        },
+        "it": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Attiva Nodkey nelle impostazioni di Safari, in Estensioni."
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Ative o Nodkey nos ajustes do Safari, em Extensões."
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Safariの設定の「機能拡張」でNodkeyをオンにします。"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Safari 설정의 확장 프로그램에서 Nodkey를 켜세요."
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "在 Safari 设置的“扩展”中开启 Nodkey。"
+          }
+        }
+      }
+    },
+    "Allow Nodkey on all websites, so that it can fill in sign-in fields.": {
+      "comment": "Machine translation; needs native review before a store release.",
+      "localizations": {
+        "nb": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Tillat Nodkey på alle nettsteder, så den kan fylle ut innloggingsfelt."
+          }
+        },
+        "sv": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Tillåt Nodkey på alla webbplatser så att den kan fylla i inloggningsfält."
+          }
+        },
+        "da": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Tillad Nodkey på alle websteder, så den kan udfylde loginfelter."
+          }
+        },
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Erlaube Nodkey auf allen Websites, damit es Anmeldefelder ausfüllen kann."
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Permite Nodkey en todos los sitios web para que pueda rellenar los campos de inicio de sesión."
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Autorisez Nodkey sur tous les sites web pour qu’il puisse remplir les champs de connexion."
+          }
+        },
+        "it": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Consenti Nodkey su tutti i siti web, così può compilare i campi di accesso."
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Permita o Nodkey em todos os sites para que ele preencha os campos de login."
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "サインイン欄に入力できるよう、すべてのWebサイトでNodkeyを許可します。"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "로그인 칸을 채울 수 있도록 모든 웹사이트에서 Nodkey를 허용하세요."
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "在所有网站上允许 Nodkey，以便它填写登录字段。"
+          }
+        }
+      }
+    },
+    "Click Nodkey in the Safari toolbar and pair it with Nodkey on your iPhone.": {
+      "comment": "Machine translation; needs native review before a store release.",
+      "localizations": {
+        "nb": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Klikk på Nodkey i verktøylinjen i Safari og koble den til Nodkey på iPhonen din."
+          }
+        },
+        "sv": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Klicka på Nodkey i Safaris verktygsfält och parkoppla det med Nodkey på din iPhone."
+          }
+        },
+        "da": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Klik på Nodkey i Safaris værktøjslinje, og par den med Nodkey på din iPhone."
+          }
+        },
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Klicke in der Safari-Symbolleiste auf Nodkey und kopple es mit Nodkey auf deinem iPhone."
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Haz clic en Nodkey en la barra de herramientas de Safari y vincúlalo con Nodkey en tu iPhone."
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Cliquez sur Nodkey dans la barre d’outils de Safari et associez-le à Nodkey sur votre iPhone."
+          }
+        },
+        "it": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Fai clic su Nodkey nella barra degli strumenti di Safari e abbinalo a Nodkey sul tuo iPhone."
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Clique no Nodkey na barra de ferramentas do Safari e emparelhe-o com o Nodkey no seu iPhone."
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Safariのツールバーで「Nodkey」をクリックし、iPhoneのNodkeyとペアリングします。"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Safari 도구 막대에서 Nodkey를 클릭하고 iPhone의 Nodkey와 페어링하세요."
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "在 Safari 工具栏中点按 Nodkey，并将其与 iPhone 上的 Nodkey 配对。"
+          }
+        }
+      }
+    },
+    "Open Safari Settings": {
+      "comment": "Machine translation; needs native review before a store release.",
+      "localizations": {
+        "nb": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Åpne Safari-innstillinger"
+          }
+        },
+        "sv": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Öppna Safaris inställningar"
+          }
+        },
+        "da": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Åbn Safaris indstillinger"
+          }
+        },
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Safari-Einstellungen öffnen"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Abrir ajustes de Safari"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Ouvrir les réglages de Safari"
+          }
+        },
+        "it": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Apri impostazioni di Safari"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Abrir ajustes do Safari"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Safariの設定を開く"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Safari 설정 열기"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "打开 Safari 设置"
+          }
+        }
+      }
+    },
+    "Get Nodkey for iPhone": {
+      "comment": "Machine translation; needs native review before a store release.",
+      "localizations": {
+        "nb": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Last ned Nodkey for iPhone"
+          }
+        },
+        "sv": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Hämta Nodkey för iPhone"
+          }
+        },
+        "da": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Hent Nodkey til iPhone"
+          }
+        },
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Nodkey für iPhone laden"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Obtener Nodkey para iPhone"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Obtenir Nodkey pour iPhone"
+          }
+        },
+        "it": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Scarica Nodkey per iPhone"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Obter o Nodkey para iPhone"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "iPhone版Nodkeyを入手"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "iPhone용 Nodkey 받기"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "获取 iPhone 版 Nodkey"
+          }
+        }
+      }
+    },
+    "%lld": {
+      "shouldTranslate": false
+    }
+  },
+  "version": "1.0"
+}

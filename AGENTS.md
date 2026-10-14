@@ -1,6 +1,6 @@
 # Nodkey browser extension: agent rules
 
-The Nodkey extension for Firefox and Chromium. It asks Nodkey on the person's
+The Nodkey extension for Firefox and Chromium (Safari is paused, ADR-0008). It asks Nodkey on the person's
 iPhone for one login or one code, fills it into the page, and offers to save a
 new login. Read `docs/adr/README.md` before you change behavior. The protocol is
 `docs/agent-protocol.md` in `peters/nodkey-cli`; the iOS app and the relay are in
@@ -21,6 +21,7 @@ Shared company rules apply: `fintermobilityas/company` (checkout `~/github/compa
   root UI. One classic script.
 - `src/app/`, `src/features/`, `src/components/`: popup and options page (Vue 3).
 - `src/i18n/messages/<lang>.json`: the twelve languages of the iPhone app.
+- `safari/`: the Mac app that carries the extension into Safari (xcodegen, ADR-0008).
 - `tests/unit/`: tests that run the real background against the fake phone.
 - `tests/e2e/`: the real-browser run (`docs/features/browser-e2e.md`).
 - `docs/features/`: the visual test procedures (ASD-STE100). Do the ones that a change
@@ -33,7 +34,8 @@ Shared company rules apply: `fintermobilityas/company` (checkout `~/github/compa
 | `npm ci` | Install (Node 24.21, see `.nvmrc`) |
 | `npm run wasm` | Build the WebAssembly module into `src/wasm` (needs `wasm-bindgen-cli` with the version in `Cargo.lock`) |
 | `npm run validate` | Lint, format check, type checks, tests and build |
-| `npm run build` | `dist/chromium`, `dist/firefox` and a zip of each |
+| `npm run build` | `dist/chromium`, `dist/firefox` and a zip of each; `dist/safari` for the Mac app |
+| `scripts/safari.sh` | Build, sign and install the Safari Mac app on the Mac build host (after `npm run build`) |
 | `npm run e2e -- --keep` | Real Chromium and Firefox on an isolated desktop |
 | `cargo test` | The WebAssembly crate's tests (native) |
 | `scripts/icons.sh` | Render the toolbar icons from `public/icons/logo.svg` (cairosvg) |

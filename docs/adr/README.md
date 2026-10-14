@@ -12,6 +12,7 @@ does. Each record uses ASD-STE100 Simplified Technical English (STE).
 | [ADR-0005](0005-save-with-sealed-password.md) | Seal the password of a save at once | Accepted |
 | [ADR-0006](0006-tests-in-real-browsers.md) | Test the extension in real browsers on an isolated desktop | Accepted |
 | [ADR-0007](0007-passkey-bridge.md) | Answer the passkey requests of pages with passkeys from the phone | Accepted |
+| [ADR-0008](0008-safari-mac-app.md) | Carry the extension into Safari with a small Mac app | Accepted (paused) |
 
 ## Template
 

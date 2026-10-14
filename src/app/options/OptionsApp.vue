@@ -12,8 +12,11 @@ import { useStatus } from '../../composables/useStatus'
 import { t } from '../../i18n/t'
 import type { Settings } from '../../models/messages'
 import { call } from '../../services/background'
+import { browserInfo } from '../../utils/browser'
 
 const { status, error, reload } = useStatus(() => undefined)
+// Safari grants website access in its own settings: permissions.request shows nothing there.
+const safari = browserInfo(navigator.userAgent).browser === 'Safari'
 type Section = 'name' | 'phone' | 'requests' | 'saving' | 'relay'
 
 const name = ref('')
@@ -85,7 +88,8 @@ function saveRelay() {
 
       <NkCard v-if="!status.siteAccess" :label="t('optSiteAccess')" :tile="2">
         <p>{{ t('optSiteAccessHelp') }}</p>
-        <NkButton @click="grantAccess">{{ t('optSiteAccessGrant') }}</NkButton>
+        <p v-if="safari" data-testid="site-access-safari">{{ t('optSiteAccessSafari') }}</p>
+        <NkButton v-else @click="grantAccess">{{ t('optSiteAccessGrant') }}</NkButton>
       </NkCard>
 
       <NkCard :label="t('optBrowser')">
