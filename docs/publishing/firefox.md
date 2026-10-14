@@ -83,7 +83,8 @@ only for a new account.
 9. Install it: open the `.xpi` file in Firefox and click "Add".
 
    Result: Firefox shows what the extension collects (authentication
-   information, website activity, website content) and adds Nodkey. It stays
+   information, financial and payment information, website activity, website
+   content) and adds Nodkey. It stays
    after a restart.
 
 10. Test the signed file before you give it to anyone:
