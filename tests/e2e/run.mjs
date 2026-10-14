@@ -307,11 +307,20 @@ async function chromium(env, site, relay) {
 
 async function firefox(env) {
   mkdirSync(state, { recursive: true })
+  const profile = join(state, 'firefox-profile')
+  // NODKEY_E2E_FIREFOX_XPI: test a signed package as Firefox installs it. Firefox then checks
+  // Mozilla's signature and refuses the extension without it.
+  const xpi = process.env.NODKEY_E2E_FIREFOX_XPI
+  if (xpi) {
+    mkdirSync(join(profile, 'extensions'), { recursive: true })
+    cpSync(xpi, join(profile, 'extensions', 'nodkey@kh-labs.dev.xpi'))
+    log('Firefox', `installs the signed package ${xpi}`)
+  }
   const browser = await puppeteer.launch({
     browser: 'firefox',
     executablePath: process.env.NODKEY_E2E_FIREFOX ?? '/usr/bin/firefox',
     headless: false,
-    userDataDir: join(state, 'firefox-profile'),
+    userDataDir: profile,
     defaultViewport: null,
     env,
     args: ['--window-size=800,1000'],
@@ -321,10 +330,17 @@ async function firefox(env) {
       'signon.rememberSignons': false,
       // Never reach the real relay from a test: it resolves to this computer, where nothing answers.
       'network.dns.localDomains': 'relay.nodkey.app',
+      ...(xpi
+        ? {
+            'extensions.autoDisableScopes': 0,
+            'extensions.enabledScopes': 15,
+            'xpinstall.signatures.required': true,
+          }
+        : {}),
     },
   })
   // The extension opens its settings page on install; the pairing there is done by hand.
-  await browser.installExtension(join(root, 'dist/firefox'))
+  if (!xpi) await browser.installExtension(join(root, 'dist/firefox'))
   return { browser, base: `moz-extension://${FIREFOX_UUID}` }
 }
 
