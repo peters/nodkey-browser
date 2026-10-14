@@ -1,10 +1,14 @@
 // A synthetic test site with the forms Nodkey fills: a sign-in, a one-time code page, a row of
-// code boxes, a sign-up, and a passkey page whose server checks the passkeys as a real website
+// code boxes, a sign-up, a checkout with card fields, and a passkey page whose server checks the passkeys as a real website
 // does. Invented data only.
 import { createServer } from 'node:http'
 import { relyingParty } from './webauthn.mjs'
 
-const page = (title, body) => `<!doctype html><html lang="en"><head><meta charset="utf-8">
+const page = (
+  title,
+  body,
+  lang = 'en',
+) => `<!doctype html><html lang="${lang}"><head><meta charset="utf-8">
 <title>${title}</title><style>
 body{font:16px system-ui;margin:40px;max-width:520px}label{display:block;margin:14px 0 4px}
 input{font:inherit;padding:10px;width:100%;box-sizing:border-box}button{font:inherit;margin-top:18px;padding:10px 18px}
@@ -92,6 +96,24 @@ const PAGES = {
     <button id="create">Create account</button></form>`,
   ),
   '/welcome': page('Welcome', '<p>You are signed in to the test site.</p>'),
+  // A checkout in Norwegian ("kr" is NOK): the total, a button that raises it, and card fields.
+  '/checkout': page(
+    'Kasse',
+    `<div id="order"><div class="line"><span>USB-C-kabel 2 m</span> <span>399,00 kr</span></div>
+    <div class="line"><span>Frakt</span> <span>100,00 kr</span></div>
+    <div class="line"><span>Totalt</span> <strong id="total">499,00 kr</strong></div></div>
+    <button type="button" id="gift">Legg til gavepapir (+100 kr)</button>
+    <form method="post" action="/paid">
+    <label for="cc-number">Kortnummer</label><input id="cc-number" autocomplete="cc-number" inputmode="numeric">
+    <label for="cc-exp">Utløper</label><input id="cc-exp" autocomplete="cc-exp" placeholder="MM/ÅÅ" maxlength="5">
+    <label for="cc-csc">CVC</label><input id="cc-csc" autocomplete="cc-csc" maxlength="4">
+    <label for="cc-name">Navn på kortet</label><input id="cc-name" autocomplete="cc-name">
+    <button id="pay">Betal</button></form>
+    <script>document.getElementById('gift').addEventListener('click', () => {
+      document.getElementById('total').textContent = '599,00 kr' })</script>`,
+    'nb',
+  ),
+  '/paid': page('Takk', '<p>Bestillingen er sendt. Testdata, ingen ekte betaling.</p>', 'nb'),
   '/passkey': page(
     'Passkeys',
     `<label for="email">E-mail</label><input id="email" value="alex@example.com" autocomplete="username webauthn">

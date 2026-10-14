@@ -19,6 +19,7 @@ and it needs the owner.
 | [Fill a code](fill-code.md) | One code field and a row of six boxes | All |
 | [Save a new login](save-login.md) | The save question, Save, and the sealed password | All |
 | [Passkeys](passkeys.md) | Create a passkey and sign in with it; the server examines the signature | All |
+| [Pay with a card](fill-card.md) | Fill a test card for the total on the page, clear it when the total goes up, save a typed card | All |
 | [Refusals](refusals.md) | Denied, paused and no answer | None |
 | [Pages without HTTPS](insecure-pages.md) | No fill on HTTP pages on the internet | None |
 | [Settings page](settings-page.md) | Name, phone, requests, saving and relay settings | None |

@@ -36,6 +36,12 @@ your phone, and nothing leaves it until you approve with Face ID.
 - **Use passkeys.** When a website asks for a passkey, Nodkey asks your iPhone.
   You approve with Face ID and the iPhone signs. The passkey never leaves your
   iPhone. Turn this off in the settings to use the passkeys of the browser.
+- **Pay with a card.** In a card field at checkout, click the Nodkey button.
+  Nodkey reads the total from the page and shows it. Your iPhone shows the shop
+  and the amount, and you approve with Face ID each time. The card is filled in
+  only if the total is still the same, and it leaves the fields again if the
+  total goes up. Nodkey never clicks Pay. A card you type yourself can be saved
+  in Nodkey.
 - **See what you approve.** The notification on your iPhone can show a picture
   of the page. It is encrypted so that only your iPhone can see it.
 - **Save new passwords.** When you sign up or change a password, the extension

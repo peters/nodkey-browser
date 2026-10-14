@@ -42,3 +42,24 @@ export function failed(e: unknown): Shown {
   const text = e instanceof Error ? e.message : String(e)
   return { state: 'error', message: t('actError', text) }
 }
+
+/** The text for a card request that did not get an approval. */
+export function cardRefusal(answer: Answer | null): Shown {
+  if (!answer || answer.decision === 'expired')
+    return { state: 'expired', message: t('actExpired') }
+  const byError: Partial<Record<string, Shown>> = {
+    paused: { state: 'denied', message: t('actPaused') },
+    unsupported_version: { state: 'error', message: t('actOldProtocol') },
+    unsupported_kind: { state: 'error', message: t('actOldProtocol') },
+    cards_off: { state: 'denied', message: t('cardOff') },
+    no_card: { state: 'denied', message: t('cardNone') },
+    over_limit: { state: 'denied', message: t('cardOverLimit') },
+    total_mismatch: { state: 'denied', message: t('cardTotalHigher') },
+    amount_missing: { state: 'error', message: t('cardBadRequest') },
+    bad_card_request: { state: 'error', message: t('cardBadRequest') },
+  }
+  const known = answer.error === undefined ? undefined : byError[answer.error]
+  if (known) return known
+  if (answer.decision === 'approved') return { state: 'error', message: t('cardBadRequest') }
+  return { state: 'denied', message: t('cardDenied') }
+}

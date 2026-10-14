@@ -4,8 +4,9 @@
  * scripts cannot reach in.
  */
 
-import type { Activity, SaveOffer } from '../models/messages'
+import type { Activity, CardOffer, SaveOffer } from '../models/messages'
 import { t } from '../i18n/t'
+import { type PayChoice, type PayView, buildPayCard, payCss } from './payui'
 
 const LOGO = `<svg viewBox="0 0 64 64" aria-hidden="true" focusable="false"><g transform="rotate(-20 32 32)"><rect x="30" y="27.5" width="25" height="9" rx="4.5" fill="currentColor"/><rect x="45" y="33" width="6" height="10" rx="3" fill="currentColor"/><circle cx="23" cy="32" r="13" fill="#ff7a59"/><path d="M17 32.5l4.2 4.2 8-8.4" fill="none" stroke="#fff" stroke-width="3.6" stroke-linecap="round" stroke-linejoin="round"/></g></svg>`
 
@@ -58,6 +59,7 @@ button.close {
 }
 .error .text { color: var(--low); }
 @keyframes spin { to { transform: rotate(360deg); } }
+${payCss}
 @media (prefers-reduced-motion: reduce) { .spinner { animation: none; border-top-color: var(--accent); } }
 `
 
@@ -83,6 +85,7 @@ export class PageUi {
     document.documentElement.append(host)
     const place = () => {
       this.placeKey()
+      this.placeRing()
     }
     window.addEventListener('scroll', place, { passive: true, capture: true })
     window.addEventListener('resize', place, { passive: true })
@@ -92,14 +95,14 @@ export class PageUi {
    * Shows the Nodkey button inside the right edge of `anchor` (the field itself), or just right of
    * it when it is too narrow, as one box of a row of code boxes is.
    */
-  showKey(field: HTMLInputElement, anchor: HTMLElement = field): void {
+  showKey(field: HTMLInputElement, anchor: HTMLElement = field, label = t('fieldButton')): void {
     if (!this.key) {
       const key = document.createElement('button')
       key.type = 'button'
       key.className = 'key'
       key.innerHTML = LOGO
-      key.title = t('fieldButton')
-      key.setAttribute('aria-label', t('fieldButton'))
+      key.title = label
+      key.setAttribute('aria-label', label)
       // Keep the field focused while the button is pressed.
       key.addEventListener('mousedown', (e) => {
         e.preventDefault()
@@ -110,6 +113,8 @@ export class PageUi {
       this.root.append(key)
       this.key = key
     }
+    this.key.title = label
+    this.key.setAttribute('aria-label', label)
     this.keyTarget = field
     this.keyAnchor = anchor
     this.key.hidden = false
@@ -172,6 +177,58 @@ export class PageUi {
   closeCard(): void {
     this.card?.remove()
     this.card = null
+    this.mark?.remove()
+    this.mark = null
+    this.markTarget = null
+  }
+
+  private mark: HTMLDivElement | null = null
+  private markTarget: HTMLElement | null = null
+
+  /** Draws a ring around the total Nodkey read, in its own layer (the page is not changed). */
+  private pointAt(el: HTMLElement | null): void {
+    this.markTarget = el
+    if (!el) return
+    this.mark ??= document.createElement('div')
+    this.mark.className = 'ring'
+    this.root.append(this.mark)
+    this.placeRing()
+  }
+
+  private placeRing(): void {
+    if (!this.mark || !this.markTarget) return
+    const r = this.markTarget.getBoundingClientRect()
+    Object.assign(this.mark.style, {
+      left: `${r.left - 4}px`,
+      top: `${r.top - 4}px`,
+      width: `${r.width + 8}px`,
+      height: `${r.height + 8}px`,
+    })
+  }
+
+  /** The payment card: the amount, where it comes from, and "Approve on iPhone". */
+  showPay(view: PayView, choose: (choice: PayChoice) => void): void {
+    const card = this.newCard(t('cardPayTitle', view.shown ?? ''))
+    card.setAttribute('role', 'dialog')
+    const focus = buildPayCard(card, view, (choice) => {
+      this.closeCard()
+      choose(choice)
+    })
+    this.pointAt(view.totalElement)
+    focus.focus({ preventScroll: true })
+  }
+
+  /** Asks whether to save the card the person just used. */
+  askSaveCard(offer: CardOffer, name: string, answer: (c: 'save' | 'later' | 'never') => void) {
+    this.askSave(
+      { site: offer.site, username: '' },
+      answer,
+      t('cardSaveAsk', name),
+      t(
+        'cardSaveExpiry',
+        `${String(offer.exp_month).padStart(2, '0')}/${String(offer.exp_year % 100).padStart(2, '0')}`,
+      ),
+    )
   }
 
   /** The state of the latest request for this page. */
@@ -204,15 +261,20 @@ export class PageUi {
   }
 
   /** Asks whether to save the login the person just used. */
-  askSave(offer: SaveOffer, answer: (choice: 'save' | 'later' | 'never') => void): void {
-    const card = this.newCard(t('saveAsk', offer.site))
+  askSave(
+    offer: Pick<SaveOffer, 'site' | 'username'>,
+    answer: (choice: 'save' | 'later' | 'never') => void,
+    ask = t('saveAsk', offer.site),
+    detail = offer.username,
+  ): void {
+    const card = this.newCard(ask)
     card.setAttribute('role', 'dialog')
     const question = document.createElement('p')
     question.className = 'text'
-    question.textContent = t('saveAsk', offer.site)
+    question.textContent = ask
     const user = document.createElement('p')
     user.className = 'muted'
-    user.textContent = offer.username
+    user.textContent = detail
     const row = document.createElement('div')
     row.className = 'row'
     const button = (label: string, cls: string, choice: 'save' | 'later' | 'never') => {

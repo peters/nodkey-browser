@@ -6,6 +6,7 @@
 
 import {
   type Activity,
+  type CardOffer,
   DEFAULT_SETTINGS,
   type PairingState,
   type SaveOffer,
@@ -125,4 +126,15 @@ export async function usernameHint(tabId: number): Promise<UsernameHint | null> 
 
 export async function setUsernameHint(tabId: number, h: UsernameHint): Promise<void> {
   await chrome.storage.session.set({ [`username:${tabId}`]: h })
+}
+
+/** The card save offer for a tab (its number and CVC sealed to the phone), for a few minutes. */
+export async function cardOffer(tabId: number): Promise<CardOffer | null> {
+  const o = await getSession<CardOffer>(`cardOffer:${tabId}`)
+  return o && Date.now() - o.at < 5 * 60_000 ? o : null
+}
+
+export async function setCardOffer(tabId: number, o: CardOffer | null): Promise<void> {
+  if (o) await chrome.storage.session.set({ [`cardOffer:${tabId}`]: o })
+  else await chrome.storage.session.remove(`cardOffer:${tabId}`)
 }

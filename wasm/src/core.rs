@@ -10,9 +10,9 @@
 //! `wasm32-unknown-unknown`.
 
 use nodkey_proto::{
-    AttachmentInfo, ClientInfo, ImageType, Kind, PairingClaimed, PasskeyAnswer, PasskeyOp,
-    PasskeyRequest, PublicKeys, Purpose, Request, SaveLogin, SealedBox, VERSION, auth, b64u, check,
-    client, code, dh, passkey, webauthn,
+    AttachmentInfo, CardRequest, ClientInfo, ImageType, Kind, PairingClaimed, PasskeyAnswer,
+    PasskeyOp, PasskeyRequest, PublicKeys, Purpose, Request, SaveCard, SaveLogin, SealedBox,
+    VERSION, auth, b64u, check, client, code, dh, passkey, webauthn,
 };
 use serde::{Deserialize, Serialize};
 use zeroize::Zeroizing;
@@ -106,6 +106,10 @@ struct Draft {
     #[serde(default)]
     passkey: Option<PasskeyRequest>,
     #[serde(default)]
+    card: Option<CardRequest>,
+    #[serde(default)]
+    save_card: Option<SaveCard>,
+    #[serde(default)]
     client: Option<ClientInfo>,
 }
 
@@ -116,7 +120,7 @@ struct Sealed {
 }
 
 /// Checks and seals a request to the phone. `draft_json` is
-/// `{kind, target, reason, agent, attachment?, save?, passkey?, client?}`; returns
+/// `{kind, target, reason, agent, attachment?, save?, passkey?, card?, save_card?, client?}`; returns
 /// `{request_id, envelope}` where `envelope` is the body of `POST /v1/phones/{id}/requests`.
 pub fn seal_request(
     draft_json: &str,
@@ -137,6 +141,9 @@ pub fn seal_request(
         filter: None,
         save: d.save,
         passkey: d.passkey,
+        bundle: None,
+        card: d.card,
+        save_card: d.save_card,
         client: d.client.map(ClientInfo::tidy),
     };
     client::check_request(&request)?;
@@ -268,6 +275,8 @@ pub fn open_grant(
     })
     .map_err(js)
 }
+
+pub mod cards;
 
 #[cfg(test)]
 mod tests;

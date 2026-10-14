@@ -3,8 +3,10 @@
  * the phone sent, and notices a submitted login so the person can save it in Nodkey.
  */
 
-import type { Reply, SaveOffer, ToBackground, ToContent } from '../models/messages'
+import type { CardOffer, Reply, SaveOffer, ToBackground, ToContent } from '../models/messages'
+import { t } from '../i18n/t'
 import { belongsTo, mayFill } from '../utils/site'
+import { askCardSave, cardFill, cardSubmitted, isCardField, startPay } from './pay'
 import { fillCode, setValue } from './fill'
 import { findLogin, findOtp, isOtpField, submission } from './forms'
 import { PageUi } from './ui'
@@ -13,6 +15,10 @@ let ui: PageUi | null = null
 
 function page(): PageUi {
   ui ??= new PageUi((field) => {
+    if (isCardField(field)) {
+      startPay(field, page(), send)
+      return
+    }
     void send({ type: isOtpField(field) || boxRow(field) ? 'fill.code' : 'fill.login' })
   })
   return ui
@@ -45,7 +51,9 @@ function isLoginField(el: EventTarget | null): el is HTMLInputElement {
 document.addEventListener(
   'focusin',
   (e) => {
-    if (isLoginField(e.target) && mayFill(location.href)) {
+    if (isCardField(e.target) && mayFill(location.href)) {
+      page().showKey(e.target, e.target, t('cardButton'))
+    } else if (isLoginField(e.target) && mayFill(location.href)) {
       page().showKey(e.target, boxRow(e.target)?.at(-1) ?? e.target)
     }
   },
@@ -57,7 +65,8 @@ document.addEventListener(
   () => {
     // Later, so a click on the button still finds its field.
     window.setTimeout(() => {
-      if (!isLoginField(document.activeElement)) ui?.hideKey()
+      const active = document.activeElement
+      if (!isLoginField(active) && !isCardField(active)) ui?.hideKey()
     }, 250)
   },
   true,
@@ -92,6 +101,10 @@ chrome.runtime.onMessage.addListener((msg: ToContent, sender, sendResponse) => {
     sendResponse(true)
     return false
   }
+  if (msg.type === 'card.fill') {
+    sendResponse(cardFill(msg, send))
+    return false
+  }
   if (msg.type === 'activity') page().showActivity(msg.activity)
   if (msg.type === 'save.prompt') ask(msg.offer)
   return false
@@ -107,7 +120,12 @@ function ask(offer: SaveOffer): void {
 async function offerSave(): Promise<void> {
   if (window !== window.top) return
   const offer = await send<SaveOffer | null>({ type: 'save.offer' })
-  if (offer) ask(offer)
+  if (offer) {
+    ask(offer)
+    return
+  }
+  const card = await send<CardOffer | null>({ type: 'card.offer' })
+  if (card) askCardSave(card, page(), send)
 }
 
 let lastSubmit = 0
@@ -116,6 +134,11 @@ let lastSubmit = 0
 function submitted(scope: ParentNode): void {
   const now = Date.now()
   if (now - lastSubmit < 1000) return
+  if (cardSubmitted(scope, send)) {
+    lastSubmit = now
+    window.setTimeout(() => void offerSave(), 1500)
+    return
+  }
   const found = submission(scope)
   if (!found) return
   lastSubmit = now

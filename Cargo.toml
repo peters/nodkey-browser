@@ -14,8 +14,8 @@ publish = false
 [workspace.dependencies]
 # The protocol and the agent's side of it live in nodkey-cli; this repository depends on them by
 # revision. Move the revision forward to take a protocol change.
-nodkey-proto = { git = "https://github.com/peters/nodkey-cli", rev = "e9132e8c8c36294299a685729d011e8dd70a2067" }
-nodkey-fake-relay = { git = "https://github.com/peters/nodkey-cli", rev = "e9132e8c8c36294299a685729d011e8dd70a2067" }
+nodkey-proto = { git = "https://github.com/peters/nodkey-cli", rev = "845ebea8d92800f2831c39f44ddc99e1d9c2ae82" }
+nodkey-fake-relay = { git = "https://github.com/peters/nodkey-cli", rev = "845ebea8d92800f2831c39f44ddc99e1d9c2ae82" }
 
 [profile.release]
 lto = "fat"
