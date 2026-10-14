@@ -67,9 +67,12 @@ Status on 2026-10-14: no developer account and no item yet.
    - Remote code: "No, I am not using remote code". The WebAssembly is in the
      package.
    - Data usage: select "Authentication information", "Financial and payment
-     information" (card fill, from 0.2.0) and "Website content".
-     Ask the owner if "Web history" also applies (each request names the site
-     of the current page). Select the three certifications.
+     information" (card fill, from 0.2.0), "Web history" and "Website content".
+     "Web history" applies because each request sends the site of the current
+     page to the iPhone, end-to-end encrypted, only when the person asks for a
+     login, a code, a card or a passkey. Firefox declares the same as
+     `websiteActivity`. The owner decided this on 2026-10-14. Select the three
+     certifications.
    - Privacy policy: `https://kh-labs.dev/nodkey/#privacy`. Make sure that it
      tells about the browser extension.
 
