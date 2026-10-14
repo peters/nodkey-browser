@@ -45,8 +45,9 @@ Status on 2026-10-14: no developer account and no item yet.
    - Language: English. The extension has twelve languages; the store takes
      the name and description from `_locales`.
    - Store icon: 128×128 PNG, `public/icons/icon-128.png`.
-   - Screenshots: `01-sign-in.png` to `05-one-place.png` (1280×800) from the
-     folder of each language.
+   - Screenshots: the five PNG files `01-sign-in`, `02-codes`, `06-cards`,
+     `04-passkeys` and `05-one-place` (1280×800) from the folder of each
+     language, in that order.
    - Small promo tile: `promo-440x280.png`. Marquee (optional):
      `marquee-1400x560.png`.
    - Official URL and support URL: `https://kh-labs.dev/nodkey/`.

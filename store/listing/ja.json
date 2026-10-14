@@ -4,7 +4,7 @@
   "amoLocale": "ja",
   "name": "Nodkey",
   "summary": "iPhone の Nodkey にあるログイン情報とコードでサインインします。リクエストはすべて Face ID で承認します。",
-  "description": "Nodkey は、パスワード、2 段階認証コード、パスキーを 1 か所にまとめます。iPhone の Nodkey の中、Face ID の向こう側です。この拡張機能を使うと Firefox や Chrome からそれらを使えます。ブラウザには何も保存しません。\n\niPHONE からサインイン\nサインイン欄の Nodkey ボタンをクリックします。iPhone にサイト名とページの画像が表示され、Face ID で承認します。拡張機能がユーザ名とパスワードを入力します。\n\n2 段階認証コード\nコード欄でも同じです。1 桁ずつ欄が分かれているページにも対応します。\n\n新しいパスワードは iPHONE へ\nアカウント作成やパスワード変更の時に、Nodkey への保存を提案します。パスワードはすぐに iPhone だけが読める形で暗号化されます。\n\nパスキー\nサイトがパスキーを求めると、iPhone が署名します。パスキーが iPhone から出ることはありません。\n\nプライバシーを最優先に\n• ブラウザには何も保存しません：パスワードもコードも\n• ブラウザと iPhone の間はエンドツーエンドで暗号化。中継サーバは何も読めません\n• 拡張機能の鍵はブラウザの外にコピーできません\n• 無料。アカウント、広告、トラッキングなし\n• オープンソース (MIT)：github.com/peters/nodkey-browser\n\nNodkey (App Store で無料) を入れた iPhone が必要です。",
+  "description": "Nodkey は、パスワード、2 段階認証コード、パスキーを 1 か所にまとめます。iPhone の Nodkey の中、Face ID の向こう側です。この拡張機能を使うと Firefox や Chrome からそれらを使えます。ブラウザには何も保存しません。\n\niPHONE からサインイン\nサインイン欄の Nodkey ボタンをクリックします。iPhone にサイト名とページの画像が表示され、Face ID で承認します。拡張機能がユーザ名とパスワードを入力します。\n\n2 段階認証コード\nコード欄でも同じです。1 桁ずつ欄が分かれているページにも対応します。\n\n新しいパスワードは iPHONE へ\nアカウント作成やパスワード変更の時に、Nodkey への保存を提案します。パスワードはすぐに iPhone だけが読める形で暗号化されます。\n\nカードで支払う\n支払い画面で「Nodkey で支払う」をクリックします。iPhone にお店と金額が表示され、Face ID で承認します。拡張機能はその金額に限ってカードを入力し、合計が増えるとカードを消します。\n\nパスキー\nサイトがパスキーを求めると、iPhone が署名します。パスキーが iPhone から出ることはありません。\n\nプライバシーを最優先に\n• ブラウザには何も保存しません：パスワードもコードもカード番号も\n• ブラウザと iPhone の間はエンドツーエンドで暗号化。中継サーバは何も読めません\n• 拡張機能の鍵はブラウザの外にコピーできません\n• 無料。アカウント、広告、トラッキングなし\n• オープンソース (MIT)：github.com/peters/nodkey-browser\n\nNodkey (App Store で無料) を入れた iPhone が必要です。",
   "captions": [
     {
       "title": "iPhone からサインイン",
@@ -25,6 +25,10 @@
     {
       "title": "すべてのパスワードを 1 か所に",
       "text": "iPhone の Nodkey に。ブラウザには何も残りません。"
+    },
+    {
+      "title": "iPhone のカードで支払う",
+      "text": "支払いごとに Face ID。ページの合計金額だけに使われます。"
     }
   ],
   "ui": {
@@ -47,7 +51,14 @@
     "createAccount": "アカウント作成",
     "passkeyBtn": "パスキーでサインイン",
     "newPassword": "新しいパスワード",
-    "filled": "iPhone から入力しました"
+    "filled": "iPhone から入力しました",
+    "checkout": "お支払い",
+    "total": "合計",
+    "cardNumber": "カード番号",
+    "expiry": "有効期限",
+    "cvc": "CVC",
+    "wantsPay": "{b} が {a} の支払いを求めています",
+    "payBtn": "Nodkey で支払う"
   },
   "review": "Machine translation; needs native review before a store release."
 }

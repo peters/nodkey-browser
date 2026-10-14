@@ -4,7 +4,7 @@
   "amoLocale": "ko",
   "name": "Nodkey",
   "summary": "iPhone의 Nodkey에 있는 로그인 정보와 코드로 로그인해요. 모든 요청은 Face ID로 승인해요.",
-  "description": "Nodkey는 비밀번호, 2단계 인증 코드, 패스키를 한곳에 보관해요. 바로 iPhone의 Nodkey, Face ID 뒤에요. 이 확장 프로그램으로 Firefox와 Chrome에서 그것들을 쓸 수 있고, 브라우저에는 아무것도 저장하지 않아요.\n\niPHONE으로 로그인\n로그인 칸의 Nodkey 버튼을 클릭하세요. iPhone에 사이트와 페이지 사진이 보이고, Face ID로 승인하면 확장 프로그램이 아이디와 비밀번호를 채워요.\n\n2단계 인증 코드\n코드 칸에서도 똑같아요. 숫자마다 칸이 나뉜 페이지도 돼요.\n\n새 비밀번호는 iPHONE으로\n계정을 만들거나 비밀번호를 바꾸면 Nodkey에 저장하자고 제안해요. 비밀번호는 바로 iPhone만 읽을 수 있게 암호화돼요.\n\n패스키\n사이트가 패스키를 요청하면 iPhone이 서명해요. 패스키는 iPhone 밖으로 나가지 않아요.\n\n처음부터 개인정보 보호\n• 브라우저에 아무것도 저장하지 않아요: 비밀번호도 코드도\n• 브라우저와 iPhone 사이는 종단 간 암호화돼요. 중계 서버는 아무것도 읽을 수 없어요\n• 확장 프로그램의 키는 브라우저 밖으로 복사할 수 없어요\n• 무료, 계정·광고·추적 없음\n• 오픈 소스 (MIT): github.com/peters/nodkey-browser\n\nApp Store에서 무료로 받는 Nodkey가 설치된 iPhone이 필요해요.",
+  "description": "Nodkey는 비밀번호, 2단계 인증 코드, 패스키를 한곳에 보관해요. 바로 iPhone의 Nodkey, Face ID 뒤에요. 이 확장 프로그램으로 Firefox와 Chrome에서 그것들을 쓸 수 있고, 브라우저에는 아무것도 저장하지 않아요.\n\niPHONE으로 로그인\n로그인 칸의 Nodkey 버튼을 클릭하세요. iPhone에 사이트와 페이지 사진이 보이고, Face ID로 승인하면 확장 프로그램이 아이디와 비밀번호를 채워요.\n\n2단계 인증 코드\n코드 칸에서도 똑같아요. 숫자마다 칸이 나뉜 페이지도 돼요.\n\n새 비밀번호는 iPHONE으로\n계정을 만들거나 비밀번호를 바꾸면 Nodkey에 저장하자고 제안해요. 비밀번호는 바로 iPhone만 읽을 수 있게 암호화돼요.\n\n카드로 결제\n결제 화면에서 'Nodkey로 결제'를 클릭하세요. iPhone에 상점과 금액이 보이고, Face ID로 승인해요. 확장 프로그램은 그 금액에만 카드를 입력하고, 합계가 오르면 카드를 지워요.\n\n패스키\n사이트가 패스키를 요청하면 iPhone이 서명해요. 패스키는 iPhone 밖으로 나가지 않아요.\n\n처음부터 개인정보 보호\n• 브라우저에 아무것도 저장하지 않아요: 비밀번호도 코드도 카드 번호도\n• 브라우저와 iPhone 사이는 종단 간 암호화돼요. 중계 서버는 아무것도 읽을 수 없어요\n• 확장 프로그램의 키는 브라우저 밖으로 복사할 수 없어요\n• 무료, 계정·광고·추적 없음\n• 오픈 소스 (MIT): github.com/peters/nodkey-browser\n\nApp Store에서 무료로 받는 Nodkey가 설치된 iPhone이 필요해요.",
   "captions": [
     {
       "title": "iPhone으로 로그인",
@@ -25,6 +25,10 @@
     {
       "title": "모든 비밀번호를 한곳에",
       "text": "iPhone의 Nodkey에. 브라우저에는 아무것도 남지 않아요."
+    },
+    {
+      "title": "iPhone의 카드로 결제",
+      "text": "결제할 때마다 Face ID. 페이지 합계에만 쓰여요."
     }
   ],
   "ui": {
@@ -47,7 +51,14 @@
     "createAccount": "계정 만들기",
     "passkeyBtn": "패스키로 로그인",
     "newPassword": "새 비밀번호",
-    "filled": "iPhone에서 채웠어요"
+    "filled": "iPhone에서 채웠어요",
+    "checkout": "결제",
+    "total": "합계",
+    "cardNumber": "카드 번호",
+    "expiry": "유효기간",
+    "cvc": "CVC",
+    "wantsPay": "{b}에서 {a} 결제를 요청해요",
+    "payBtn": "Nodkey로 결제"
   },
   "review": "Machine translation; needs native review before a store release."
 }

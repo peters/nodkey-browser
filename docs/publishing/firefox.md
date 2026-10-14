@@ -110,7 +110,7 @@ Do this only after the owner says yes to a public release.
 2. Fill in the listing from `store/out/firefox/<locale>/listing.txt` (see
    [Store material](store-material.md)). Add each of the twelve languages
    with "Add a locale" and paste its name, summary and description.
-   - Screenshots: `01-sign-in.png` to `05-one-place.png` from the same folder,
+   - Screenshots: `01-sign-in.png` to `06-cards.png` from the same folder,
      with the captions from `listing.txt`.
    - Categories: "Privacy & Security".
    - Support website: `https://kh-labs.dev/nodkey/`.

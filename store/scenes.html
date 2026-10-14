@@ -517,6 +517,35 @@
           `<svg class="abs" style="left:760px;top:330px" width="160" height="200" viewBox="0 0 160 200" fill="none" stroke="#138a63" stroke-width="3" stroke-dasharray="6 7" stroke-linecap="round">
       <path d="M10 30 C80 30 90 100 150 100"/><path d="M10 170 C80 170 90 100 150 100"/></svg>` +
           phone(920, 110, '', false)
+      } else if (scene === '6') {
+        const amount = '499,00 NOK'
+        html +=
+          caption(6) +
+          win(
+            64,
+            300,
+            760,
+            440,
+            `https://${site}/checkout`,
+            `
+    <h2>${esc(u.checkout)}</h2>
+    <div style="display:flex;justify-content:space-between;width:400px;font-weight:600;margin-bottom:6px">
+      <span>${esc(u.total)}</span><span>${amount}</span></div>
+    <label>${esc(u.cardNumber)}</label><div class="field focus">4242 4242 4242 4242<img class="nk" src="${LOGO}" alt=""></div>
+    <div style="display:flex;gap:12px;width:400px">
+      <div style="flex:1"><label>${esc(u.expiry)}</label><div class="field" style="width:auto">12 / 28</div></div>
+      <div style="flex:1"><label>${esc(u.cvc)}</label><div class="field" style="width:auto">•••</div></div></div>
+    <div class="btn" style="background:var(--accent)">${esc(u.payBtn)}</div>`,
+          ) +
+          phone(
+            920,
+            110,
+            sheet(
+              esc(u.wantsPay).replace('{b}', esc(browser)).replace('{a}', amount),
+              account(site, 'Visa •••• 4242', amount),
+              approve,
+            ) + `<div class="faceid abs" style="left:84px;top:150px">${FACE}</div>`,
+          )
       } else if (scene === 'promo') {
         html = `<div class="blob" style="left:300px;top:-110px;width:220px;height:220px;background:var(--t4);opacity:.8"></div>
     <div class="blob" style="left:-80px;top:180px;width:200px;height:200px;background:var(--t2);opacity:.8"></div>

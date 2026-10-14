@@ -19,7 +19,9 @@ const checkOnly = args.includes('--check')
 
 // The strictest limit of AMO and the Chrome Web Store for each field.
 const LIMITS = { name: 45, summary: 132, description: 15000, captionTitle: 44, captionText: 90 }
-const SHOTS = ['01-sign-in', '02-codes', '03-save', '04-passkeys', '05-one-place']
+const SHOTS = ['01-sign-in', '02-codes', '03-save', '04-passkeys', '05-one-place', '06-cards']
+// The Chrome Web Store takes at most five screenshots: cards replace the save screenshot there.
+const CHROME_SHOTS = ['01-sign-in', '02-codes', '06-cards', '04-passkeys', '05-one-place']
 
 /**
  * @typedef {{ title: string, text: string }} Caption
@@ -120,9 +122,10 @@ for (const l of listings) {
     const dir = join(outRoot, store, locale)
     rmSync(dir, { recursive: true, force: true })
     mkdirSync(dir, { recursive: true })
-    for (const [i, name] of SHOTS.entries()) {
+    const shots = store === 'chrome' ? CHROME_SHOTS : SHOTS
+    for (const name of shots) {
       await render(
-        `lang=${l.lang}&browser=${browserName}&scene=${i + 1}`,
+        `lang=${l.lang}&browser=${browserName}&scene=${SHOTS.indexOf(name) + 1}`,
         1280,
         800,
         join(dir, `${name}.png`),
@@ -142,7 +145,12 @@ for (const l of listings) {
         join(dir, 'marquee-1400x560.png'),
       )
     }
-    const captions = l.captions.map((c, i) => `${SHOTS[i]}: ${c.title} ${c.text}`).join('\n')
+    const captions = shots
+      .map((name) => {
+        const c = l.captions[SHOTS.indexOf(name)]
+        return `${name}: ${c?.title} ${c?.text}`
+      })
+      .join('\n')
     writeFileSync(
       join(dir, 'listing.txt'),
       `Name\n${l.name}\n\nSummary\n${l.summary}\n\nDescription\n${l.description}\n\nScreenshot captions\n${captions}\n`,

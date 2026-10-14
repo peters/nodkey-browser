@@ -4,7 +4,7 @@
   "amoLocale": "es-ES",
   "name": "Nodkey",
   "summary": "Inicia sesión con los accesos y códigos de Nodkey en tu iPhone. Apruebas cada solicitud con Face ID.",
-  "description": "Nodkey guarda tus contraseñas, códigos de dos pasos y llaves de acceso en un solo lugar: Nodkey en tu iPhone, protegido con Face ID. Esta extensión permite que Firefox y Chrome los usen, sin guardar nada en el navegador.\n\nINICIA SESIÓN DESDE TU IPHONE\nHaz clic en el botón de Nodkey en un campo de inicio de sesión. Tu iPhone muestra el sitio y una imagen de la página, y lo apruebas con Face ID. La extensión rellena tu usuario y contraseña.\n\nCÓDIGOS DE DOS PASOS\nLo mismo en un campo de código, también cuando la página tiene una casilla por dígito.\n\nLAS CONTRASEÑAS NUEVAS VAN A TU IPHONE\nCuando creas una cuenta o cambias una contraseña, la extensión te ofrece guardarla en Nodkey. La contraseña queda cifrada para tu iPhone al instante.\n\nLLAVES DE ACCESO\nCuando un sitio pide una llave de acceso, tu iPhone firma. La llave nunca sale de él.\n\nPRIVADO DESDE EL DISEÑO\n• No se guarda nada en el navegador: ni contraseñas ni códigos\n• Cifrado de extremo a extremo entre el navegador y tu iPhone; el relé no puede leer nada\n• Las claves de la extensión no se pueden copiar fuera del navegador\n• Gratis, sin cuenta, sin anuncios y sin rastreo\n• Código abierto (MIT): github.com/peters/nodkey-browser\n\nNecesitas un iPhone con Nodkey, gratis en el App Store.",
+  "description": "Nodkey guarda tus contraseñas, códigos de dos pasos y llaves de acceso en un solo lugar: Nodkey en tu iPhone, protegido con Face ID. Esta extensión permite que Firefox y Chrome los usen, sin guardar nada en el navegador.\n\nINICIA SESIÓN DESDE TU IPHONE\nHaz clic en el botón de Nodkey en un campo de inicio de sesión. Tu iPhone muestra el sitio y una imagen de la página, y lo apruebas con Face ID. La extensión rellena tu usuario y contraseña.\n\nCÓDIGOS DE DOS PASOS\nLo mismo en un campo de código, también cuando la página tiene una casilla por dígito.\n\nLAS CONTRASEÑAS NUEVAS VAN A TU IPHONE\nCuando creas una cuenta o cambias una contraseña, la extensión te ofrece guardarla en Nodkey. La contraseña queda cifrada para tu iPhone al instante.\n\nPAGA CON TARJETA\nAl pagar, haz clic en Pagar con Nodkey. Tu iPhone muestra la tienda y el importe, y lo apruebas con Face ID. La extensión rellena la tarjeta solo para ese importe y la quita si el total sube.\n\nLLAVES DE ACCESO\nCuando un sitio pide una llave de acceso, tu iPhone firma. La llave nunca sale de él.\n\nPRIVADO DESDE EL DISEÑO\n• No se guarda nada en el navegador: ni contraseñas, ni códigos, ni números de tarjeta\n• Cifrado de extremo a extremo entre el navegador y tu iPhone; el relé no puede leer nada\n• Las claves de la extensión no se pueden copiar fuera del navegador\n• Gratis, sin cuenta, sin anuncios y sin rastreo\n• Código abierto (MIT): github.com/peters/nodkey-browser\n\nNecesitas un iPhone con Nodkey, gratis en el App Store.",
   "captions": [
     {
       "title": "Inicia sesión desde tu iPhone",
@@ -25,6 +25,10 @@
     {
       "title": "Un solo lugar para tus contraseñas",
       "text": "Nodkey en tu iPhone. Nada se guarda en el navegador."
+    },
+    {
+      "title": "Paga con una tarjeta de tu iPhone",
+      "text": "Face ID en cada pago, solo por el total de la página."
     }
   ],
   "ui": {
@@ -47,7 +51,14 @@
     "createAccount": "Crear cuenta",
     "passkeyBtn": "Entrar con llave de acceso",
     "newPassword": "Contraseña nueva",
-    "filled": "Rellenado desde tu iPhone"
+    "filled": "Rellenado desde tu iPhone",
+    "checkout": "Pago",
+    "total": "Total",
+    "cardNumber": "Número de tarjeta",
+    "expiry": "Caducidad",
+    "cvc": "CVC",
+    "wantsPay": "{b} quiere pagar {a}",
+    "payBtn": "Pagar con Nodkey"
   },
   "review": "Machine translation; needs native review before a store release."
 }

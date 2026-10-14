@@ -7,7 +7,7 @@ extension does or how it looks.
 | Source | What it holds |
 |---|---|
 | `store/listing/<lang>.json` | Name, summary, description, screenshot captions and the text in the images, for one language |
-| `store/scenes.html` | The images: five screenshots (1280×800), a small promo tile (440×280) and a marquee (1400×560) |
+| `store/scenes.html` | The images: six screenshots (1280×800), a small promo tile (440×280) and a marquee (1400×560) |
 | `store/assets/phone/<lang>.jpg` | The Passwords screen of the iPhone app in that language, from `peters/nodkey` `marketing/raw/<lang>/passwords.png` (sample data only) |
 | `scripts/store.mjs` | Checks the texts and renders everything into `store/out/` (not in Git) |
 
@@ -60,9 +60,10 @@ review before the first public listing.
    node scripts/store.mjs
    ```
 
-   Result: `store/out/firefox/<AMO locale>/` and
-   `store/out/chrome/<Chrome locale>/` have `01-sign-in.png` to
-   `05-one-place.png` and `listing.txt`. The Chrome folders also have
+   Result: `store/out/firefox/<AMO locale>/` has the six screenshots
+   `01-sign-in.png` to `06-cards.png` and `listing.txt`.
+   `store/out/chrome/<Chrome locale>/` has five screenshots (the Chrome Web
+   Store takes at most five: `03-save.png` is left out), `listing.txt`,
    `promo-440x280.png` and `marquee-1400x560.png`. The script stops with a
    message when a caption does not fit above the browser window.
 
