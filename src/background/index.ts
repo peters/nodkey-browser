@@ -7,6 +7,7 @@ import init, { display_code } from '../wasm/nodkey.js'
 import type { Reply, ToBackground } from '../models/messages'
 import { t } from '../i18n/t'
 import * as actions from './actions'
+import * as cards from './cards'
 import { finishPairing, rememberPhone, startPairing, unpair } from './agent'
 import { failed } from './outcome'
 import { answer as answerPasskey, syncPasskeyScripts } from './passkeys'
@@ -107,6 +108,27 @@ async function handle(msg: ToBackground, sender: chrome.runtime.MessageSender): 
     case 'save.dismiss':
       if (sender.tab) await actions.dismissOffer(sender.tab, msg.id, msg.never)
       return null
+    case 'card.fill':
+      // Answer at once; the result arrives as the tab's activity. Only from the page's own frame.
+      if (sender.tab && sender.url && !isExtensionPage(sender)) {
+        void cards.fill(sender.tab, sender.frameId ?? 0, sender.url, msg)
+      }
+      return null
+    case 'card.cleared':
+      if (sender.tab && sender.url)
+        await cards.cleared(sender.tab, sender.frameId, sender.url, msg.total)
+      return null
+    case 'card.candidate':
+      if (sender.tab && sender.url) await cards.candidate(sender.tab, sender.url, msg)
+      return null
+    case 'card.offer':
+      return sender.tab && sender.url ? cards.takeOffer(sender.tab, sender.url) : null
+    case 'card.accept':
+      if (sender.tab) void cards.acceptOffer(sender.tab, msg.id)
+      return null
+    case 'card.dismiss':
+      if (sender.tab) await cards.dismissOffer(sender.tab, msg.id, msg.never)
+      return null
   }
   if (fromPage) throw new Error('not allowed from a web page')
   switch (msg.type) {
@@ -193,7 +215,12 @@ chrome.storage.onChanged.addListener((changes, area) => {
 void syncPasskeyScripts()
 
 chrome.tabs.onRemoved.addListener((tabId) => {
-  void chrome.storage.session.remove([`activity:${tabId}`, `offer:${tabId}`, `username:${tabId}`])
+  void chrome.storage.session.remove([
+    `activity:${tabId}`,
+    `offer:${tabId}`,
+    `username:${tabId}`,
+    `cardOffer:${tabId}`,
+  ])
 })
 
 // First install: open the settings page, which starts with pairing.

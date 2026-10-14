@@ -4,7 +4,7 @@
  * peters/nodkey-cli.
  */
 
-export type Kind = 'code' | 'login' | 'list' | 'insights' | 'cleanup' | 'save' | 'passkey'
+export type Kind = 'code' | 'login' | 'list' | 'insights' | 'cleanup' | 'save' | 'passkey' | 'card'
 export type Decision = 'approved' | 'denied' | 'expired'
 export type Scope = 'selected' | 'codes' | 'logins' | 'all'
 export type Saved = 'added' | 'updated' | 'unchanged'
@@ -32,7 +32,27 @@ export interface Answer {
   password?: string
   saved?: Saved
   passkey?: PasskeyAnswer
+  card?: CardAnswer
   error?: string
+}
+
+/** An amount: a decimal string with a dot and an ISO 4217 code (`docs/agent-protocol.md`). */
+export interface Money {
+  value: string
+  currency: string
+}
+
+/** The card of an approved card request. Only for filling at once: never store or log it. */
+export interface CardAnswer {
+  title: string
+  brand: string
+  last4: string
+  holder?: string
+  number: string
+  exp_month: number
+  exp_year: number
+  cvc?: string
+  approved_amount: Money
 }
 
 /** The phone's passkey answer (base64url values): an assertion (get) or a new passkey (create). */
@@ -162,9 +182,51 @@ export function parseAnswer(json: string): Answer {
     answer.saved = oneOf(v, 'saved', ['added', 'updated', 'unchanged'] as const)
   }
   if (isObject(v.passkey)) answer.passkey = parsePasskeyAnswer(v.passkey)
+  if (isObject(v.card)) answer.card = parseCardAnswer(v.card)
   const error = optStr(v, 'error')
   if (error !== undefined) answer.error = error
   return answer
+}
+
+export function parseMoney(v: unknown): Money {
+  if (!isObject(v)) throw new ProtocolError('expected {value, currency}')
+  const value = str(v, 'value')
+  const currency = str(v, 'currency')
+  if (!/^\d{1,12}(\.\d{1,3})?$/.test(value) || !/^[A-Z]{3}$/.test(currency)) {
+    throw new ProtocolError('not an amount')
+  }
+  return { value, currency }
+}
+
+function int(o: Record<string, unknown>, key: string, min: number, max: number): number {
+  const v = o[key]
+  if (typeof v !== 'number' || !Number.isInteger(v) || v < min || v > max) {
+    throw new ProtocolError(`${key} is out of range`)
+  }
+  return v
+}
+
+function parseCardAnswer(o: Record<string, unknown>): CardAnswer {
+  const card: CardAnswer = {
+    title: str(o, 'title'),
+    brand: str(o, 'brand'),
+    last4: str(o, 'last4'),
+    number: str(o, 'number'),
+    exp_month: int(o, 'exp_month', 1, 12),
+    exp_year: int(o, 'exp_year', 2000, 2099),
+    approved_amount: parseMoney(o.approved_amount),
+  }
+  if (!/^\d{12,19}$/.test(card.number) || !/^\d{4}$/.test(card.last4)) {
+    throw new ProtocolError('not a card number')
+  }
+  const holder = optStr(o, 'holder')
+  if (holder !== undefined) card.holder = holder
+  const cvc = optStr(o, 'cvc')
+  if (cvc !== undefined) {
+    if (!/^\d{3,4}$/.test(cvc)) throw new ProtocolError('not a CVC')
+    card.cvc = cvc
+  }
+  return card
 }
 
 function optB64u(o: Record<string, unknown>, key: string): string | undefined {

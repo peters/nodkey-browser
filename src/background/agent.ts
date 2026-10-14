@@ -120,6 +120,10 @@ export interface Ask {
   save?: { url: string; username: string; title?: string; password: SealedBox }
   /** The `passkey` object of a passkey request (`docs/agent-protocol.md`). */
   passkey?: Record<string, unknown>
+  /** The `card` object of a card request. */
+  card?: Record<string, unknown>
+  /** The `save_card` object of a card save (number and CVC sealed already). */
+  saveCard?: Record<string, unknown>
   client: ClientInfo
 }
 
@@ -150,6 +154,8 @@ export async function ask(a: Ask, phone: Phone, signal?: AbortSignal): Promise<O
   }
   if (a.save) draft.save = a.save
   if (a.passkey) draft.passkey = a.passkey
+  if (a.card) draft.card = a.card
+  if (a.saveCard) draft.save_card = a.saveCard
   const nowSeconds = Math.floor(Date.now() / 1000)
   const sealed = parseSealedRequest(
     seal_request(JSON.stringify(draft), agent.agent_id, phone.kem, nowSeconds),

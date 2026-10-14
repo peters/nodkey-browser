@@ -39,7 +39,13 @@ synthetic test site. It does not use the real relay or a real phone.
    5. Opens `/signup`, types a new user name and password and submits. Then it
       answers Save in the save question with the Enter key. The fake phone
       opens the sealed password, and the script compares it.
-   6. Opens `/passkey` and does [Passkeys](passkeys.md): a conditional request
+   6. Opens `/checkout` and does [Pay with a card](fill-card.md): it fills the
+      test card for the total of 499,00 kr, makes sure that the fake phone saw
+      the amount, the total and the origin, raises the total and waits for the
+      empty card fields. Then it types a second test card, pays and saves the
+      card. The fake phone opens the sealed card number, and the script
+      compares it.
+   7. Opens `/passkey` and does [Passkeys](passkeys.md): a conditional request
       that must not reach the phone, Create a passkey and Sign in with a
       passkey. The server of the test site examines the passkey and the ES256
       signature. In Chromium, the script then turns the passkey setting off and
@@ -55,7 +61,8 @@ synthetic test site. It does not use the real relay or a real phone.
 
 ## Notes
 
-- `--passkeys-only` pairs and then does only step 6.
+- `--passkeys-only` pairs and then does only step 7. `--cards-only` pairs and
+  then does only step 6.
 
 - Chromium runs in Norwegian (`--lang=nb`) and Firefox in English. Thus the run
   shows two of the twelve languages.

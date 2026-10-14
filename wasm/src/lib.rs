@@ -138,3 +138,38 @@ pub fn client_data_json(op: &str, challenge: &str, origin: &str) -> Result<Strin
 pub fn check_passkey_answer(request_json: &str, answer_json: &str) -> Result<(), JsError> {
     js(core::check_passkey_answer(request_json, answer_json))
 }
+
+#[wasm_bindgen]
+pub fn parse_money(value: &str, currency: &str) -> Result<String, JsError> {
+    js(core::cards::parse_money(value, currency))
+}
+
+#[wasm_bindgen]
+pub fn money_exceeds(a_json: &str, b_json: &str) -> Result<bool, JsError> {
+    js(core::cards::money_exceeds(a_json, b_json))
+}
+
+#[wasm_bindgen]
+pub fn check_card(card_json: &str, target: &str) -> Result<String, JsError> {
+    js(core::cards::check_card(card_json, target))
+}
+
+#[wasm_bindgen]
+pub fn seal_card_secret(agent_id: &str, phone_kem: &str, secret: &str) -> Result<String, JsError> {
+    js(core::cards::seal_card_secret(agent_id, phone_kem, secret))
+}
+
+#[wasm_bindgen]
+pub fn card_luhn(number: &str) -> bool {
+    core::cards::luhn(number)
+}
+
+#[wasm_bindgen]
+pub fn card_brand(number: &str) -> String {
+    core::cards::brand(number)
+}
+
+#[wasm_bindgen]
+pub fn card_last4(number: &str) -> Option<String> {
+    core::cards::last4(number)
+}

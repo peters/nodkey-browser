@@ -3,7 +3,8 @@
 // row of boxes), save a new login, and create and use a passkey that the site's server checks.
 // See docs/features/browser-e2e.md.
 //
-//   node tests/e2e/run.mjs [--browser chromium|firefox|both] [--keep] [--display :N] [--passkeys-only]
+//   node tests/e2e/run.mjs [--browser chromium|firefox|both] [--keep] [--display :N]
+//                          [--passkeys-only | --cards-only]
 //
 // Without --display it starts its own Xvfb + x11vnc (set NODKEY_E2E_TOOLS to an unpacked tools
 // root when x11vnc is not installed) and prints the VNC address for a Horizon Device panel.
@@ -12,6 +13,7 @@ import { cpSync, existsSync, mkdirSync, readFileSync, rmSync } from 'node:fs'
 import { homedir } from 'node:os'
 import { join, resolve } from 'node:path'
 import puppeteer from 'puppeteer-core'
+import { cardFlow } from './cards.mjs'
 import { findVnc, startDesktop } from './desktop.mjs'
 import { startSite } from './site.mjs'
 
@@ -23,6 +25,7 @@ const option = (name, fallback) => {
 const which = option('--browser', 'both')
 const keep = args.includes('--keep')
 const passkeysOnly = args.includes('--passkeys-only')
+const cardsOnly = args.includes('--cards-only')
 const root = resolve(import.meta.dirname, '../..')
 const run = `run-${Date.now()}`
 // Snap Chromium can only read under ~/snap/chromium; Firefox and logs use a private cache folder.
@@ -119,6 +122,8 @@ async function pairByHand(name, relay) {
   await waitFor('the pairing by hand', () => existsSync(marker), 15 * 60_000)
   return readFileSync(marker, 'utf8').trim() || `${name} test`
 }
+
+const helpers = { log, waitFor, clickKey }
 
 async function flow(name, browser, relay, site, agentName) {
   const tab = await browser.newPage()
@@ -353,16 +358,20 @@ async function main() {
       const c = await chromium(desktop.env, site.base, relay)
       open.push(c.browser)
       const name = await pairByDriver('Chromium', c.browser, c.base, relay)
-      if (!passkeysOnly) await flow('Chromium', c.browser, relay, site.base, name)
-      await passkeyFlow('Chromium', c.browser, relay, site)
-      await passkeysOff('Chromium', c.browser, c.base, site)
+      if (!passkeysOnly && !cardsOnly) await flow('Chromium', c.browser, relay, site.base, name)
+      if (!passkeysOnly) await cardFlow('Chromium', c.browser, relay, site.base, name, helpers)
+      if (!cardsOnly) {
+        await passkeyFlow('Chromium', c.browser, relay, site)
+        await passkeysOff('Chromium', c.browser, c.base, site)
+      }
     }
     if (which === 'firefox' || which === 'both') {
       const f = await firefox(desktop.env)
       open.push(f.browser)
       const name = await pairByHand('Firefox', relay)
-      if (!passkeysOnly) await flow('Firefox', f.browser, relay, site.base, name)
-      await passkeyFlow('Firefox', f.browser, relay, site)
+      if (!passkeysOnly && !cardsOnly) await flow('Firefox', f.browser, relay, site.base, name)
+      if (!passkeysOnly) await cardFlow('Firefox', f.browser, relay, site.base, name, helpers)
+      if (!cardsOnly) await passkeyFlow('Firefox', f.browser, relay, site)
     }
     log('all flows passed')
     if (keep) {
