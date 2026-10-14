@@ -106,7 +106,7 @@ export type ToBackground =
   | { type: 'pair.cancel' }
   | { type: 'pair.confirm' }
   | { type: 'pair.reject' }
-  | { type: 'fill.login'; tabId?: number }
+  | { type: 'fill.login'; tabId?: number; username?: string }
   | { type: 'fill.code'; tabId?: number }
   | { type: 'save.candidate'; url: string; username: string; password: string; title?: string }
   | { type: 'save.offer' }

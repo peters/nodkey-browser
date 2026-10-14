@@ -139,6 +139,21 @@ async function flow(name, browser, relay, site, agentName) {
   if (user !== 'alex@example.com') throw new Error(`user name ${user}`)
   await sleep(2500)
 
+  log(name, 'fill a login for the user name in the field')
+  await tab.goto(`${site}/login`)
+  await tab.type('#email', 'alex@example.com', { delay: 30 })
+  await clickKey(tab, '#password')
+  await waitFor('the filled password', () =>
+    tab.$eval('#password', (el) => el.value === 'correct horse battery staple'),
+  )
+  const asked = (await (await relay.control('/_fake/seen')).json()).filter(
+    (s) => s.request.kind === 'login' && s.request.agent === agentName,
+  )
+  const target = asked.at(-1)?.request.target
+  if (target !== `${new URL(site).hostname}/alex@example.com`) throw new Error(`target ${target}`)
+  log(name, `the request named the account: ${target}`)
+  await sleep(2000)
+
   log(name, 'fill a code')
   await tab.goto(`${site}/otp`)
   await clickKey(tab, '#code')

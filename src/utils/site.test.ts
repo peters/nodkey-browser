@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { belongsTo, isLocalHost, mayFill, siteOf } from './site'
+import { belongsTo, isLocalHost, mayFill, requestTarget, siteOf } from './site'
 
 describe('siteOf', () => {
   it('names the site without www', () => {
@@ -37,5 +37,20 @@ describe('belongsTo', () => {
     expect(belongsTo('https://www.vg.no/', 'vg.no')).toBe(true)
     expect(belongsTo('https://vg.no.evil.example/', 'vg.no')).toBe(false)
     expect(belongsTo('https://evilvg.no/', 'vg.no')).toBe(false)
+  })
+})
+
+describe('requestTarget', () => {
+  it('names the account when the page has a user name', () => {
+    expect(requestTarget('github.com', 'alex@example.com')).toBe('github.com/alex@example.com')
+    expect(requestTarget('github.com', '  alex ')).toBe('github.com/alex')
+  })
+  it('asks for the site when there is no usable user name', () => {
+    expect(requestTarget('github.com')).toBe('github.com')
+    expect(requestTarget('github.com', '')).toBe('github.com')
+    expect(requestTarget('github.com', '   ')).toBe('github.com')
+    expect(requestTarget('github.com', 'alex smith')).toBe('github.com')
+    expect(requestTarget('github.com', 'a/b')).toBe('github.com')
+    expect(requestTarget('github.com', 'x'.repeat(201))).toBe('github.com')
   })
 })
