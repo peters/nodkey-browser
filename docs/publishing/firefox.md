@@ -86,6 +86,20 @@ only for a new account.
    information, website activity, website content) and adds Nodkey. It stays
    after a restart.
 
+10. Test the signed file before you give it to anyone:
+
+    ```sh
+    NODKEY_E2E_FIREFOX_XPI=<path to the .xpi> npm run e2e -- --browser firefox
+    ```
+
+    Result: Firefox installs the file as a normal extension and checks the
+    signature. All flows pass (the pairing is by hand, see
+    [Pairing in Firefox](../features/pairing-firefox.md)).
+
+An unlisted extension does not update by itself: the manifest has no
+`update_url`. Install each new signed file by hand (open the `.xpi` in
+Firefox, then "Update").
+
 ## Listed version (public)
 
 Do this only after the owner says yes to a public release.
