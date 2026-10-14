@@ -16,8 +16,9 @@ input{font:inherit;padding:10px;width:100%;box-sizing:border-box}button{font:inh
 </style></head><body><p class="banner">Nodkey test site: synthetic data only</p><h1>${title}</h1>${body}</body></html>`
 
 // The page side of the passkey page: options from the server, WebAuthn, the answer back. It reads
-// the credential through the ArrayBuffer API (as most websites do) and checks toJSON() too.
-const PASSKEY_SCRIPT = `
+// the credential through the ArrayBuffer API (as most websites do) and checks toJSON() too. Then it
+// replaces toJSON in strict code, as @github/webauthn-json does (GitHub).
+const PASSKEY_SCRIPT = `'use strict'
 const b64u = (b) => btoa(String.fromCharCode(...new Uint8Array(b))).replace(/\\+/g, '-').replace(/\\//g, '_').replace(/=+$/, '')
 const bytes = (s) => Uint8Array.from(atob(s.replace(/-/g, '+').replace(/_/g, '/')), (c) => c.charCodeAt(0))
 const status = (text) => { document.getElementById('status').textContent = text }
@@ -43,6 +44,7 @@ function asJson(cred) {
   }
   const json = { id: cred.id, rawId: b64u(cred.rawId), type: cred.type, authenticatorAttachment: cred.authenticatorAttachment, response, clientExtensionResults: cred.getClientExtensionResults() }
   if (JSON.stringify(sorted(cred.toJSON())) !== JSON.stringify(sorted(json))) throw new Error('toJSON() differs: ' + JSON.stringify(cred.toJSON()))
+  cred.toJSON = () => json
   return json
 }
 document.getElementById('create').addEventListener('click', async () => {

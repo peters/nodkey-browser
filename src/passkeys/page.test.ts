@@ -210,6 +210,13 @@ describe('the page script', () => {
     expect(new TextDecoder().decode(response.getPublicKey() ?? new ArrayBuffer(0))).toBe('spki')
     expect(response.getPublicKeyAlgorithm()).toBe(-7)
     expect(response.getTransports()).toEqual(['hybrid', 'internal'])
+    // @github/webauthn-json replaces toJSON on the credential (this module is strict code).
+    const page = cred as unknown as { toJSON: () => unknown }
+    page.toJSON = () => 'from the page'
+    expect(page.toJSON()).toBe('from the page')
+    expect(() => {
+      ;(cred as unknown as { id: string }).id = 'other'
+    }).toThrow(TypeError)
   })
 
   it('rejects with the DOMException the background names', async () => {

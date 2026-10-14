@@ -26,7 +26,11 @@ function protoOf(name: string): object {
 function make(name: string, values: Record<string, unknown>): object {
   const props: PropertyDescriptorMap = {}
   for (const [key, value] of Object.entries(values)) {
-    props[key] = { value, enumerable: false, configurable: true, writable: false }
+    // Methods stay writable: the browser's own methods are writable on the prototype, so pages
+    // replace them (`@github/webauthn-json` sets `credential.toJSON`). An assignment to a
+    // read-only property throws in strict code. Values stay read-only, as the native getters are.
+    const writable = typeof value === 'function'
+    props[key] = { value, enumerable: false, configurable: true, writable }
   }
   return Object.create(protoOf(name), props) as object
 }
