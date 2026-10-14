@@ -46,7 +46,8 @@ only for a new account.
    Android".
 
    Result: The automatic validation shows "Your add-on was validated with no
-   errors". Warnings are possible. Read them.
+   errors". Warnings are possible. Read them. Version 0.1.0 had 4 warnings,
+   for example "Unsafe assignment to innerHTML" from the bundled Vue code.
 
 4. Click "Continue".
 
@@ -55,7 +56,14 @@ only for a new account.
    JavaScript from Vite and WebAssembly from Rust, so the reviewers need the
    source code.
 
-6. In "Notes to Reviewer", write how to build:
+6. Click "Continue".
+
+   Result: The page shows "Version Signature Pending". The unlisted flow does
+   not ask for release notes or notes to the reviewer. AMO sends an e-mail
+   when the signed file is ready, usually after some minutes.
+
+7. Open "My Add-ons", the add-on, then the version. If a reviewer asks how to
+   build, give these notes:
 
    ```text
    Source: https://github.com/peters/nodkey-browser (tag v<version>).
@@ -65,11 +73,6 @@ only for a new account.
    The protocol code (WebAssembly) comes from https://github.com/peters/nodkey-cli
    at the revision in Cargo.toml.
    ```
-
-7. Click "Submit Version".
-
-   Result: The version page shows "Approved" after some minutes, and a link
-   to the signed file.
 
 8. Download the signed file (`.xpi`). Keep it outside the repository.
 
