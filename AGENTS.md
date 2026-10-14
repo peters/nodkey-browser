@@ -61,3 +61,7 @@ Shared company rules apply: `fintermobilityas/company` (checkout `~/github/compa
 
 The repository is public. Do not publish to the Chrome Web Store or
 addons.mozilla.org or share a package without the owner's explicit yes.
+
+The steps for each store are in [docs/publishing](docs/publishing/README.md)
+(ASD-STE100). Use the `horizon:horizon-browser` skill for the store pages when
+it is available, and the `nodkey` skill for the logins.
