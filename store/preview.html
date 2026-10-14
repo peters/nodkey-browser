@@ -1,0 +1,149 @@
+<title>Nodkey Store Listing</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,400..800&display=swap">
+<!--
+  The review page of the store material. scripts/store.mjs writes it to store/out/index.html with the
+  listing texts in __DATA__; the images are the PNG files next to it (firefox/<locale>/, chrome/<locale>/).
+-->
+<style>
+/* Layout: a review sheet. Language and store pickers on top, the listing text, then the images in store order. */
+:root {
+  --bg: #fbfaf7; --card: #ffffff; --ink: #1d2433; --muted: #5f6878; --rule: #e3e6ea;
+  --accent: #138a63; --on-accent: #ffffff; --warn: #9a4b10; --warn-bg: #ffead9; --over: #d23b2a;
+  --chip: #eef0ec;
+  --display: 'Bricolage Grotesque', 'Noto Sans CJK JP', system-ui, sans-serif;
+  --body: system-ui, -apple-system, 'Segoe UI', 'Noto Sans', 'Noto Sans CJK JP', sans-serif;
+  --mono: ui-monospace, 'SF Mono', Menlo, monospace;
+}
+@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) {
+  --bg: #11141a; --card: #1a1f27; --ink: #eef1f5; --muted: #9aa3b2; --rule: #2a303a;
+  --accent: #5fd3a5; --on-accent: #052016; --warn: #ffb37a; --warn-bg: #3a2414; --over: #ff6b5a; --chip: #20262f; color-scheme: dark } }
+:root[data-theme="dark"] {
+  --bg: #11141a; --card: #1a1f27; --ink: #eef1f5; --muted: #9aa3b2; --rule: #2a303a;
+  --accent: #5fd3a5; --on-accent: #052016; --warn: #ffb37a; --warn-bg: #3a2414; --over: #ff6b5a; --chip: #20262f; color-scheme: dark }
+* { box-sizing: border-box; }
+body { background: var(--bg); color: var(--ink); font: 15px/1.5 var(--body); }
+.wrap { max-width: 1120px; margin: 0 auto; padding-block: 28px 64px; padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px)); display: grid; gap: 24px; }
+header { display: flex; align-items: center; gap: 14px; flex-wrap: wrap; }
+header img { width: 44px; height: 44px; }
+h1 { font: 760 32px/1.1 var(--display); margin: 0; letter-spacing: -0.5px; text-wrap: balance; }
+.lead { color: var(--muted); margin: 4px 0 0; max-width: 70ch; }
+.pickers { display: grid; gap: 12px; position: sticky; top: env(safe-area-inset-top, 0px); background: var(--bg); padding-block: 10px; z-index: 2; border-bottom: 1px solid var(--rule); }
+.row { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; }
+.label { font-size: 12px; letter-spacing: .06em; text-transform: uppercase; color: var(--muted); min-width: 74px; }
+button.chip { font: 600 13px var(--body); border: 1px solid var(--rule); background: var(--chip); color: var(--ink); border-radius: 999px; padding: 6px 12px; cursor: pointer; }
+button.chip[aria-pressed="true"] { background: var(--accent); color: var(--on-accent); border-color: var(--accent); }
+button.chip:focus-visible { outline: 3px solid var(--accent); outline-offset: 2px; }
+.note { background: var(--warn-bg); color: var(--warn); border-radius: 12px; padding: 10px 14px; font-size: 14px; margin: 0; }
+.card { background: var(--card); border: 1px solid var(--rule); border-radius: 18px; padding: 20px; display: grid; gap: 16px; min-width: 0; }
+.field { display: grid; gap: 4px; min-width: 0; }
+.field .top { display: flex; justify-content: space-between; gap: 12px; font-size: 12px; letter-spacing: .06em; text-transform: uppercase; color: var(--muted); }
+.count { font-variant-numeric: tabular-nums; text-transform: none; letter-spacing: 0; }
+.count.over { color: var(--over); font-weight: 700; }
+.name { font: 700 22px var(--display); }
+.desc { white-space: pre-wrap; max-width: 75ch; overflow-wrap: anywhere; }
+.locale { font: 12px var(--mono); color: var(--muted); }
+.shots { display: grid; grid-template-columns: repeat(auto-fill, minmax(min(100%, 460px), 1fr)); gap: 20px; }
+figure { margin: 0; display: grid; gap: 8px; min-width: 0; }
+figure img { width: 100%; height: auto; border-radius: 12px; border: 1px solid var(--rule); display: block; }
+figcaption { font-size: 14px; color: var(--muted); }
+figcaption b { color: var(--ink); display: block; font-family: var(--display); font-size: 16px; }
+.file { font: 12px var(--mono); color: var(--muted); }
+.promos { display: flex; flex-wrap: wrap; gap: 20px; align-items: flex-start; }
+.promos figure:first-child { max-width: 440px; }
+.promos figure:last-child { flex: 1 1 520px; }
+h2 { font: 700 20px var(--display); margin: 0; }
+</style>
+
+<div class="wrap">
+  <header>
+    <img src="data:image/svg+xml;base64,__LOGO__" alt="Nodkey logo">
+    <div>
+      <h1>Nodkey Store Listing</h1>
+      <p class="lead">The texts and images for addons.mozilla.org and the Chrome Web Store, in the twelve languages of the extension. Pick a language and a store.</p>
+    </div>
+  </header>
+  <div class="pickers">
+    <div class="row" role="group" aria-label="Language"><span class="label">Language</span><span id="langs" class="row"></span></div>
+    <div class="row" role="group" aria-label="Store"><span class="label">Store</span><span id="stores" class="row"></span></div>
+  </div>
+  <p id="note" class="note" hidden></p>
+  <section class="card" aria-labelledby="t-text">
+    <h2 id="t-text">Listing text</h2>
+    <div class="field"><div class="top"><span>Name</span><span id="c-name" class="count"></span></div><div id="v-name" class="name"></div></div>
+    <div class="field"><div class="top"><span>Summary</span><span id="c-summary" class="count"></span></div><div id="v-summary"></div></div>
+    <div class="field"><div class="top"><span>Description</span><span id="c-desc" class="count"></span></div><div id="v-desc" class="desc"></div></div>
+    <div class="locale" id="v-locale"></div>
+  </section>
+  <section aria-labelledby="t-shots" style="display:grid;gap:14px">
+    <h2 id="t-shots">Screenshots, 1280×800 <span id="shot-count" class="locale"></span></h2>
+    <div id="shots" class="shots"></div>
+  </section>
+  <section id="promo-sec" aria-labelledby="t-promo" style="display:grid;gap:14px">
+    <h2 id="t-promo">Promo tiles</h2>
+    <div id="promos" class="promos"></div>
+  </section>
+</div>
+
+<script>
+const DATA = __DATA__
+const ORDER = ['en', 'nb', 'sv', 'da', 'de', 'es', 'fr', 'it', 'pt-BR', 'ja', 'ko', 'zh-Hans']
+const SHOTS = __SHOTS__
+const PICK = { firefox: SHOTS, chrome: __CHROME_SHOTS__ }
+const LIMITS = { name: 45, summary: 132 }
+const STORES = { firefox: 'Firefox (AMO)', chrome: 'Chrome Web Store' }
+const get = (k, d) => { try { return localStorage.getItem(k) || d } catch { return d } }
+const put = (k, v) => { try { localStorage.setItem(k, v) } catch {} }
+let lang = ORDER.includes(location.hash.slice(1)) ? location.hash.slice(1) : get('sl-lang', 'en')
+let store = get('sl-store', 'firefox')
+if (!DATA[lang]) lang = 'en'
+if (!STORES[store]) store = 'firefox'
+
+function chips(el, items, current, label, pick) {
+  el.replaceChildren(...items.map((k) => {
+    const b = document.createElement('button')
+    b.className = 'chip'; b.type = 'button'; b.id = 'chip-' + k
+    b.textContent = label(k); b.setAttribute('aria-pressed', String(k === current))
+    b.addEventListener('click', () => pick(k))
+    return b
+  }))
+}
+function count(el, n, limit) {
+  el.textContent = limit ? `${n} / ${limit}` : `${n} characters`
+  el.classList.toggle('over', !!limit && n > limit)
+}
+function render() {
+  const d = DATA[lang]
+  const loc = store === 'firefox' ? d.amoLocale : d.chromeLocale
+  chips(document.getElementById('langs'), ORDER, lang, (k) => DATA[k].label, (k) => { lang = k; put('sl-lang', k); render() })
+  chips(document.getElementById('stores'), Object.keys(STORES), store, (k) => STORES[k], (k) => { store = k; put('sl-store', k); render() })
+  const note = document.getElementById('note')
+  note.hidden = lang === 'en'
+  note.textContent = 'Machine translation. A native speaker should read it before the listing goes public.'
+  document.getElementById('v-name').textContent = d.name
+  document.getElementById('v-summary').textContent = d.summary
+  document.getElementById('v-desc').textContent = d.description
+  count(document.getElementById('c-name'), d.name.length, LIMITS.name)
+  count(document.getElementById('c-summary'), d.summary.length, LIMITS.summary)
+  count(document.getElementById('c-desc'), d.description.length)
+  document.getElementById('v-locale').textContent = `Store locale: ${loc} · files in store/out/${store}/${loc}/`
+  document.getElementById('shot-count').textContent = store === 'chrome' ? '(five: the store takes at most five)' : `(${SHOTS.length})`
+  document.getElementById('shots').replaceChildren(...PICK[store].map((s) => {
+    const c = d.captions[SHOTS.indexOf(s)]
+    const f = document.createElement('figure')
+    f.innerHTML = `<img loading="lazy" width="1280" height="800" alt="">` +
+      `<figcaption><b></b><span></span><div class="file">${s}.png</div></figcaption>`
+    f.querySelector('img').src = `${store}/${loc}/${s}.png`
+    f.querySelector('img').alt = c.title
+    f.querySelector('b').textContent = c.title
+    f.querySelector('span').textContent = c.text
+    return f
+  }))
+  const promo = document.getElementById('promo-sec')
+  promo.hidden = store !== 'chrome'
+  document.getElementById('promos').innerHTML = store !== 'chrome' ? '' :
+    ['promo-440x280', 'marquee-1400x560'].map((p) =>
+      `<figure><img loading="lazy" src="chrome/${loc}/${p}.png" alt="${p}"><figcaption><div class="file">${p}.png</div></figcaption></figure>`).join('')
+}
+render()
+</script>

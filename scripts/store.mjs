@@ -160,6 +160,32 @@ for (const l of listings) {
 }
 await browser.close()
 server.close()
+
+// The review page (store/out/index.html): every language and store with its texts and images.
+if (!only) {
+  const data = Object.fromEntries(
+    listings.map((l) => [
+      l.lang,
+      {
+        label: l.label,
+        chromeLocale: l.chromeLocale,
+        amoLocale: l.amoLocale,
+        name: l.name,
+        summary: l.summary,
+        description: l.description,
+        captions: l.captions,
+      },
+    ]),
+  )
+  const logo = readFileSync(join(root, 'public/icons/logo.svg')).toString('base64')
+  const page = readFileSync(join(root, 'store/preview.html'), 'utf8')
+    .replace('__LOGO__', logo)
+    .replace('__DATA__', JSON.stringify(data))
+    .replace('__SHOTS__', JSON.stringify(SHOTS))
+    .replace('__CHROME_SHOTS__', JSON.stringify(CHROME_SHOTS))
+  writeFileSync(join(outRoot, 'index.html'), page)
+  console.log('review page: store/out/index.html')
+}
 if (problems.length) {
   console.error(problems.join('\n'))
   process.exit(1)

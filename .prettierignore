@@ -5,3 +5,4 @@ src/wasm
 package-lock.json
 public/_locales
 *.md
+store/preview.html

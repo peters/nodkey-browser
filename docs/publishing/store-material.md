@@ -9,6 +9,7 @@ extension does or how it looks.
 | `store/listing/<lang>.json` | Name, summary, description, screenshot captions and the text in the images, for one language |
 | `store/scenes.html` | The images: six screenshots (1280×800), a small promo tile (440×280) and a marquee (1400×560) |
 | `store/assets/phone/<lang>.jpg` | The Passwords screen of the iPhone app in that language, from `peters/nodkey` `marketing/raw/<lang>/passwords.png` (sample data only) |
+| `store/preview.html` | The review page that `scripts/store.mjs` fills in |
 | `scripts/store.mjs` | Checks the texts and renders everything into `store/out/` (not in Git) |
 
 The name and the summary come from `src/i18n/messages/<lang>.json`
@@ -67,8 +68,11 @@ review before the first public listing.
    `promo-440x280.png` and `marquee-1400x560.png`. The script stops with a
    message when a caption does not fit above the browser window.
 
-5. Look at the images of at least English, Norwegian, German (long words) and
-   Japanese. Make sure that no text is cut and that no real data shows.
+5. Open `store/out/index.html` (the review page: every language and store with
+   its texts and images). Look at the images of at least English, Norwegian,
+   German (long words) and Japanese. Make sure that no text is cut and that
+   no real data shows. To show the page to the owner, publish `store/out` as
+   a private Claude artifact (the page and its PNG files).
 
 6. Use the files in [Firefox](firefox.md) and [Chrome](chrome.md).
 
