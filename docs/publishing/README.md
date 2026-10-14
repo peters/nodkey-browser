@@ -56,9 +56,14 @@ They use ASD-STE100 Simplified Technical English. Do them for each release.
    git archive --format=zip -o dist/nodkey-browser-source-<version>.zip HEAD
    ```
 
+   Push the commit (or a release branch, for example `release/0.1`) so the
+   reviewers can find it. Do not tag it yet (step 7).
+
    Result: `dist/nodkey-browser-source-<version>.zip` exists. AMO needs it
    (see [Firefox](firefox.md)).
 
-6. Tag the commit: `git tag v<version>` and `git push origin v<version>`.
+6. Do [Firefox](firefox.md) and [Chrome](chrome.md).
 
-7. Do [Firefox](firefox.md) and [Chrome](chrome.md).
+7. Tag the commit only after the owner confirms that the published version
+   works: `git tag v<version>` and `git push origin v<version>`. Do not push
+   a tag before that.

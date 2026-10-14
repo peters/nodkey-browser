@@ -66,7 +66,7 @@ only for a new account.
    build, give these notes:
 
    ```text
-   Source: https://github.com/peters/nodkey-browser (tag v<version>).
+   Source: https://github.com/peters/nodkey-browser (commit <sha>).
    Build: Node 24.21 (.nvmrc), Rust with wasm32-unknown-unknown and
    wasm-bindgen-cli (version in Cargo.lock). npm ci && npm run build.
    The package is dist/nodkey-firefox-<version>.zip.
