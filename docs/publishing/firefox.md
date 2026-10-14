@@ -74,7 +74,11 @@ only for a new account.
    at the revision in Cargo.toml.
    ```
 
-8. Download the signed file (`.xpi`). Keep it outside the repository.
+8. When the e-mail "Your extension has passed our automated screening" comes,
+   open the version page and click the `.xpi` link. Do this in the browser
+   where you are signed in: the link does not work without a session.
+   Keep the file outside the repository. Version 0.1.0 was approved 6 minutes
+   after the upload.
 
 9. Install it: open the `.xpi` file in Firefox and click "Add".
 
