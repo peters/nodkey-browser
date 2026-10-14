@@ -36,17 +36,19 @@ Status on 2026-10-14: no developer account and no item yet.
    Result: The dashboard shows the item with the tabs "Package", "Store
    listing", "Privacy" and "Distribution".
 
-3. "Store listing":
-   - Description: from "What it does" in `README.md`.
+3. "Store listing" (make the files first, see [Store material](store-material.md)):
+   - Description: from `store/out/chrome/<locale>/listing.txt`. Add the other
+     eleven languages with "Add language" and paste each description; the
+     name and summary come from `_locales` in the package.
    - Category: "Productivity", subcategory "Tools" (or what the store offers
      for password tools).
    - Language: English. The extension has twelve languages; the store takes
      the name and description from `_locales`.
    - Store icon: 128×128 PNG, `public/icons/icon-128.png`.
-   - Screenshots: 1280×800 (one to five), from the visual test procedures,
-     with synthetic data only.
-   - Small promo tile: 440×280 PNG. Make it from the logo and the Flis
-     colours.
+   - Screenshots: `01-sign-in.png` to `05-one-place.png` (1280×800) from the
+     folder of each language.
+   - Small promo tile: `promo-440x280.png`. Marquee (optional):
+     `marquee-1400x560.png`.
    - Official URL and support URL: `https://kh-labs.dev/nodkey/`.
 
 4. "Privacy":

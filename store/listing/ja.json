@@ -1,0 +1,53 @@
+{
+  "label": "日本語",
+  "chromeLocale": "ja",
+  "amoLocale": "ja",
+  "name": "Nodkey",
+  "summary": "iPhone の Nodkey にあるログイン情報とコードでサインインします。リクエストはすべて Face ID で承認します。",
+  "description": "Nodkey は、パスワード、2 段階認証コード、パスキーを 1 か所にまとめます。iPhone の Nodkey の中、Face ID の向こう側です。この拡張機能を使うと Firefox や Chrome からそれらを使えます。ブラウザには何も保存しません。\n\niPHONE からサインイン\nサインイン欄の Nodkey ボタンをクリックします。iPhone にサイト名とページの画像が表示され、Face ID で承認します。拡張機能がユーザ名とパスワードを入力します。\n\n2 段階認証コード\nコード欄でも同じです。1 桁ずつ欄が分かれているページにも対応します。\n\n新しいパスワードは iPHONE へ\nアカウント作成やパスワード変更の時に、Nodkey への保存を提案します。パスワードはすぐに iPhone だけが読める形で暗号化されます。\n\nパスキー\nサイトがパスキーを求めると、iPhone が署名します。パスキーが iPhone から出ることはありません。\n\nプライバシーを最優先に\n• ブラウザには何も保存しません：パスワードもコードも\n• ブラウザと iPhone の間はエンドツーエンドで暗号化。中継サーバは何も読めません\n• 拡張機能の鍵はブラウザの外にコピーできません\n• 無料。アカウント、広告、トラッキングなし\n• オープンソース (MIT)：github.com/peters/nodkey-browser\n\nNodkey (App Store で無料) を入れた iPhone が必要です。",
+  "captions": [
+    {
+      "title": "iPhone からサインイン",
+      "text": "サインイン欄の Nodkey をクリックして Face ID で承認。"
+    },
+    {
+      "title": "2 段階認証コードも自動入力",
+      "text": "1 桁ずつ欄が分かれたページにも対応。"
+    },
+    {
+      "title": "新しいパスワードは iPhone へ",
+      "text": "ワンクリックで保存。読めるのはあなたの iPhone だけ。"
+    },
+    {
+      "title": "パスキーは iPhone の中に",
+      "text": "署名するのは iPhone。パスキーは外に出ません。"
+    },
+    {
+      "title": "すべてのパスワードを 1 か所に",
+      "text": "iPhone の Nodkey に。ブラウザには何も残りません。"
+    }
+  ],
+  "ui": {
+    "signIn": "サインイン",
+    "email": "メール",
+    "password": "パスワード",
+    "approveOnPhone": "iPhone で承認してください",
+    "wantsPassword": "{b} がパスワードを求めています",
+    "wantsCode": "{b} がコードを求めています",
+    "wantsSave": "{b} がログインの保存を求めています",
+    "wantsPasskey": "{b} がパスキーを使おうとしています",
+    "approveOnce": "1 回だけ承認",
+    "deny": "拒否",
+    "save": "保存",
+    "notNow": "後で",
+    "codeTitle": "2 段階認証コード",
+    "codeHint": "6 桁のコードを入力",
+    "verify": "確認",
+    "saveQ": "このログインを Nodkey に保存しますか？",
+    "createAccount": "アカウント作成",
+    "passkeyBtn": "パスキーでサインイン",
+    "newPassword": "新しいパスワード",
+    "filled": "iPhone から入力しました"
+  },
+  "review": "Machine translation; needs native review before a store release."
+}

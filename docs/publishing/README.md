@@ -7,6 +7,7 @@ They use ASD-STE100 Simplified Technical English. Do them for each release.
 |---|---|---|
 | [Firefox](firefox.md) | addons.mozilla.org (AMO): unlisted (signed file only) or listed (public) | `dist/nodkey-firefox-<version>.zip` |
 | [Chrome](chrome.md) | Chrome Web Store (Chrome, Edge, Brave and other Chromium browsers) | `dist/nodkey-chromium-<version>.zip` |
+| [Store material](store-material.md) | Texts and images for both stores, in twelve languages | `store/out/` |
 | Safari | Paused. See [ADR-0008](../adr/0008-safari-mac-app.md). | `dist/safari` in the Mac app |
 
 ## Rules
@@ -57,13 +58,15 @@ They use ASD-STE100 Simplified Technical English. Do them for each release.
    ```
 
    Push the commit (or a release branch, for example `release/0.1`) so the
-   reviewers can find it. Do not tag it yet (step 7).
+   reviewers can find it. Do not tag it yet (step 8).
 
    Result: `dist/nodkey-browser-source-<version>.zip` exists. AMO needs it
    (see [Firefox](firefox.md)).
 
-6. Do [Firefox](firefox.md) and [Chrome](chrome.md).
+6. Make the [store material](store-material.md) when the listing must change.
 
-7. Tag the commit only after the owner confirms that the published version
+7. Do [Firefox](firefox.md) and [Chrome](chrome.md).
+
+8. Tag the commit only after the owner confirms that the published version
    works: `git tag v<version>` and `git push origin v<version>`. Do not push
    a tag before that.

@@ -1,0 +1,53 @@
+{
+  "label": "Italiano",
+  "chromeLocale": "it",
+  "amoLocale": "it",
+  "name": "Nodkey",
+  "summary": "Accedi con le credenziali e i codici di Nodkey sul tuo iPhone. Approvi ogni richiesta con Face ID.",
+  "description": "Nodkey tiene password, codici a due fattori e passkey in un solo posto: Nodkey sul tuo iPhone, protetto da Face ID. Questa estensione permette a Firefox e Chrome di usarli, senza salvare nulla nel browser.\n\nACCEDI DAL TUO IPHONE\nFai clic sul pulsante Nodkey in un campo di accesso. Il tuo iPhone mostra il sito e un'immagine della pagina, e approvi con Face ID. L'estensione compila nome utente e password.\n\nCODICI A DUE FATTORI\nLo stesso in un campo per il codice, anche quando la pagina ha una casella per cifra.\n\nLE NUOVE PASSWORD VANNO SUL TUO IPHONE\nQuando crei un account o cambi una password, l'estensione propone di salvarla in Nodkey. La password viene subito cifrata per il tuo iPhone.\n\nPASSKEY\nQuando un sito chiede una passkey, firma il tuo iPhone. La passkey non lo lascia mai.\n\nPRIVATO FIN DAL PROGETTO\n• Nulla viene salvato nel browser: né password né codici\n• Cifrato end-to-end tra browser e iPhone; il relay non può leggere nulla\n• Le chiavi dell'estensione non si possono copiare fuori dal browser\n• Gratis, senza account, pubblicità o tracciamento\n• Open source (MIT): github.com/peters/nodkey-browser\n\nTi serve un iPhone con Nodkey, gratis sull'App Store.",
+  "captions": [
+    {
+      "title": "Accedi dal tuo iPhone",
+      "text": "Fai clic su Nodkey nel campo e approva con Face ID."
+    },
+    {
+      "title": "Codici a due fattori, compilati",
+      "text": "Anche quando la pagina ha una casella per cifra."
+    },
+    {
+      "title": "Le nuove password sul tuo iPhone",
+      "text": "Salva con un clic. Solo il tuo iPhone può leggerla."
+    },
+    {
+      "title": "Le passkey restano sull'iPhone",
+      "text": "Il tuo iPhone firma. La passkey non lo lascia mai."
+    },
+    {
+      "title": "Un solo posto per tutte le password",
+      "text": "Nodkey sul tuo iPhone. Nel browser non resta nulla."
+    }
+  ],
+  "ui": {
+    "signIn": "Accedi",
+    "email": "E-mail",
+    "password": "Password",
+    "approveOnPhone": "Approva sul tuo iPhone",
+    "wantsPassword": "{b} chiede una password",
+    "wantsCode": "{b} chiede un codice",
+    "wantsSave": "{b} vuole salvare un accesso",
+    "wantsPasskey": "{b} vuole usare una passkey",
+    "approveOnce": "Approva una volta",
+    "deny": "Rifiuta",
+    "save": "Salva",
+    "notNow": "Non ora",
+    "codeTitle": "Codice a due fattori",
+    "codeHint": "Inserisci il codice di 6 cifre",
+    "verify": "Verifica",
+    "saveQ": "Salvare questo accesso in Nodkey?",
+    "createAccount": "Crea account",
+    "passkeyBtn": "Accedi con passkey",
+    "newPassword": "Nuova password",
+    "filled": "Compilato dal tuo iPhone"
+  },
+  "review": "Machine translation; needs native review before a store release."
+}

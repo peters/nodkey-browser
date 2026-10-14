@@ -21,6 +21,8 @@ Shared company rules apply: `fintermobilityas/company` (checkout `~/github/compa
   root UI. One classic script.
 - `src/app/`, `src/features/`, `src/components/`: popup and options page (Vue 3).
 - `src/i18n/messages/<lang>.json`: the twelve languages of the iPhone app.
+- `store/`: the store texts (`listing/<lang>.json`) and images (`scenes.html`) for AMO and the
+  Chrome Web Store; `scripts/store.mjs` renders them into `store/out/` (docs/publishing/store-material.md).
 - `safari/`: the Mac app that carries the extension into Safari (xcodegen, ADR-0008).
 - `tests/unit/`: tests that run the real background against the fake phone.
 - `tests/e2e/`: the real-browser run (`docs/features/browser-e2e.md`).
@@ -35,6 +37,7 @@ Shared company rules apply: `fintermobilityas/company` (checkout `~/github/compa
 | `npm run wasm` | Build the WebAssembly module into `src/wasm` (needs `wasm-bindgen-cli` with the version in `Cargo.lock`) |
 | `npm run validate` | Lint, format check, type checks, tests and build |
 | `npm run build` | `dist/chromium`, `dist/firefox` and a zip of each; `dist/safari` for the Mac app |
+| `npm run store` | Check the store texts and render the store images into `store/out/` |
 | `scripts/safari.sh` | Build, sign and install the Safari Mac app on the Mac build host (after `npm run build`) |
 | `npm run e2e -- --keep` | Real Chromium and Firefox on an isolated desktop |
 | `cargo test` | The WebAssembly crate's tests (native) |
@@ -56,6 +59,14 @@ Shared company rules apply: `fintermobilityas/company` (checkout `~/github/compa
 - The private keys are non-extractable WebCrypto keys (ADR-0002). Do not add a
   way to export them.
 - The browser test must never reach the real relay or a real phone.
+
+## Companion repositories
+
+Nodkey has three parts: the iPhone app and relay (`peters/nodkey`), the command line, MCP server
+and protocol (`peters/nodkey-cli`), and this extension. When the app gets a feature that agents or
+browsers can see (a request kind, how accounts match, saves, passkeys, cards), check whether the
+extension needs it, and keep the store texts and the data disclosures true
+(docs/publishing/store-material.md).
 
 ## Publishing
 

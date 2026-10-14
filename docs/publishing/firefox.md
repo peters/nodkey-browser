@@ -107,16 +107,16 @@ Do this only after the owner says yes to a public release.
 1. Do the steps of the unlisted version, but use "Submit a New Add-on" and
    select "On this site".
 
-2. Fill in the listing:
-   - Name: Nodkey. Summary: one sentence from `README.md`.
-   - Description: from "What it does" in `README.md`.
+2. Fill in the listing from `store/out/firefox/<locale>/listing.txt` (see
+   [Store material](store-material.md)). Add each of the twelve languages
+   with "Add a locale" and paste its name, summary and description.
+   - Screenshots: `01-sign-in.png` to `05-one-place.png` from the same folder,
+     with the captions from `listing.txt`.
    - Categories: "Privacy & Security".
    - Support website: `https://kh-labs.dev/nodkey/`.
    - Privacy policy: the extension sends data to the owner's iPhone, so a
      privacy policy is necessary. Use `https://kh-labs.dev/nodkey/#privacy`
      and make sure that it tells about the browser extension.
-   - Screenshots: 1280×800, from the visual test procedures, with synthetic
-     data only. `docs/images/demo.gif` shows the flow.
    - License: MIT.
 
 3. Click "Submit Version".

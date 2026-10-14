@@ -1,0 +1,53 @@
+{
+  "label": "Dansk",
+  "chromeLocale": "da",
+  "amoLocale": "da",
+  "name": "Nodkey",
+  "summary": "Log ind med logins og koder fra Nodkey på din iPhone. Du godkender hver anmodning med Face ID.",
+  "description": "Nodkey samler dine adgangskoder, totrinskoder og adgangsnøgler ét sted: Nodkey på din iPhone, bag Face ID. Med denne udvidelse kan Firefox og Chrome bruge dem, og intet gemmes i browseren.\n\nLOG IND FRA DIN IPHONE\nKlik på Nodkey-knappen i et loginfelt. Din iPhone viser webstedet og et billede af siden, og du godkender med Face ID. Udvidelsen udfylder brugernavn og adgangskode.\n\nTOTRINSKODER\nDet samme i et kodefelt, også når siden har én boks pr. ciffer.\n\nNYE ADGANGSKODER HAVNER PÅ DIN IPHONE\nNår du opretter en konto eller skifter adgangskode, tilbyder udvidelsen at gemme den i Nodkey. Adgangskoden låses til din iPhone med det samme.\n\nADGANGSNØGLER\nNår et websted beder om en adgangsnøgle, signerer din iPhone. Nøglen forlader den aldrig.\n\nPRIVAT FRA BUNDEN\n• Intet gemmes i browseren: ingen adgangskoder, ingen koder\n• End-to-end-krypteret mellem browseren og din iPhone; relæet kan ikke læse noget\n• Udvidelsens nøgler kan ikke kopieres ud af browseren\n• Gratis, ingen konto, ingen reklamer, ingen sporing\n• Åben kildekode (MIT): github.com/peters/nodkey-browser\n\nDu skal bruge en iPhone med Nodkey, gratis i App Store.",
+  "captions": [
+    {
+      "title": "Log ind fra din iPhone",
+      "text": "Klik på Nodkey i loginfeltet, og godkend med Face ID."
+    },
+    {
+      "title": "Totrinskoder udfyldes",
+      "text": "Også når siden har én boks pr. ciffer."
+    },
+    {
+      "title": "Nye adgangskoder havner på din iPhone",
+      "text": "Gem med ét klik. Kun din iPhone kan læse den."
+    },
+    {
+      "title": "Adgangsnøgler bliver på din iPhone",
+      "text": "Din iPhone signerer. Nøglen forlader den aldrig."
+    },
+    {
+      "title": "Ét sted til alle adgangskoder",
+      "text": "Nodkey på din iPhone. Intet gemmes i browseren."
+    }
+  ],
+  "ui": {
+    "signIn": "Log ind",
+    "email": "E-mail",
+    "password": "Adgangskode",
+    "approveOnPhone": "Godkend på din iPhone",
+    "wantsPassword": "{b} vil have en adgangskode",
+    "wantsCode": "{b} vil have en kode",
+    "wantsSave": "{b} vil gemme et login",
+    "wantsPasskey": "{b} vil bruge en adgangsnøgle",
+    "approveOnce": "Godkend én gang",
+    "deny": "Afvis",
+    "save": "Gem",
+    "notNow": "Ikke nu",
+    "codeTitle": "Totrinskode",
+    "codeHint": "Indtast den sekscifrede kode",
+    "verify": "Bekræft",
+    "saveQ": "Gem dette login i Nodkey?",
+    "createAccount": "Opret konto",
+    "passkeyBtn": "Log ind med adgangsnøgle",
+    "newPassword": "Ny adgangskode",
+    "filled": "Udfyldt fra din iPhone"
+  },
+  "review": "Machine translation; needs native review before a store release."
+}

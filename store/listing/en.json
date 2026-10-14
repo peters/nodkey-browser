@@ -1,0 +1,53 @@
+{
+  "label": "English",
+  "chromeLocale": "en",
+  "amoLocale": "en-US",
+  "name": "Nodkey",
+  "summary": "Sign in with logins and codes from Nodkey on your iPhone. You approve every request with Face ID.",
+  "description": "Nodkey keeps your passwords, two-step codes and passkeys in one place: Nodkey on your iPhone, behind Face ID. This extension lets Firefox and Chrome use them, and it stores nothing in the browser.\n\nSIGN IN FROM YOUR IPHONE\nClick the Nodkey button in a sign-in field. Your iPhone shows the site and a picture of the page, and you approve with Face ID. The extension fills in your user name and password.\n\nTWO-STEP CODES\nThe same in a code field, also when the page has one box per digit.\n\nNEW PASSWORDS GO TO YOUR IPHONE\nWhen you sign up or change a password, the extension offers to save it in Nodkey. The password is locked for your iPhone at once.\n\nPASSKEYS\nWhen a website asks for a passkey, your iPhone signs. The passkey never leaves it.\n\nPRIVATE BY DESIGN\n• Nothing is stored in the browser: no passwords, no codes\n• End-to-end encrypted between the browser and your iPhone; the relay cannot read it\n• The extension's keys cannot be copied out of the browser\n• Free, no account, no ads, no tracking\n• Open source (MIT): github.com/peters/nodkey-browser\n\nYou need an iPhone with Nodkey, free on the App Store.",
+  "captions": [
+    {
+      "title": "Sign in from your iPhone",
+      "text": "Click Nodkey in the sign-in field and approve with Face ID."
+    },
+    {
+      "title": "Two-step codes, filled in",
+      "text": "Even when the page has one box per digit."
+    },
+    {
+      "title": "New passwords go to your iPhone",
+      "text": "Save with one click. Only your iPhone can read it."
+    },
+    {
+      "title": "Passkeys stay on your iPhone",
+      "text": "Your iPhone signs. The passkey never leaves it."
+    },
+    {
+      "title": "One place for every password",
+      "text": "Nodkey on your iPhone. Nothing is stored in the browser."
+    }
+  ],
+  "ui": {
+    "signIn": "Sign in",
+    "email": "E-mail",
+    "password": "Password",
+    "approveOnPhone": "Approve on your iPhone",
+    "wantsPassword": "{b} wants a password",
+    "wantsCode": "{b} wants a code",
+    "wantsSave": "{b} wants to save a login",
+    "wantsPasskey": "{b} wants to use a passkey",
+    "approveOnce": "Approve once",
+    "deny": "Deny",
+    "save": "Save",
+    "notNow": "Not now",
+    "codeTitle": "Two-step code",
+    "codeHint": "Enter the 6-digit code from your app",
+    "verify": "Verify",
+    "saveQ": "Save this login in Nodkey?",
+    "createAccount": "Create account",
+    "passkeyBtn": "Sign in with a passkey",
+    "newPassword": "New password",
+    "filled": "Filled from your iPhone"
+  },
+  "review": "Source text."
+}

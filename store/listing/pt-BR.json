@@ -1,0 +1,53 @@
+{
+  "label": "Português (Brasil)",
+  "chromeLocale": "pt_BR",
+  "amoLocale": "pt-BR",
+  "name": "Nodkey",
+  "summary": "Entre com logins e códigos do Nodkey no seu iPhone. Você aprova cada solicitação com o Face ID.",
+  "description": "O Nodkey guarda suas senhas, códigos de duas etapas e chaves-senha em um só lugar: o Nodkey no seu iPhone, protegido pelo Face ID. Esta extensão permite que o Firefox e o Chrome os usem, sem guardar nada no navegador.\n\nENTRE PELO SEU IPHONE\nClique no botão do Nodkey em um campo de login. Seu iPhone mostra o site e uma imagem da página, e você aprova com o Face ID. A extensão preenche usuário e senha.\n\nCÓDIGOS DE DUAS ETAPAS\nO mesmo em um campo de código, mesmo quando a página tem uma caixa por dígito.\n\nSENHAS NOVAS VÃO PARA O SEU IPHONE\nQuando você cria uma conta ou troca uma senha, a extensão oferece salvá-la no Nodkey. A senha é cifrada para o seu iPhone na hora.\n\nCHAVES-SENHA\nQuando um site pede uma chave-senha, o seu iPhone assina. A chave nunca sai dele.\n\nPRIVADO DESDE O INÍCIO\n• Nada fica guardado no navegador: nem senhas, nem códigos\n• Criptografia de ponta a ponta entre o navegador e o iPhone; o relay não consegue ler nada\n• As chaves da extensão não podem ser copiadas para fora do navegador\n• Grátis, sem conta, sem anúncios, sem rastreamento\n• Código aberto (MIT): github.com/peters/nodkey-browser\n\nVocê precisa de um iPhone com o Nodkey, grátis na App Store.",
+  "captions": [
+    {
+      "title": "Entre pelo seu iPhone",
+      "text": "Clique no Nodkey no campo e aprove com o Face ID."
+    },
+    {
+      "title": "Códigos de duas etapas preenchidos",
+      "text": "Mesmo quando a página tem uma caixa por dígito."
+    },
+    {
+      "title": "Senhas novas vão para o iPhone",
+      "text": "Salve com um clique. Só o seu iPhone consegue ler."
+    },
+    {
+      "title": "Chaves-senha ficam no iPhone",
+      "text": "O seu iPhone assina. A chave nunca sai dele."
+    },
+    {
+      "title": "Um só lugar para todas as senhas",
+      "text": "Nodkey no seu iPhone. Nada fica no navegador."
+    }
+  ],
+  "ui": {
+    "signIn": "Entrar",
+    "email": "E-mail",
+    "password": "Senha",
+    "approveOnPhone": "Aprove no seu iPhone",
+    "wantsPassword": "{b} quer uma senha",
+    "wantsCode": "{b} quer um código",
+    "wantsSave": "{b} quer salvar um login",
+    "wantsPasskey": "{b} quer usar uma chave-senha",
+    "approveOnce": "Aprovar uma vez",
+    "deny": "Negar",
+    "save": "Salvar",
+    "notNow": "Agora não",
+    "codeTitle": "Código de duas etapas",
+    "codeHint": "Digite o código de 6 dígitos",
+    "verify": "Verificar",
+    "saveQ": "Salvar este login no Nodkey?",
+    "createAccount": "Criar conta",
+    "passkeyBtn": "Entrar com chave-senha",
+    "newPassword": "Nova senha",
+    "filled": "Preenchido pelo seu iPhone"
+  },
+  "review": "Machine translation; needs native review before a store release."
+}

@@ -1,0 +1,53 @@
+{
+  "label": "Norsk bokmål",
+  "chromeLocale": "no",
+  "amoLocale": "nb-NO",
+  "name": "Nodkey",
+  "summary": "Logg inn med innlogginger og koder fra Nodkey på iPhonen din. Du godkjenner hver forespørsel med Face ID.",
+  "description": "Nodkey samler passordene, totrinnskodene og passkeyene dine på ett sted: Nodkey på iPhonen, bak Face ID. Med denne utvidelsen kan Firefox og Chrome bruke dem, og ingenting lagres i nettleseren.\n\nLOGG INN FRA IPHONEN\nKlikk Nodkey-knappen i et innloggingsfelt. iPhonen viser nettstedet og et bilde av siden, og du godkjenner med Face ID. Utvidelsen fyller inn brukernavn og passord.\n\nTOTRINNSKODER\nDet samme i et kodefelt, også når siden har én rute per siffer.\n\nNYE PASSORD HAVNER PÅ IPHONEN\nNår du lager en konto eller bytter passord, tilbyr utvidelsen å lagre det i Nodkey. Passordet låses for iPhonen med en gang.\n\nPASSKEYS\nNår et nettsted ber om en passkey, signerer iPhonen. Passkeyen forlater den aldri.\n\nPRIVAT FRA BUNNEN AV\n• Ingenting lagres i nettleseren: ingen passord, ingen koder\n• Ende-til-ende-kryptert mellom nettleseren og iPhonen; relayet kan ikke lese noe\n• Utvidelsens nøkler kan ikke kopieres ut av nettleseren\n• Gratis, uten konto, reklame eller sporing\n• Åpen kildekode (MIT): github.com/peters/nodkey-browser\n\nDu trenger en iPhone med Nodkey, gratis i App Store.",
+  "captions": [
+    {
+      "title": "Logg inn fra iPhonen",
+      "text": "Klikk Nodkey i innloggingsfeltet og godkjenn med Face ID."
+    },
+    {
+      "title": "Totrinnskoder fylles inn",
+      "text": "Også når siden har én rute per siffer."
+    },
+    {
+      "title": "Nye passord havner på iPhonen",
+      "text": "Lagre med ett klikk. Bare iPhonen kan lese det."
+    },
+    {
+      "title": "Passkeys blir på iPhonen",
+      "text": "iPhonen signerer. Passkeyen forlater den aldri."
+    },
+    {
+      "title": "Ett sted for alle passord",
+      "text": "Nodkey på iPhonen. Ingenting lagres i nettleseren."
+    }
+  ],
+  "ui": {
+    "signIn": "Logg inn",
+    "email": "E-post",
+    "password": "Passord",
+    "approveOnPhone": "Godkjenn på iPhonen",
+    "wantsPassword": "{b} vil ha et passord",
+    "wantsCode": "{b} vil ha en kode",
+    "wantsSave": "{b} vil lagre en innlogging",
+    "wantsPasskey": "{b} vil bruke en passkey",
+    "approveOnce": "Godkjenn én gang",
+    "deny": "Avvis",
+    "save": "Lagre",
+    "notNow": "Ikke nå",
+    "codeTitle": "Totrinnskode",
+    "codeHint": "Skriv inn den sekssifrede koden",
+    "verify": "Bekreft",
+    "saveQ": "Lagre denne innloggingen i Nodkey?",
+    "createAccount": "Opprett konto",
+    "passkeyBtn": "Logg inn med passkey",
+    "newPassword": "Nytt passord",
+    "filled": "Fylt inn fra iPhonen"
+  },
+  "review": "Machine translation; needs native review before a store release."
+}

@@ -1,0 +1,53 @@
+{
+  "label": "한국어",
+  "chromeLocale": "ko",
+  "amoLocale": "ko",
+  "name": "Nodkey",
+  "summary": "iPhone의 Nodkey에 있는 로그인 정보와 코드로 로그인해요. 모든 요청은 Face ID로 승인해요.",
+  "description": "Nodkey는 비밀번호, 2단계 인증 코드, 패스키를 한곳에 보관해요. 바로 iPhone의 Nodkey, Face ID 뒤에요. 이 확장 프로그램으로 Firefox와 Chrome에서 그것들을 쓸 수 있고, 브라우저에는 아무것도 저장하지 않아요.\n\niPHONE으로 로그인\n로그인 칸의 Nodkey 버튼을 클릭하세요. iPhone에 사이트와 페이지 사진이 보이고, Face ID로 승인하면 확장 프로그램이 아이디와 비밀번호를 채워요.\n\n2단계 인증 코드\n코드 칸에서도 똑같아요. 숫자마다 칸이 나뉜 페이지도 돼요.\n\n새 비밀번호는 iPHONE으로\n계정을 만들거나 비밀번호를 바꾸면 Nodkey에 저장하자고 제안해요. 비밀번호는 바로 iPhone만 읽을 수 있게 암호화돼요.\n\n패스키\n사이트가 패스키를 요청하면 iPhone이 서명해요. 패스키는 iPhone 밖으로 나가지 않아요.\n\n처음부터 개인정보 보호\n• 브라우저에 아무것도 저장하지 않아요: 비밀번호도 코드도\n• 브라우저와 iPhone 사이는 종단 간 암호화돼요. 중계 서버는 아무것도 읽을 수 없어요\n• 확장 프로그램의 키는 브라우저 밖으로 복사할 수 없어요\n• 무료, 계정·광고·추적 없음\n• 오픈 소스 (MIT): github.com/peters/nodkey-browser\n\nApp Store에서 무료로 받는 Nodkey가 설치된 iPhone이 필요해요.",
+  "captions": [
+    {
+      "title": "iPhone으로 로그인",
+      "text": "로그인 칸에서 Nodkey를 클릭하고 Face ID로 승인하세요."
+    },
+    {
+      "title": "2단계 인증 코드도 자동 입력",
+      "text": "숫자마다 칸이 나뉜 페이지도 돼요."
+    },
+    {
+      "title": "새 비밀번호는 iPhone으로",
+      "text": "한 번 클릭으로 저장해요. iPhone만 읽을 수 있어요."
+    },
+    {
+      "title": "패스키는 iPhone에 그대로",
+      "text": "서명은 iPhone이 해요. 패스키는 밖으로 나가지 않아요."
+    },
+    {
+      "title": "모든 비밀번호를 한곳에",
+      "text": "iPhone의 Nodkey에. 브라우저에는 아무것도 남지 않아요."
+    }
+  ],
+  "ui": {
+    "signIn": "로그인",
+    "email": "이메일",
+    "password": "비밀번호",
+    "approveOnPhone": "iPhone에서 승인하세요",
+    "wantsPassword": "{b}에서 비밀번호를 요청해요",
+    "wantsCode": "{b}에서 코드를 요청해요",
+    "wantsSave": "{b}에서 로그인을 저장하려고 해요",
+    "wantsPasskey": "{b}에서 패스키를 쓰려고 해요",
+    "approveOnce": "한 번 승인",
+    "deny": "거절",
+    "save": "저장",
+    "notNow": "나중에",
+    "codeTitle": "2단계 인증 코드",
+    "codeHint": "6자리 코드를 입력하세요",
+    "verify": "확인",
+    "saveQ": "이 로그인을 Nodkey에 저장할까요?",
+    "createAccount": "계정 만들기",
+    "passkeyBtn": "패스키로 로그인",
+    "newPassword": "새 비밀번호",
+    "filled": "iPhone에서 채웠어요"
+  },
+  "review": "Machine translation; needs native review before a store release."
+}

@@ -1,0 +1,53 @@
+{
+  "label": "Deutsch",
+  "chromeLocale": "de",
+  "amoLocale": "de",
+  "name": "Nodkey",
+  "summary": "Melde dich mit Logins und Codes aus Nodkey auf deinem iPhone an. Du bestätigst jede Anfrage mit Face ID.",
+  "description": "Nodkey bewahrt deine Passwörter, Zwei-Faktor-Codes und Passkeys an einem Ort auf: Nodkey auf deinem iPhone, hinter Face ID. Mit dieser Erweiterung können Firefox und Chrome sie nutzen, und im Browser wird nichts gespeichert.\n\nVOM IPHONE AUS ANMELDEN\nKlicke auf die Nodkey-Taste in einem Anmeldefeld. Dein iPhone zeigt die Website und ein Bild der Seite, und du bestätigst mit Face ID. Die Erweiterung füllt Benutzername und Passwort aus.\n\nZWEI-FAKTOR-CODES\nGenauso in einem Codefeld, auch wenn die Seite ein Feld pro Ziffer hat.\n\nNEUE PASSWÖRTER LANDEN AUF DEINEM IPHONE\nWenn du ein Konto anlegst oder ein Passwort änderst, bietet die Erweiterung an, es in Nodkey zu sichern. Das Passwort wird sofort für dein iPhone verschlüsselt.\n\nPASSKEYS\nFragt eine Website nach einem Passkey, signiert dein iPhone. Der Passkey verlässt es nie.\n\nPRIVAT VON GRUND AUF\n• Nichts wird im Browser gespeichert: keine Passwörter, keine Codes\n• Ende-zu-Ende-verschlüsselt zwischen Browser und iPhone; das Relay kann nichts lesen\n• Die Schlüssel der Erweiterung lassen sich nicht aus dem Browser kopieren\n• Kostenlos, ohne Konto, Werbung oder Tracking\n• Open Source (MIT): github.com/peters/nodkey-browser\n\nDu brauchst ein iPhone mit Nodkey, kostenlos im App Store.",
+  "captions": [
+    {
+      "title": "Vom iPhone aus anmelden",
+      "text": "Klicke im Anmeldefeld auf Nodkey und bestätige mit Face ID."
+    },
+    {
+      "title": "Zwei-Faktor-Codes, ausgefüllt",
+      "text": "Auch wenn die Seite ein Feld pro Ziffer hat."
+    },
+    {
+      "title": "Neue Passwörter aufs iPhone",
+      "text": "Mit einem Klick sichern. Nur dein iPhone kann es lesen."
+    },
+    {
+      "title": "Passkeys bleiben auf dem iPhone",
+      "text": "Dein iPhone signiert. Der Passkey verlässt es nie."
+    },
+    {
+      "title": "Ein Ort für alle Passwörter",
+      "text": "Nodkey auf deinem iPhone. Im Browser wird nichts gespeichert."
+    }
+  ],
+  "ui": {
+    "signIn": "Anmelden",
+    "email": "E-Mail",
+    "password": "Passwort",
+    "approveOnPhone": "Auf dem iPhone bestätigen",
+    "wantsPassword": "{b} möchte ein Passwort",
+    "wantsCode": "{b} möchte einen Code",
+    "wantsSave": "{b} möchte ein Login sichern",
+    "wantsPasskey": "{b} möchte einen Passkey nutzen",
+    "approveOnce": "Einmal erlauben",
+    "deny": "Ablehnen",
+    "save": "Sichern",
+    "notNow": "Nicht jetzt",
+    "codeTitle": "Zwei-Faktor-Code",
+    "codeHint": "Gib den sechsstelligen Code ein",
+    "verify": "Bestätigen",
+    "saveQ": "Dieses Login in Nodkey sichern?",
+    "createAccount": "Konto anlegen",
+    "passkeyBtn": "Mit Passkey anmelden",
+    "newPassword": "Neues Passwort",
+    "filled": "Vom iPhone ausgefüllt"
+  },
+  "review": "Machine translation; needs native review before a store release."
+}

@@ -1,0 +1,558 @@
+<!doctype html>
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <!--
+  The store images of the extension, drawn in the Flis style. scripts/store.mjs opens this page with
+  ?lang=<lang>&browser=Firefox|Chrome&scene=1..5 (1280×800 screenshots) or &scene=promo (440×280) and
+  &scene=marquee (1400×560), and saves a screenshot of it. Text comes from store/listing/<lang>.json.
+  Invented data only.
+-->
+    <style>
+      @font-face {
+        font-family: 'Bricolage';
+        src: url('/public/fonts/bricolage-latin.woff2') format('woff2');
+        font-weight: 200 800;
+      }
+      :root {
+        --bg: #fbfaf7;
+        --card: #fff;
+        --ink: #1d2433;
+        --muted: #5f6878;
+        --rule: #e3e6ea;
+        --accent: #138a63;
+        --red: #d23b2a;
+        --t1: #c8efd9;
+        --t2: #ffd9c7;
+        --t3: #cfe3ff;
+        --t4: #e5dbff;
+        --display:
+          'Bricolage', 'Noto Sans CJK JP', 'Noto Sans CJK KR', 'Noto Sans CJK SC', system-ui,
+          sans-serif;
+        --text:
+          system-ui, 'Noto Sans', 'Noto Sans CJK JP', 'Noto Sans CJK KR', 'Noto Sans CJK SC',
+          sans-serif;
+      }
+      * {
+        box-sizing: border-box;
+        margin: 0;
+        padding: 0;
+      }
+      html,
+      body {
+        background: var(--bg);
+        color: var(--ink);
+        overflow: hidden;
+      }
+      body {
+        position: relative;
+        font-family: var(--text);
+      }
+      .abs {
+        position: absolute;
+      }
+      .blob {
+        position: absolute;
+        border-radius: 48px;
+        transform: rotate(-14deg);
+      }
+      .display {
+        font-family: var(--display);
+      }
+
+      /* caption */
+      #brand {
+        left: 64px;
+        top: 52px;
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        font: 700 26px var(--display);
+      }
+      #brand img {
+        width: 44px;
+        height: 44px;
+      }
+      #title {
+        left: 64px;
+        top: 116px;
+        width: 780px;
+        font: 760 48px/1.08 var(--display);
+        letter-spacing: -1px;
+      }
+      #text {
+        left: 64px;
+        width: 700px;
+        font: 500 21px/1.35 var(--display);
+        color: var(--muted);
+      }
+
+      /* browser window */
+      .win {
+        background: #fff;
+        border: 1px solid var(--rule);
+        border-radius: 16px;
+        overflow: hidden;
+        box-shadow: 0 24px 60px rgba(29, 36, 51, 0.16);
+      }
+      .win .bar {
+        height: 42px;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        padding: 0 14px;
+        background: #f1f2f4;
+        border-bottom: 1px solid var(--rule);
+      }
+      .win .dot {
+        width: 11px;
+        height: 11px;
+        border-radius: 50%;
+      }
+      .win .url {
+        flex: 1;
+        margin-left: 10px;
+        height: 26px;
+        border-radius: 13px;
+        background: #fff;
+        display: flex;
+        align-items: center;
+        padding: 0 12px;
+        font-size: 13px;
+        color: var(--muted);
+      }
+      .win .ext {
+        width: 24px;
+        height: 24px;
+      }
+      .win .tab {
+        font-size: 12px;
+        color: var(--muted);
+        margin-right: 8px;
+        white-space: nowrap;
+      }
+      .page {
+        padding: 28px 40px;
+      }
+      .page h2 {
+        font: 700 26px var(--display);
+        margin-bottom: 14px;
+      }
+      .page label {
+        display: block;
+        font-size: 13px;
+        color: var(--muted);
+        margin: 10px 0 5px;
+      }
+      .field {
+        position: relative;
+        width: 400px;
+        height: 42px;
+        border: 1.5px solid #c9ced6;
+        border-radius: 9px;
+        font-size: 16px;
+        display: flex;
+        align-items: center;
+        padding: 0 12px;
+      }
+      .field.focus {
+        border-color: var(--accent);
+        box-shadow: 0 0 0 3px rgba(19, 138, 99, 0.15);
+      }
+      .field .nk {
+        position: absolute;
+        right: 7px;
+        top: 7px;
+        width: 26px;
+        height: 26px;
+      }
+      .btn {
+        display: inline-flex;
+        margin-top: 16px;
+        padding: 0 20px;
+        height: 40px;
+        border-radius: 9px;
+        background: var(--ink);
+        color: #fff;
+        align-items: center;
+        font-weight: 600;
+      }
+      .boxes {
+        display: flex;
+        gap: 8px;
+        align-items: center;
+      }
+      .box {
+        width: 46px;
+        height: 54px;
+        border: 1.5px solid var(--accent);
+        border-radius: 10px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font: 700 24px var(--display);
+      }
+      .bubble {
+        background: #fff;
+        border: 1px solid var(--rule);
+        border-radius: 14px;
+        box-shadow: 0 10px 30px rgba(29, 36, 51, 0.15);
+        padding: 12px 14px;
+        display: flex;
+        gap: 10px;
+        align-items: center;
+        font-size: 14px;
+      }
+      .bubble img {
+        width: 28px;
+        height: 28px;
+      }
+      .bubble b {
+        display: block;
+      }
+
+      /* phone */
+      #phone {
+        width: 288px;
+        height: 600px;
+        border-radius: 52px;
+        background: #1d2433;
+        padding: 12px;
+        box-shadow: 0 30px 70px rgba(29, 36, 51, 0.28);
+      }
+      #screen {
+        position: relative;
+        width: 264px;
+        height: 576px;
+        border-radius: 41px;
+        overflow: hidden;
+        background: var(--bg);
+      }
+      #screen > img {
+        position: absolute;
+        left: 0;
+        top: 0;
+        width: 264px;
+      }
+      .dim {
+        position: absolute;
+        inset: 0;
+        background: rgba(29, 36, 51, 0.35);
+      }
+      .sheet {
+        position: absolute;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: var(--bg);
+        border-radius: 26px 26px 0 0;
+        padding: 10px 14px 18px;
+      }
+      .sheet .grab {
+        width: 38px;
+        height: 4px;
+        border-radius: 2px;
+        background: #c9ced6;
+        margin: 0 auto 10px;
+      }
+      .sheet h3 {
+        font: 700 17px/1.2 var(--display);
+      }
+      .sheet .boxc {
+        background: #fff;
+        border-radius: 12px;
+        margin-top: 10px;
+        font-size: 11.5px;
+      }
+      .sheet .row {
+        padding: 9px 10px;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        border-bottom: 1px solid var(--rule);
+      }
+      .sheet .row:last-child {
+        border: 0;
+      }
+      .av {
+        width: 26px;
+        height: 26px;
+        border-radius: 7px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-weight: 700;
+        font-size: 10px;
+      }
+      .sub {
+        color: var(--muted);
+        font-size: 10.5px;
+      }
+      .btns {
+        display: flex;
+        gap: 8px;
+        margin-top: 14px;
+      }
+      .btns div {
+        height: 38px;
+        border-radius: 10px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-weight: 650;
+        font-size: 12.5px;
+        text-align: center;
+        padding: 0 6px;
+      }
+      .deny {
+        flex: 1;
+        background: #fff;
+        color: var(--red);
+        border: 1px solid var(--rule);
+      }
+      .ok {
+        flex: 1.6;
+        background: var(--accent);
+        color: #fff;
+      }
+      .faceid {
+        width: 96px;
+        height: 96px;
+        border-radius: 24px;
+        background: rgba(29, 36, 51, 0.82);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+      }
+      .code {
+        font: 760 40px var(--display);
+        letter-spacing: 1px;
+      }
+
+      /* promo */
+      .promo-name {
+        font: 780 44px var(--display);
+        letter-spacing: -1px;
+      }
+    </style>
+  </head>
+  <body>
+    <div id="root"></div>
+    <script type="module">
+      const q = new URLSearchParams(location.search)
+      const lang = q.get('lang') || 'en'
+      const browser = q.get('browser') || 'Firefox'
+      const scene = q.get('scene') || '1'
+      const L = await (await fetch(`/store/listing/${lang}.json`)).json()
+      const u = L.ui
+      const esc = (s) => String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;')
+      const b = (s) => esc(s).replace('{b}', browser)
+      const LOGO = '/public/icons/logo.svg'
+      const sizes = { promo: [440, 280], marquee: [1400, 560] }
+      const [W, H] = sizes[scene] || [1280, 800]
+      document.body.style.width = W + 'px'
+      document.body.style.height = H + 'px'
+
+      const FACE = `<svg viewBox="0 0 64 64" width="56" height="56" fill="none" stroke="#fff" stroke-width="4" stroke-linecap="round">
+  <path d="M4 18V10a6 6 0 0 1 6-6h8M46 4h8a6 6 0 0 1 6 6v8M60 46v8a6 6 0 0 1-6 6h-8M18 60h-8a6 6 0 0 1-6-6v-8"/>
+  <path d="M22 24v5M42 24v5M32 24v12h-3M24 44c5 4 11 4 16 0"/></svg>`
+
+      const blobs = `
+  <div class="blob" style="left:${W - 260}px;top:-150px;width:320px;height:320px;background:var(--t4);opacity:.7"></div>
+  <div class="blob" style="left:-120px;top:${H - 200}px;width:280px;height:280px;background:var(--t2);opacity:.7"></div>
+  <div class="blob" style="left:${W * 0.55}px;top:${H - 120}px;width:220px;height:220px;background:var(--t3);opacity:.6"></div>`
+
+      function win(x, y, w, h, url, body, title = '') {
+        return `<div class="win abs" style="left:${x}px;top:${y}px;width:${w}px;height:${h}px">
+    <div class="bar"><span class="dot" style="background:#ff7a59"></span><span class="dot" style="background:#ffd166"></span>
+      <span class="dot" style="background:#5fd3a5"></span><div class="url">🔒 ${esc(url)}</div>
+      ${title ? `<span class="tab">${esc(title)}</span>` : ''}<img class="ext" src="${LOGO}" alt=""></div>
+    <div class="page">${body}</div></div>`
+      }
+
+      function phone(x, y, content, dim = true) {
+        return `<div id="phone" class="abs" style="left:${x}px;top:${y}px"><div id="screen">
+    <img src="/store/assets/phone/${lang}.jpg" alt="">${dim ? '<div class="dim"></div>' : ''}${content}</div></div>`
+      }
+
+      function sheet(title, rows, buttons, extra = '') {
+        return `<div class="sheet"><div class="grab"></div><h3>${title}</h3>
+    <div class="boxc"><div class="row"><div class="av" style="background:var(--t1);color:var(--accent)">${browser.slice(0, 2).toUpperCase()}</div>
+      <div><b>${esc(browser)}</b><div class="sub">my-laptop</div></div></div></div>
+    ${rows}${extra}<div class="btns">${buttons}</div></div>`
+      }
+      const account = (site, user, chip = '') => `<div class="boxc"><div class="row">
+  <div class="av" style="background:var(--t3);color:#2b5fa8">${esc(site[0].toUpperCase())}</div>
+  <div><b>${esc(site)}</b><div class="sub">${esc(user)}</div></div>${chip ? `<span class="sub" style="margin-left:auto">${esc(chip)}</span>` : ''}</div></div>`
+      const approve = `<div class="deny">${esc(u.deny)}</div><div class="ok">${esc(u.approveOnce)}</div>`
+
+      function caption(i) {
+        const c = L.captions[i - 1]
+        return `<div id="brand" class="abs"><img src="${LOGO}" alt=""><span>Nodkey</span></div>
+    <div id="title" class="abs">${esc(c.title)}</div><div id="text" class="abs">${esc(c.text)}</div>`
+      }
+
+      const site = 'shop.example.com'
+      const user = 'alex@example.com'
+      let html = blobs
+      if (scene === '1') {
+        html +=
+          caption(1) +
+          win(
+            64,
+            300,
+            760,
+            440,
+            `https://${site}/sign-in`,
+            `
+    <h2>${esc(u.signIn)}</h2>
+    <label>${esc(u.email)}</label><div class="field focus">${user}<img class="nk" src="${LOGO}" alt=""></div>
+    <label>${esc(u.password)}</label><div class="field">••••••••••••</div>
+    <div class="btn">${esc(u.signIn)}</div>`,
+          ) +
+          `<div class="bubble abs" style="left:520px;top:470px"><img src="${LOGO}" alt=""><div><b>Nodkey</b><span class="sub" style="font-size:13px">${esc(u.approveOnPhone)}</span></div></div>` +
+          phone(
+            920,
+            110,
+            sheet(b(u.wantsPassword), account(site, user, u.password), approve) +
+              `<div class="faceid abs" style="left:84px;top:150px">${FACE}</div>`,
+          )
+      } else if (scene === '2') {
+        html +=
+          caption(2) +
+          win(
+            64,
+            300,
+            760,
+            440,
+            `https://${site}/verify`,
+            `
+    <h2>${esc(u.codeTitle)}</h2><label>${esc(u.codeHint)}</label>
+    <div class="boxes">${'190274'
+      .split('')
+      .map((d) => `<div class="box">${d}</div>`)
+      .join('')}<img src="${LOGO}" style="width:30px;height:30px;margin-left:6px" alt=""></div>
+    <div class="btn">${esc(u.verify)}</div>
+    <div class="bubble" style="margin-top:22px;width:max-content"><img src="${LOGO}" alt=""><b>${esc(u.filled)}</b></div>`,
+          ) +
+          phone(
+            920,
+            110,
+            sheet(
+              b(u.wantsCode),
+              account(site, user) +
+                `<div class="boxc" style="padding:12px 10px;text-align:center"><div class="code">190 274</div></div>`,
+              approve,
+            ),
+          )
+      } else if (scene === '3') {
+        html +=
+          caption(3) +
+          win(
+            64,
+            300,
+            760,
+            440,
+            `https://${site}/sign-up`,
+            `
+    <h2>${esc(u.createAccount)}</h2>
+    <label>${esc(u.email)}</label><div class="field">${user}</div>
+    <label>${esc(u.newPassword)}</label><div class="field focus">••••••••••••••</div>
+    <div class="btn">${esc(u.createAccount)}</div>`,
+          ) +
+          `<div class="bubble abs" style="left:430px;top:400px;width:360px;display:block">
+      <div style="display:flex;gap:10px;align-items:center"><img src="${LOGO}" alt=""><b>${esc(u.saveQ)}</b></div>
+      <div class="sub" style="margin:6px 0 10px 38px;font-size:13px">${site} · ${user}</div>
+      <div style="display:flex;gap:8px;margin-left:38px"><div class="btn" style="margin:0;background:var(--accent);height:34px">${esc(u.save)}</div>
+      <div class="btn" style="margin:0;background:#fff;color:var(--ink);border:1px solid var(--rule);height:34px">${esc(u.notNow)}</div></div></div>` +
+          phone(
+            920,
+            110,
+            sheet(
+              b(u.wantsSave),
+              account(site, user, '••••••••'),
+              `<div class="deny">${esc(u.notNow)}</div><div class="ok">${esc(u.save)}</div>`,
+            ),
+          )
+      } else if (scene === '4') {
+        html +=
+          caption(4) +
+          win(
+            64,
+            300,
+            760,
+            440,
+            `https://${site}/sign-in`,
+            `
+    <h2>${esc(u.signIn)}</h2>
+    <label>${esc(u.email)}</label><div class="field">${user}</div>
+    <div class="btn" style="background:var(--accent);gap:10px">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2"><circle cx="9" cy="8" r="4"/><path d="M3 21c0-4 3-6 6-6s6 2 6 6M17 11a3 3 0 1 1 3 3v6l-2-1"/></svg>
+      ${esc(u.passkeyBtn)}</div>`,
+          ) +
+          phone(
+            920,
+            110,
+            sheet(b(u.wantsPasskey), account(site, user, 'passkey'), approve) +
+              `<div class="faceid abs" style="left:84px;top:150px">${FACE}</div>`,
+          )
+      } else if (scene === '5') {
+        const minis = ['Firefox', 'Chrome', 'Edge', 'Brave']
+        html +=
+          caption(5) +
+          minis
+            .map((name, i) =>
+              win(
+                64 + i * 48,
+                300 + i * 70,
+                560,
+                250,
+                `https://${['github.com', 'vg.no', 'mail.example.com', site][i]}/login`,
+                `
+      <h2 style="font-size:20px">${esc(u.signIn)}</h2><div class="field" style="width:320px">${user}<img class="nk" src="${LOGO}" alt=""></div>`,
+                name,
+              ),
+            )
+            .join('') +
+          `<svg class="abs" style="left:760px;top:330px" width="160" height="200" viewBox="0 0 160 200" fill="none" stroke="#138a63" stroke-width="3" stroke-dasharray="6 7" stroke-linecap="round">
+      <path d="M10 30 C80 30 90 100 150 100"/><path d="M10 170 C80 170 90 100 150 100"/></svg>` +
+          phone(920, 110, '', false)
+      } else if (scene === 'promo') {
+        html = `<div class="blob" style="left:300px;top:-110px;width:220px;height:220px;background:var(--t4);opacity:.8"></div>
+    <div class="blob" style="left:-80px;top:180px;width:200px;height:200px;background:var(--t2);opacity:.8"></div>
+    <div class="abs" style="left:36px;top:40px;display:flex;align-items:center;gap:14px"><img src="${LOGO}" style="width:72px;height:72px" alt="">
+      <span class="promo-name">Nodkey</span></div>
+    <div class="abs display" style="left:36px;top:140px;width:370px;font:700 25px/1.15 var(--display)">${esc(L.captions[0].title)}</div>
+    <div class="abs display" style="left:36px;top:214px;width:370px;font:500 15px/1.3 var(--display);color:var(--muted)">${esc(L.captions[4].text)}</div>`
+      } else if (scene === 'marquee') {
+        html +=
+          `<div class="abs" style="left:80px;top:90px;display:flex;align-items:center;gap:18px"><img src="${LOGO}" style="width:96px;height:96px" alt="">
+      <span class="promo-name" style="font-size:64px">Nodkey</span></div>
+    <div class="abs" style="left:80px;top:230px;width:640px;font:760 46px/1.1 var(--display);letter-spacing:-1px">${esc(L.captions[0].title)}</div>
+    <div class="abs" style="left:80px;top:350px;width:600px;font:500 22px/1.35 var(--display);color:var(--muted)">${esc(L.captions[4].text)}</div>` +
+          `<div class="abs" style="left:800px;top:24px;transform:scale(.85);transform-origin:0 0">` +
+          win(
+            0,
+            120,
+            420,
+            300,
+            `https://${site}`,
+            `<h2 style="font-size:20px">${esc(u.signIn)}</h2><div class="field focus" style="width:320px">${user}<img class="nk" src="${LOGO}" alt=""></div>`,
+          ) +
+          phone(330, 0, sheet(b(u.wantsPassword), account(site, user), approve)) +
+          '</div>'
+      }
+      document.getElementById('root').innerHTML = html
+      const text = document.getElementById('text')
+      const title = document.getElementById('title')
+      if (text && title) text.style.top = title.offsetTop + title.offsetHeight + 16 + 'px'
+      await document.fonts.ready
+      await Promise.all(
+        [...document.images].map((i) =>
+          i.complete ? 0 : new Promise((r) => (i.onload = i.onerror = r)),
+        ),
+      )
+      document.body.dataset.ready = '1'
+    </script>
+  </body>
+</html>

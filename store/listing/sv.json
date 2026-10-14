@@ -1,0 +1,53 @@
+{
+  "label": "Svenska",
+  "chromeLocale": "sv",
+  "amoLocale": "sv-SE",
+  "name": "Nodkey",
+  "summary": "Logga in med inloggningar och koder från Nodkey på din iPhone. Du godkänner varje förfrågan med Face ID.",
+  "description": "Nodkey samlar dina lösenord, tvåstegskoder och nycklar på ett ställe: Nodkey på din iPhone, bakom Face ID. Med det här tillägget kan Firefox och Chrome använda dem, och inget sparas i webbläsaren.\n\nLOGGA IN FRÅN DIN IPHONE\nKlicka på Nodkey-knappen i ett inloggningsfält. Din iPhone visar webbplatsen och en bild av sidan, och du godkänner med Face ID. Tillägget fyller i användarnamn och lösenord.\n\nTVÅSTEGSKODER\nSamma sak i ett kodfält, även när sidan har en ruta per siffra.\n\nNYA LÖSENORD HAMNAR PÅ DIN IPHONE\nNär du skapar ett konto eller byter lösenord erbjuder tillägget att spara det i Nodkey. Lösenordet låses för din iPhone direkt.\n\nNYCKLAR (PASSKEYS)\nNär en webbplats ber om en nyckel signerar din iPhone. Nyckeln lämnar den aldrig.\n\nPRIVAT FRÅN GRUNDEN\n• Inget sparas i webbläsaren: inga lösenord, inga koder\n• Krypterat hela vägen mellan webbläsaren och din iPhone; reläet kan inte läsa något\n• Tilläggets nycklar kan inte kopieras ut ur webbläsaren\n• Gratis, inget konto, ingen reklam, ingen spårning\n• Öppen källkod (MIT): github.com/peters/nodkey-browser\n\nDu behöver en iPhone med Nodkey, gratis på App Store.",
+  "captions": [
+    {
+      "title": "Logga in från din iPhone",
+      "text": "Klicka på Nodkey i inloggningsfältet och godkänn med Face ID."
+    },
+    {
+      "title": "Tvåstegskoder fylls i",
+      "text": "Även när sidan har en ruta per siffra."
+    },
+    {
+      "title": "Nya lösenord hamnar på din iPhone",
+      "text": "Spara med ett klick. Bara din iPhone kan läsa det."
+    },
+    {
+      "title": "Nycklar stannar på din iPhone",
+      "text": "Din iPhone signerar. Nyckeln lämnar den aldrig."
+    },
+    {
+      "title": "Ett ställe för alla lösenord",
+      "text": "Nodkey på din iPhone. Inget sparas i webbläsaren."
+    }
+  ],
+  "ui": {
+    "signIn": "Logga in",
+    "email": "E-post",
+    "password": "Lösenord",
+    "approveOnPhone": "Godkänn på din iPhone",
+    "wantsPassword": "{b} vill ha ett lösenord",
+    "wantsCode": "{b} vill ha en kod",
+    "wantsSave": "{b} vill spara en inloggning",
+    "wantsPasskey": "{b} vill använda en nyckel",
+    "approveOnce": "Godkänn en gång",
+    "deny": "Neka",
+    "save": "Spara",
+    "notNow": "Inte nu",
+    "codeTitle": "Tvåstegskod",
+    "codeHint": "Ange den sexsiffriga koden",
+    "verify": "Bekräfta",
+    "saveQ": "Spara inloggningen i Nodkey?",
+    "createAccount": "Skapa konto",
+    "passkeyBtn": "Logga in med nyckel",
+    "newPassword": "Nytt lösenord",
+    "filled": "Ifyllt från din iPhone"
+  },
+  "review": "Machine translation; needs native review before a store release."
+}
