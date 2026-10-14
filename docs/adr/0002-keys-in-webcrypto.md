@@ -29,7 +29,7 @@ test vector.
 ## Consequences
 
 - The extension needs Ed25519 and X25519 in WebCrypto: Chromium 137 or later,
-  Firefox 130 or later.
+  Firefox 140 or later (Firefox needs 140 for `data_collection_permissions`).
 - The keys stay in the browser profile. Another browser or profile must pair
   again.
 - A backup of the browser profile does not contain usable key bytes.

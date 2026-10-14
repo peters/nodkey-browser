@@ -78,7 +78,7 @@ iPhone:
 
 - An iPhone with iOS 18 or later and [Nodkey](https://apps.apple.com/app/id6820952672)
   from the App Store (free).
-- Chromium 137 or later (or a browser built on it), or Firefox 130 or later.
+- Chromium 137 or later (or a browser built on it), or Firefox 140 or later.
 
 The extension is not in the Chrome Web Store or on addons.mozilla.org yet. Until
 then, build it from source (below) and load it unpacked.
