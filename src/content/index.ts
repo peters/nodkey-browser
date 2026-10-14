@@ -13,7 +13,13 @@ let ui: PageUi | null = null
 
 function page(): PageUi {
   ui ??= new PageUi((field) => {
-    void send({ type: isOtpField(field) || boxRow(field) ? 'fill.code' : 'fill.login' })
+    if (isOtpField(field) || boxRow(field)) {
+      void send({ type: 'fill.code' })
+      return
+    }
+    // A user name already in the form (typed, or filled by the browser) names the account.
+    const username = findLogin(document)?.username?.value.trim()
+    void send(username ? { type: 'fill.login', username } : { type: 'fill.login' })
   })
   return ui
 }

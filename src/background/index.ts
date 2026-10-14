@@ -90,6 +90,7 @@ async function handle(msg: ToBackground, sender: chrome.runtime.MessageSender): 
           msg.type === 'fill.login' ? 'login' : 'code',
           tab,
           isExtensionPage(sender) ? undefined : sender.frameId,
+          msg.type === 'fill.login' ? msg.username : undefined,
         )
       }
       return null

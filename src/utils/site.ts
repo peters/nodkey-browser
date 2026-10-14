@@ -43,3 +43,14 @@ export function belongsTo(frameUrl: string, site: string): boolean {
   const s = siteOf(frameUrl)
   return s !== null && (s === site || s.endsWith(`.${site}`) || site.endsWith(`.${s}`))
 }
+
+/**
+ * The `target` of a login or code request: the site, or `site/username` when the page already has
+ * a user name (typed, or filled by the browser). The phone then answers for that account without
+ * asking which one. A value that cannot be an account name is left out.
+ */
+export function requestTarget(site: string, username?: string | null): string {
+  const name = username?.trim() ?? ''
+  if (!name || name.length > 200 || /[\s/]/.test(name)) return site
+  return `${site}/${name}`
+}

@@ -114,6 +114,7 @@ export async function unpair(phoneId: string): Promise<void> {
 
 export interface Ask {
   kind: Kind
+  /** The request's `target`: the site, or `site/account` (see `requestTarget`). */
   site: string
   reason: string
   picture?: Picture | null

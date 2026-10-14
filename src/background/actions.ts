@@ -8,7 +8,7 @@ import type { ActivityKind, SaveOffer, Status, ToContent } from '../models/messa
 import { type Phone, parseSealedBox } from '../models/protocol'
 import { t } from '../i18n/t'
 import { browserInfo, defaultAgentName } from '../utils/browser'
-import { belongsTo, mayFill, siteOf } from '../utils/site'
+import { belongsTo, mayFill, requestTarget, siteOf } from '../utils/site'
 import { type ClientInfo, ask } from './agent'
 import { failed, notApproved, saved } from './outcome'
 import { capture } from './screenshot'
@@ -74,8 +74,16 @@ async function fillKey(site: string, username: string, password: string): Promis
   return Array.from(new Uint8Array(digest), (b) => b.toString(16).padStart(2, '0')).join('')
 }
 
-/** Asks the phone for a login or a code for the tab's site and fills it into the page. */
-export async function fill(kind: 'login' | 'code', tab: chrome.tabs.Tab, frameId?: number) {
+/**
+ * Asks the phone for a login or a code for the tab's site and fills it into the page. A known user
+ * name (from the page, or the sign-in just submitted on this tab) names the account.
+ */
+export async function fill(
+  kind: 'login' | 'code',
+  tab: chrome.tabs.Tab,
+  frameId?: number,
+  username?: string,
+) {
   const tabId = tab.id
   if (tabId === undefined) return
   const url = tab.url ?? ''
@@ -90,7 +98,13 @@ export async function fill(kind: 'login' | 'code', tab: chrome.tabs.Tab, frameId
     const settings = await store.settings()
     const picture = settings.screenshots ? await capture(tab.windowId, site) : null
     const reason = t(kind === 'login' ? 'reasonLogin' : 'reasonCode', site, info.browser)
-    const { answer } = await ask({ kind, site, reason, picture, client: client() }, phone)
+    let account = username
+    if (!account && kind === 'code') {
+      const hinted = await store.usernameHint(tabId)
+      if (hinted && (hinted.site === site || belongsTo(url, hinted.site))) account = hinted.username
+    }
+    const target = requestTarget(site, account)
+    const { answer } = await ask({ kind, site: target, reason, picture, client: client() }, phone)
     if (answer?.decision !== 'approved') {
       const shown = notApproved(answer, kind)
       await publish(tabId, kind, site, shown.state, shown.message, frameId)
