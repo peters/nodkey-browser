@@ -66,7 +66,8 @@ Status on 2026-10-14: no developer account and no item yet.
 
    - Remote code: "No, I am not using remote code". The WebAssembly is in the
      package.
-   - Data usage: select "Authentication information" and "Website content".
+   - Data usage: select "Authentication information", "Financial and payment
+     information" (card fill, from 0.2.0) and "Website content".
      Ask the owner if "Web history" also applies (each request names the site
      of the current page). Select the three certifications.
    - Privacy policy: `https://kh-labs.dev/nodkey/#privacy`. Make sure that it

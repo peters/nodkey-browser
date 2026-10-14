@@ -64,7 +64,7 @@ const targets = {
         // What leaves the browser, end to end encrypted to the person's own iPhone: logins (fill and
         // save), the site of each request and, when the setting is on, a picture of the page.
         data_collection_permissions: {
-          required: ['authenticationInfo', 'websiteActivity', 'websiteContent'],
+          required: ['authenticationInfo', 'financialAndPaymentInfo', 'websiteActivity', 'websiteContent'],
         },
       },
     },
