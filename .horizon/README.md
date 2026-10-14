@@ -9,7 +9,7 @@ On a new checkout, generate the WebAssembly bindings before validation:
 ```sh
 npm ci
 npm run wasm
-localci run -w ci.yml validate horizon-pins --event push --skip 'Read access to peters/nodkey-cli (private)' --cache
+localci run -w ci.yml validate horizon-pins --event push --cache
 ```
 
 The current workflow runs type checking before `npm test`. Its `pretest`
@@ -24,12 +24,11 @@ workflow addition is `horizon-pins`, which checks the worker pins with
 For later checks, use the same job with `--fast`:
 
 ```sh
-localci run -w ci.yml validate horizon-pins --event push --skip 'Read access to peters/nodkey-cli (private)' --fast
+localci run -w ci.yml validate horizon-pins --event push --fast
 ```
 
-The skipped step writes a CI secret into Git configuration. Use Horizon's
-machine-local GitHub access binding for `peters/nodkey-cli` instead. Never
-copy the CI token into the image or this configuration.
+`peters/nodkey-cli` is public, so the validation needs no GitHub
+credentials.
 
 The preview loads the built `dist/chromium` extension with Chrome for Testing.
 It does not build again. The real relay hostname resolves to loopback for

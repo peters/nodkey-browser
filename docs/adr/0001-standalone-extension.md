@@ -37,6 +37,6 @@ To use a protocol change, change the revision in `Cargo.toml` and run the tests.
   vectors in `peters/nodkey-cli` check both.
 - The build needs Rust, the `wasm32-unknown-unknown` target and
   `wasm-bindgen-cli` with the same version as `Cargo.lock`.
-- The build needs read access to `peters/nodkey-cli` while that repository is
-  private. CI needs a token for that repository.
+- The build fetches `peters/nodkey-cli` from GitHub. That repository is public,
+  so the build and CI need no credentials.
 - The WebAssembly file is approximately 300 KB.
