@@ -18,6 +18,10 @@
   <a href="https://apps.apple.com/app/id6820952672"><img src="https://toolbox.marketingtools.apple.com/api/v2/badges/download-on-the-app-store/black/en-us?size=250x83" height="44" alt="Download Nodkey on the App Store"></a>
 </p>
 
+<p align="center">
+  <img src="docs/images/demo.gif" width="100%" alt="Click the Nodkey button in a sign-in field, approve on the iPhone with Face ID, and the extension fills the login">
+</p>
+
 The Nodkey extension signs you in with logins and one-time codes from
 [Nodkey](https://kh-labs.dev/nodkey/) on your iPhone. Every request shows up on
 your phone, and nothing leaves it until you approve with Face ID.
@@ -48,6 +52,27 @@ site, user name, password or code.
 The extension's private keys are browser keys that cannot be copied out. The
 protocol code is the same Rust code the `nodkey` command line uses, compiled to
 WebAssembly.
+
+## Meet Nodkey
+
+<p align="center">
+  <img src="docs/images/app-passwords.png" width="200" alt="Nodkey: your passwords as colourful tiles">
+  <img src="docs/images/app-agent.png" width="200" alt="Nodkey: an agent asks for a password and you approve">
+  <img src="docs/images/app-codes.png" width="200" alt="Nodkey: two-step codes, big and clear">
+  <img src="docs/images/app-agents.png" width="200" alt="Nodkey: your agents, under control">
+</p>
+
+[Nodkey](https://apps.apple.com/app/id6820952672) is a free password manager and authenticator for
+iPhone:
+
+- **Passwords, two-step codes and passkeys** behind Face ID, filled in with AutoFill in Safari and
+  apps.
+- **Agents sign in, you decide.** This extension and coding agents ask; you see who asks, for which
+  site and why, and approve with Face ID. Pause one agent, or stop all agents with one tap.
+- **Move in in minutes** from Apple Passwords, 1Password, Bitwarden, Chrome, Firefox and more.
+  Export everything again at any time.
+- **Backed up in your own iCloud**, end-to-end encrypted.
+- **No account, no ads, no tracking.** In 12 languages.
 
 ## What you need
 
