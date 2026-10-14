@@ -55,13 +55,7 @@ Shared company rules apply: `fintermobilityas/company` (checkout `~/github/compa
   way to export them.
 - The browser test must never reach the real relay or a real phone.
 
-## CI
-
-CI needs the secret `NODKEY_CLI_DEPLOY_KEY`: the private half of a read-only deploy key of
-`peters/nodkey-cli` ("nodkey-browser CI (read-only)"), for the git dependency. CI fetches it over SSH.
-
 ## Publishing
 
-The repository is private. Do not publish to the Chrome Web Store or
-addons.mozilla.org, make the repository public or share a package without the
-owner's explicit yes.
+The repository is public. Do not publish to the Chrome Web Store or
+addons.mozilla.org or share a package without the owner's explicit yes.

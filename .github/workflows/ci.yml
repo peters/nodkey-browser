@@ -13,20 +13,6 @@ jobs:
         with:
           node-version-file: .nvmrc
           cache: npm
-      - name: Read access to peters/nodkey-cli (private, read-only deploy key)
-        env:
-          KEY: ${{ secrets.NODKEY_CLI_DEPLOY_KEY }}
-        run: |
-          test -n "$KEY" || { echo "Set the NODKEY_CLI_DEPLOY_KEY secret (a read-only deploy key of peters/nodkey-cli)"; exit 1; }
-          install -d -m 700 ~/.ssh
-          printf '%s\n' "$KEY" > ~/.ssh/nodkey_cli
-          chmod 600 ~/.ssh/nodkey_cli
-          # GitHub's published host key (api.github.com/meta), so no first-use trust is needed.
-          echo "github.com ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIOMqqnkVzrm0SdG6UOoqKLsabgH5C9okWi0dh2l9GKJl" >> ~/.ssh/known_hosts
-          git config --global core.sshCommand "ssh -i ~/.ssh/nodkey_cli -o IdentitiesOnly=yes"
-          git config --global url."ssh://git@github.com/peters/nodkey-cli".insteadOf https://github.com/peters/nodkey-cli
-          # Cargo's built-in git does not read insteadOf; the git command line does.
-          echo "CARGO_NET_GIT_FETCH_WITH_CLI=true" >> "$GITHUB_ENV"
       - name: Rust for WebAssembly
         run: |
           rustup target add wasm32-unknown-unknown
