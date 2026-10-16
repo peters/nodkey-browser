@@ -23,7 +23,7 @@ text. Change them there.
 | English | `en` | en-US | en |
 | Norwegian Bokmål | `nb` | nb-NO | no |
 | Swedish | `sv` | sv-SE | sv |
-| Danish | `da` | da | da |
+| Danish | `da` | none (AMO has no Danish) | da |
 | German | `de` | de | de |
 | Spanish | `es` | es-ES | es |
 | French | `fr` | fr | fr |

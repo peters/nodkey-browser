@@ -105,25 +105,98 @@ Firefox, then "Update").
 
 Do this only after the owner says yes to a public release.
 
-1. Do the steps of the unlisted version, but use "Submit a New Add-on" and
-   select "On this site".
+Status on 2026-10-16: version 0.2.2 is the first listed version. Its status is
+"Awaiting Review". The add-on page is `https://addons.mozilla.org/firefox/addon/nodkey/`.
+The add-on had only unlisted versions before. The first listed version makes
+the public listing.
 
-2. Fill in the listing from `store/out/firefox/<locale>/listing.txt` (see
-   [Store material](store-material.md)). Add each of the twelve languages
-   with "Add a locale" and paste its name, summary and description.
-   - Screenshots: `01-sign-in.png` to `06-cards.png` from the same folder,
-     with the captions from `listing.txt`.
-   - Categories: "Privacy & Security".
-   - Support website: `https://kh-labs.dev/nodkey/`.
-   - Privacy policy: the extension sends data to the owner's iPhone, so a
-     privacy policy is necessary. Use `https://kh-labs.dev/nodkey/#privacy`
-     and make sure that it tells about the browser extension.
-   - License: MIT.
+1. Do [Prepare a release](README.md#prepare-a-release).
 
-3. Click "Submit Version".
+2. Open "My Add-ons", the add-on, and "Upload New Version".
 
-   Result: The status is "Awaiting Review". A reviewer can ask questions by
-   e-mail. Answer them in the AMO review thread.
+   Result: The page shows "Where to Host Version" with the last channel.
+
+3. If the page shows "On your own", click "Change". Select "On this site" and
+   click "Continue".
+
+4. Click "Select a file..." and select `dist/nodkey-firefox-<version>.zip`.
+   Select only "Firefox" as the compatible application. Click "Continue".
+
+   Result: "Your add-on was validated with no errors". Version 0.2.2 had 4
+   warnings ("Unsafe assignment to innerHTML").
+
+5. On the first listed version, AMO shows the page "Describe Add-on". (A new
+   version of a listed add-on shows only the version notes.) Fill in:
+   - Name and summary: AMO takes them from `_locales` in the package. AMO has
+     no field for a language that it gets in another code. Thus add Norwegian
+     Bokmål (`nb-NO`) by hand from `store/out/firefox/nb-NO/listing.txt`.
+   - Description: the English text from `store/out/firefox/en-US/listing.txt`,
+     and the text of each other language from its folder. AMO has no Danish
+     locale, so the listing has eleven languages.
+   - "This add-on requires payment, non-free services or software, or
+     additional hardware": select it. Nodkey needs an iPhone with the Nodkey
+     app.
+   - Category: "Privacy & Security".
+   - Support e-mail: `nodkey@kh-labs.dev`. Support website:
+     `https://kh-labs.dev/nodkey/`.
+   - License: "MIT License".
+   - "This add-on has a privacy policy": select it. Paste the text of the
+     browser extension part of the privacy policy and the link
+     `https://kh-labs.dev/nodkey/#privacy` (the source is
+     `site/i18n/en.json` in the `kh-labs` repository, keys
+     `nkPrivacySummary`, `nkPBrowser` and `nkPCards`).
+   - Notes to Reviewer: use the text below. Change the commit and the version.
+
+     ```text
+     Nodkey needs an iPhone with the free Nodkey app (App Store). There is no
+     account and no login.
+
+     To test:
+     1. Click the toolbar icon, then "Get a code".
+     2. In Nodkey on the iPhone: Agents > Add agent, type the code, and
+        compare the check number.
+     3. Open a sign-in page and click the Nodkey button in the field.
+        Approve on the iPhone.
+
+     Source: https://github.com/peters/nodkey-browser (commit <sha>). The
+     source package is attached.
+     Build: Node 24.21 (.nvmrc), Rust with wasm32-unknown-unknown and
+     wasm-bindgen-cli (version in Cargo.lock). npm ci && npm run build.
+     The package is dist/nodkey-firefox-<version>.zip.
+     The protocol code (WebAssembly) comes from
+     https://github.com/peters/nodkey-cli at the revision in Cargo.toml.
+
+     The innerHTML warnings: content.js sets a constant SVG icon string that
+     is built into the package; the other uses are in the Vue runtime. No
+     page or remote content goes into innerHTML.
+
+     Contact: nodkey@kh-labs.dev
+     ```
+
+6. Click "Submit Version".
+
+   Result: AMO shows "Do You Need to Submit Source Code?".
+
+7. Select "Yes", select `dist/nodkey-browser-source-<version>.zip` and click
+   "Continue".
+
+   Result: "Version Submitted". The status is "Awaiting Review". A reviewer
+   can ask questions by e-mail. Answer them in the AMO review thread.
+
+8. Open "Edit Product Page", then "Images", then "Edit":
+   - Icon: "Upload a Custom Icon...", `public/icons/icon-128.png`.
+   - Screenshots: "Add a Screenshot..." and select the six files `01-sign-in`
+     to `06-cards` from `store/out/firefox/en-US/`. AMO keeps one set of
+     screenshots for all languages.
+   - Captions: one caption for each screenshot and each language. Use
+     "<title>. <text>" from `captions` in `store/listing/<language>.json`
+     (for Japanese and Chinese, "<title>。<text>").
+   - Click "Save Changes".
+
+   Result: The page shows the icon and the six screenshots.
+
+9. Open "Describe Add-on" and "Images" again with "Edit", and make sure that
+   all eleven languages have a description and six captions.
 
 ## Problems
 
@@ -132,4 +205,5 @@ Do this only after the owner says yes to a public release.
 | The "data_collection_permissions" property is missing | Since 2025 AMO needs it for all new extensions | It is in `scripts/build.mjs`. Keep it, and keep `strict_min_version` at 140 or more. |
 | Version already exists | AMO saw this version number before | Increase `version` in `package.json` and build again. |
 | The add-on id is in use | Another account has the id | Use the account that uploaded the id first. |
-| Source code is necessary | The package has minified code | Upload the source package (step 5). |
+| Source code is necessary | The package has minified code | Upload the source package (step 5 of the unlisted version, step 7 of the listed version). |
+| The page shows "Not Found" for the add-on | You are not signed in | Click "Log in" and sign in. AMO then opens the page. |

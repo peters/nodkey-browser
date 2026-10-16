@@ -42,24 +42,27 @@ contact e-mail nodkey@kh-labs.dev.
    listing", "Privacy" and "Distribution".
 
 3. "Store listing" (make the files first, see [Store material](store-material.md)):
-   - Description: from `store/out/chrome/<locale>/listing.txt`. Add the other
-     eleven languages with "Add language" and paste each description; the
-     name and summary come from `_locales` in the package.
    - Category: "Privacy & Security".
-   - Language: English. The extension has twelve languages; the store takes
-     the name and description from `_locales`.
    - Store icon: 128×128 PNG, `public/icons/icon-128.png`.
-   - Screenshots: the five PNG files `01-sign-in`, `02-codes`, `06-cards`,
-     `04-passkeys` and `05-one-place` (1280×800) from the folder of each
-     language, in that order.
+   - Global screenshot: `store/out/chrome/en/01-sign-in.png`.
    - Small promo tile: `promo-440x280.png`. Marquee (optional):
      `marquee-1400x560.png`.
    - Homepage URL: `https://kh-labs.dev/nodkey/`. Support URL:
-     `https://kh-labs.dev/nodkey/#help`. Official URL: "None" (the store
-     shows only domains that are verified in Google Search Console).
-   - For each language, select it in "Current editing language", paste the
-     description and add the five screenshots of that language. Click "Save
-     draft" before you change the language.
+     `https://kh-labs.dev/nodkey/#help`. Official URL: "None". The store shows
+     only domains that are verified in Google Search Console.
+   - The name and the summary come from `_locales` in the package. Thus the
+     store shows all twelve languages in "Current editing language".
+   - Do these steps for each language, English first:
+     1. Select the language in "Current editing language" (for example
+        "Japanese – ja").
+     2. Paste the description from `store/out/chrome/<locale>/listing.txt`.
+     3. Add the five localized screenshots `01-sign-in`, `02-codes`,
+        `06-cards`, `04-passkeys` and `05-one-place` (1280×800) from the
+        folder of that language, in that order.
+     4. Click "Save draft". Then change the language.
+
+     Result: "Item saved." The language has a description and five
+     screenshots.
 
 4. "Privacy":
    - Single purpose: "Fill logins, two-step codes, payment cards and passkeys
@@ -97,8 +100,8 @@ contact e-mail nodkey@kh-labs.dev.
    Click "Submit for review" in the dialog.
 
    Result: The store tells you that broad host permissions can delay the
-   review. Click "Submit for review" again. The status is "Pending review". The store sends an e-mail when the
-   review is done.
+   review. Click "Submit for review" again. The status is "Pending review".
+   The store sends an e-mail when the review is done.
 
 8. If the review refuses the item, read the e-mail. Change the code or the
    listing, increase the version, and submit again.
@@ -125,3 +128,5 @@ contact e-mail nodkey@kh-labs.dev.
 | Version must be greater than | The store saw this version | Increase `version` in `package.json`. |
 | Missing permission justification | A permission has no text | Fill in the table in "Privacy". |
 | Rejected: excessive permissions | The reviewer thinks `<all_urls>` is too much | Explain in the appeal that the button must show in sign-in fields on all websites. |
+| "Submit for review" is not available | A tab has a missing field | Click "Why can't I submit?". It shows the missing fields. |
+| "Publishing will be delayed" | The host permission `<all_urls>` | This is normal for Nodkey. Click "Submit for review" in the dialog. |
