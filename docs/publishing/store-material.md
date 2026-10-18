@@ -84,3 +84,23 @@ review before the first public listing.
 - New data that leaves the browser: change the data disclosures too
   (`data_collection_permissions` in `scripts/build.mjs` and "Privacy" in
   [Chrome](chrome.md)), and the "Private by design" list in `description`.
+
+## What the extension sends (keep the texts true)
+
+Check `description` and the disclosures against this list for each release.
+Everything goes end-to-end encrypted to the person's iPhone, through the relay.
+
+| Request | When | What it holds |
+|---|---|---|
+| `login`, `code` | The person clicks the Nodkey button or the popup | The site (and the user name when the page has one), the reason, an optional picture of the page |
+| `sms_code` | The person clicks the Nodkey button in the code field of a page that says the code came by SMS | The site and the wait (120 seconds) |
+| `suggest` | The person clicks "Remember" on "Remember that <site> uses <provider> sign-in?" | The site and the name of the provider only (`federated`, `seen`, `extension`) |
+| `save`, `save_card` | The person clicks "Save" | The page address, the user name or the card's brand, last digits and expiry; the password, number and CVC sealed for the phone only |
+| `card` | The person clicks "Approve on iPhone" at a checkout | The shop, the amount, the origin and the total on the page |
+| `passkey` | A page asks for a passkey (and its PRF inputs) | The relying party, the client data that the extension makes, the credential ids and the PRF inputs |
+
+The answers can hold a password, a code, a card, a provider login (`via`) or
+PRF outputs. The extension fills or returns them at once and keeps none in
+storage. It keeps a provider login in memory for 3 minutes, for the provider's
+own pages only ([ADR-0010](../adr/0010-sign-in-methods.md)).
+

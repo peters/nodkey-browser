@@ -36,7 +36,19 @@ makes ES256 passkeys and signs as the app does.
    Result: The `origin` in each `client_data_json` is the origin of the test
    site.
 
-6. In the settings page, turn off "Use passkeys from Nodkey". Load `/passkey`
+6. Click "Create a passkey with PRF".
+
+   Result: The page asks for a new passkey with `extensions.prf` and an input.
+   The status shows "PRF enabled for" and the user name. The server of the test
+   site examined the PRF output: it is HMAC-SHA256 of the fixed `credRandom` of
+   the fake phone (the nodkey-proto vectors) and the salt of the input.
+
+7. Click "Unlock with PRF".
+
+   Result: The status shows "PRF key for" and the user name. The output is the
+   same as in step 6. The request in `/_fake/seen` has `prf.eval.first`.
+
+8. In the settings page, turn off "Use passkeys from Nodkey". Load `/passkey`
    again.
 
    Result: `navigator.credentials.get` is the function of the browser
@@ -46,5 +58,9 @@ makes ES256 passkeys and signs as the app does.
 
 - Click "Create a passkey" again with the same user name. Result: The phone
   refuses (`excluded`) and the status shows `InvalidStateError`.
+- A passkey from before PRF: `tests/unit/passkey.integration.test.ts` asks
+  for a PRF output from the test passkey of the fake phone for `webauthn.io`.
+  Result: The phone answers `prf_unsupported`. Nodkey asks again without PRF,
+  and the page gets a sign-in with `prf: {}` (no results).
 - Set the fake phone mode to `deny` and sign in. Result: The status shows
   `NotAllowedError`. The card shows "You denied the request on your iPhone."

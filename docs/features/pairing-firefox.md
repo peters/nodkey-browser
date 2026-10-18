@@ -19,23 +19,24 @@ procedure with real input on the isolated desktop: the `horizon-device` tool
    opened it at install. The page starts with "Pair with your iPhone". The name
    field shows "Firefox on Linux". (screenshot)
 
-2. Scroll to "Advanced". Select the text in "Relay address" (click the field,
-   then `ctrl+a`). Type the fake relay address from the log
+2. Click the page and push End to go to "Advanced". Remove the text in "Relay
+   address" (click the field, push End, then Backspace until the field is
+   empty). Type the fake relay address from the log
    (`manual_pairing.relay`). Click "Save relay".
 
    Result: The page shows "Saved.". Do not start the pairing before this step:
    the run blocks the real relay, but a pairing with the wrong relay fails.
 
-3. Scroll to the top. Select the name and type "Firefox test". Click "Get a
-   code".
+3. Scroll to the top. Remove the name in the same way and type "Firefox
+   test". Click "Get a code".
 
    Result: A 6-character code and "Waiting for your iPhone" show. (screenshot)
 
 4. Wait for the fake phone.
 
    Result: "Compare the numbers" shows "Test iPhone" and a check number.
-   Compare it with `/_fake/check/<agent_id>`. Get the agent id from the
-   relay's `/_fake/seen` after the first request, or from the fake relay log.
+   Compare it with `/_fake/check/<agent_id>`. Get the agent id (`agent_id`)
+   from the relay's `/_fake/seen` after the first request of the run.
    (screenshot)
 
 5. Click "Same number".

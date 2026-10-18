@@ -33,9 +33,20 @@ your phone, and nothing leaves it until you approve with Face ID.
   and the password.
 - **Fill a code.** The same in a two-step code field, also when the page has one
   box per digit.
+- **Codes by SMS.** When a site sends its code by SMS, the Nodkey button in the
+  code field can get it from your iPhone. You set this up once with a Shortcuts
+  automation on the iPhone.
+- **Sign in with Google, Apple and others.** Nodkey knows which sites you sign
+  in to with Google, Apple, GitHub, Microsoft or Facebook. It shows you the
+  button to click, and it fills your Google (or Apple, ...) login only on that
+  provider's own sign-in page. At "Check your phone", the Nodkey button picks a
+  passkey or a code from Nodkey instead. After you sign in with a provider, the
+  extension can ask to remember it; your iPhone then gets only the site and the
+  provider's name.
 - **Use passkeys.** When a website asks for a passkey, Nodkey asks your iPhone.
   You approve with Face ID and the iPhone signs. The passkey never leaves your
-  iPhone. Turn this off in the settings to use the passkeys of the browser.
+  iPhone. Websites that use passkeys to unlock a key (the PRF extension) get it
+  too. Turn this off in the settings to use the passkeys of the browser.
 - **Pay with a card.** In a card field at checkout, click the Nodkey button.
   Nodkey reads the total from the page and shows it. Your iPhone shows the shop
   and the amount, and you approve with Face ID each time. The card is filled in

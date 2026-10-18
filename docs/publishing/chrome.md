@@ -71,10 +71,10 @@ contact e-mail nodkey@kh-labs.dev.
 
      | Permission | Justification |
      |---|---|
-     | `storage` | Keeps the pairing, the settings and the list of sites where the user does not want a save offer. Never a password, a code or a card number. |
+     | `storage` | Keeps the pairing, the settings and the list of sites where the user does not want a save offer. For the browser session only, it keeps how the user signs in to a site when the iPhone said so (for example "Sign in with Google"; no secret). Never a password, a code or a card number. |
      | `activeTab` | Takes a picture of the current page for the approval screen on the iPhone, when the user turns this on, so the user can see which page asks before approving. |
      | `scripting` | Adds the page script (in the package) that sends the passkey requests of a page (navigator.credentials) to Nodkey, so the iPhone can sign them. |
-     | Host permission `<all_urls>` | Shows the Nodkey button in sign-in, code and card fields on all websites, and fills only the login, code or card that the user approved on the iPhone. A password manager cannot know in advance which sites the user signs in to. Nothing leaves the page until the user clicks the Nodkey button or accepts an offer to save a new login. |
+     | Host permission `<all_urls>` | Shows the Nodkey button in sign-in, code and card fields on all websites, and fills only the login, code or card that the user approved on the iPhone. A password manager cannot know in advance which sites the user signs in to. Nothing leaves the page until the user clicks the Nodkey button or accepts an offer to save a new login or to remember a sign-in method. A provider login (for example the Google login) is filled only on the provider's own sign-in pages. |
 
    - Remote code: "No, I am not using remote code". The WebAssembly is in the
      package.
@@ -82,7 +82,9 @@ contact e-mail nodkey@kh-labs.dev.
      information" (card fill, from 0.2.0), "Web history" and "Website content".
      "Web history" applies because each request sends the site of the current
      page to the iPhone, end-to-end encrypted, only when the person asks for a
-     login, a code, a card or a passkey. Firefox declares the same as
+     login, a code, a card or a passkey, or accepts "Remember that <site> uses
+     <provider> sign-in?" (that suggestion holds only the site and the name of
+     the provider). Firefox declares the same as
      `websiteActivity`. The owner decided this on 2026-10-14. Select the three
      certifications.
    - Privacy policy: `https://kh-labs.dev/nodkey/#privacy`. Make sure that it

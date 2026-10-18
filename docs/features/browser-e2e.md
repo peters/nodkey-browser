@@ -39,16 +39,22 @@ synthetic test site. It does not use the real relay or a real phone.
    5. Opens `/signup`, types a new user name and password and submits. Then it
       answers Save in the save question with the Enter key. The fake phone
       opens the sealed password, and the script compares it.
-   6. Opens `/checkout` and does [Pay with a card](fill-card.md): it fills the
+   6. Does [Sign-in methods](sign-in-methods.md): "Sign in with Google" on
+      `/federated`, the Google login on the stand-in Google pages, the Nodkey
+      button at "Check your phone" and the question to remember the method on
+      `/learn`. Then [Codes sent by SMS](sms-code.md) on `/sms` and
+      [The agent limit](agent-limit.md) on `/login`. In Chromium, the script
+      also reads the activity of the tab (the text of the card and the popup).
+   7. Opens `/checkout` and does [Pay with a card](fill-card.md): it fills the
       test card for the total of 499,00 kr, makes sure that the fake phone saw
       the amount, the total and the origin, raises the total and waits for the
       empty card fields. Then it types a second test card, pays and saves the
       card. The fake phone opens the sealed card number, and the script
       compares it.
-   7. Opens `/passkey` and does [Passkeys](passkeys.md): a conditional request
+   8. Opens `/passkey` and does [Passkeys](passkeys.md): a conditional request
       that must not reach the phone, Create a passkey and Sign in with a
-      passkey. The server of the test site examines the passkey and the ES256
-      signature. In Chromium, the script then turns the passkey setting off and
+      passkey, then the same with PRF. The server of the test site examines
+      the passkey, the ES256 signature and the PRF output. In Chromium, the script then turns the passkey setting off and
       makes sure that the page has the passkeys of the browser again.
 
    Result: The log shows `all flows passed`.
@@ -61,8 +67,16 @@ synthetic test site. It does not use the real relay or a real phone.
 
 ## Notes
 
-- `--passkeys-only` pairs and then does only step 7. `--cards-only` pairs and
-  then does only step 6.
+- `--passkeys-only` pairs and then does only step 8. `--cards-only` pairs and
+  then does only step 7. `--signin-only` pairs and then does only step 6.
+- The run starts a stand-in for Google's sign-in pages on
+  `https://accounts.google.com:<port>`, with a certificate that `openssl`
+  makes for the run. The browsers resolve `accounts.google.com` to this
+  computer and accept that certificate. Nothing goes to Google.
+- Snap Firefox (`/usr/bin/firefox` on Ubuntu) cannot open the display of the
+  isolated desktop ("cannot open display"). Then install Firefox for the test
+  with `npx @puppeteer/browsers install firefox@stable --path ~/.cache/<folder>`
+  and set `NODKEY_E2E_FIREFOX` to its `firefox` file.
 
 - Chromium runs in Norwegian (`--lang=nb`) and Firefox in English. Thus the run
   shows two of the twelve languages.

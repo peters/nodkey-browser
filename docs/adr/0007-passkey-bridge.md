@@ -53,6 +53,20 @@ website. Thus the page must not choose the origin.
    `chrome.scripting` only while the setting "Use passkeys from Nodkey" is on
    and a phone is paired. When the setting is off, no passkey script runs in
    pages.
+10. PRF (added 2026-10-18, peters/nodkey-browser#7): the page script gives
+    `extensions.prf` to the background, with each BufferSource in base64url.
+    The background applies the rules of WebAuthn before it asks the phone:
+    `evalByCredential` is not allowed on create and needs a non-empty
+    `allowCredentials` on get (`NotSupportedError`), and each of its keys must
+    be in `allowCredentials` (`SyntaxError`). A get with `prf: {}` and no
+    inputs sends no `prf`. The page gets `getClientExtensionResults().prf`
+    (`enabled` on create, `results` as ArrayBuffers) and the same values in
+    base64url in `toJSON()`. When the phone answers `prf_unsupported` (a
+    passkey from before PRF), the background asks again without PRF, so the
+    page gets a sign-in without `results`, as a browser does with an
+    authenticator without PRF. The person approves two times. A PRF answer
+    with a lease other than `once` is refused. The outputs are secret keys: the
+    extension does not keep or log them.
 
 ## Consequences
 
