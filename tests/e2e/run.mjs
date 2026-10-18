@@ -4,7 +4,7 @@
 // See docs/features/browser-e2e.md.
 //
 //   node tests/e2e/run.mjs [--browser chromium|firefox|both] [--keep] [--display :N]
-//                          [--passkeys-only | --cards-only]
+//                          [--passkeys-only | --cards-only | --signin-only]
 //
 // Without --display it starts its own Xvfb + x11vnc (set NODKEY_E2E_TOOLS to an unpacked tools
 // root when x11vnc is not installed) and prints the VNC address for a Horizon Device panel.
@@ -15,6 +15,8 @@ import { join, resolve } from 'node:path'
 import puppeteer from 'puppeteer-core'
 import { cardFlow } from './cards.mjs'
 import { findVnc, startDesktop } from './desktop.mjs'
+import { startGoogle } from './provider.mjs'
+import { signinFlow } from './signin.mjs'
 import { startSite } from './site.mjs'
 
 const args = process.argv.slice(2)
@@ -26,6 +28,8 @@ const which = option('--browser', 'both')
 const keep = args.includes('--keep')
 const passkeysOnly = args.includes('--passkeys-only')
 const cardsOnly = args.includes('--cards-only')
+const signinOnly = args.includes('--signin-only')
+const only = passkeysOnly || cardsOnly || signinOnly
 const root = resolve(import.meta.dirname, '../..')
 const run = `run-${Date.now()}`
 // Snap Chromium can only read under ~/snap/chromium; Firefox and logs use a private cache folder.
@@ -257,6 +261,20 @@ async function passkeyFlow(name, browser, relay, site) {
     throw new Error(`the phone saw ${JSON.stringify(origins)}`)
   }
   await sleep(2000)
+
+  log(name, 'create a passkey with PRF and unlock a key with it')
+  await tab.click('#prf-create')
+  const enabled = await passkeyStatus(tab, 'Creating with PRF')
+  if (!enabled.startsWith('PRF enabled for')) throw new Error(`passkey page: ${enabled}`)
+  log(name, `${enabled}: the server checked the PRF output`)
+  await sleep(2000)
+  await tab.click('#prf-signin')
+  const unlocked = await passkeyStatus(tab, 'Unlocking')
+  if (!unlocked.startsWith('PRF key for')) throw new Error(`passkey page: ${unlocked}`)
+  const prf = (await seen()).at(-1)?.request.passkey.prf
+  if (!prf?.eval?.first) throw new Error(`the phone saw ${JSON.stringify(prf)}`)
+  log(name, `${unlocked}: the same output again, checked by the server`)
+  await sleep(2000)
 }
 
 /** Turns the passkey setting off: a new page load gets the browser's own WebAuthn again. */
@@ -290,6 +308,8 @@ async function chromium(env, site, relay) {
     enableExtensions: [ext],
     userDataDir: join(chromiumHome, 'profile'),
     defaultViewport: null,
+    // The stand-in Google pages have a certificate made for this run.
+    acceptInsecureCerts: true,
     env,
     args: [
       '--lang=nb',
@@ -298,8 +318,8 @@ async function chromium(env, site, relay) {
       '--no-first-run',
       '--no-default-browser-check',
       '--password-store=basic',
-      // Never reach the real relay from a test.
-      '--host-resolver-rules=MAP relay.nodkey.app 127.0.0.1',
+      // Never reach the real relay from a test. The stand-in Google pages run on this computer.
+      '--host-resolver-rules=MAP relay.nodkey.app 127.0.0.1, MAP accounts.google.com 127.0.0.1',
     ],
   })
   const worker = await browser.waitForTarget(
@@ -307,7 +327,19 @@ async function chromium(env, site, relay) {
   )
   const base = worker.url().replace(/\/background\.js$/, '')
   await setRelay(browser, base, relay.base)
-  return { browser, base }
+  // The tab activities, as the popup shows them, read in the background.
+  const activities = async () => {
+    const w = await (
+      await browser.waitForTarget(
+        (t) => t.type() === 'service_worker' && t.url().endsWith('/background.js'),
+      )
+    ).worker()
+    const all = await w.evaluate(() => chrome.storage.session.get(null))
+    return Object.entries(all)
+      .filter(([k]) => k.startsWith('activity:'))
+      .map(([, v]) => v)
+  }
+  return { browser, base, activities }
 }
 
 async function firefox(env) {
@@ -327,6 +359,7 @@ async function firefox(env) {
     headless: false,
     userDataDir: profile,
     defaultViewport: null,
+    acceptInsecureCerts: true,
     env,
     args: ['--window-size=800,1000'],
     extraPrefsFirefox: {
@@ -334,7 +367,8 @@ async function firefox(env) {
       'intl.locale.requested': 'en-US',
       'signon.rememberSignons': false,
       // Never reach the real relay from a test: it resolves to this computer, where nothing answers.
-      'network.dns.localDomains': 'relay.nodkey.app',
+      // The stand-in Google pages run on this computer too.
+      'network.dns.localDomains': 'relay.nodkey.app,accounts.google.com',
       ...(xpi
         ? {
             'extensions.autoDisableScopes': 0,
@@ -373,12 +407,14 @@ async function main() {
   log(`desktop ${desktop.display}${desktop.vncAddress ? `, VNC ${desktop.vncAddress}` : ''}`)
   if (desktop.vncAddress) console.log(JSON.stringify({ vnc_address: desktop.vncAddress }))
   const relay = await startRelay()
-  const site = await startSite()
+  const google = await startGoogle(state)
+  const site = await startSite(google.base)
   const open = []
   cleanup = () => {
     for (const b of open) b.process()?.kill()
     relay.child.kill()
     site.stop()
+    google.stop()
     desktop.stop()
     rmSync(chromiumHome, { recursive: true, force: true })
   }
@@ -389,9 +425,12 @@ async function main() {
       const c = await chromium(desktop.env, site.base, relay)
       open.push(c.browser)
       const name = await pairByDriver('Chromium', c.browser, c.base, relay)
-      if (!passkeysOnly && !cardsOnly) await flow('Chromium', c.browser, relay, site.base, name)
-      if (!passkeysOnly) await cardFlow('Chromium', c.browser, relay, site.base, name, helpers)
-      if (!cardsOnly) {
+      if (!only) await flow('Chromium', c.browser, relay, site.base, name)
+      if (!only || signinOnly) {
+        await signinFlow('Chromium', c.browser, relay, site.base, name, helpers, c.activities)
+      }
+      if (!only || cardsOnly) await cardFlow('Chromium', c.browser, relay, site.base, name, helpers)
+      if (!only || passkeysOnly) {
         await passkeyFlow('Chromium', c.browser, relay, site)
         await passkeysOff('Chromium', c.browser, c.base, site)
       }
@@ -400,9 +439,12 @@ async function main() {
       const f = await firefox(desktop.env)
       open.push(f.browser)
       const name = await pairByHand('Firefox', relay)
-      if (!passkeysOnly && !cardsOnly) await flow('Firefox', f.browser, relay, site.base, name)
-      if (!passkeysOnly) await cardFlow('Firefox', f.browser, relay, site.base, name, helpers)
-      if (!cardsOnly) await passkeyFlow('Firefox', f.browser, relay, site)
+      if (!only) await flow('Firefox', f.browser, relay, site.base, name)
+      if (!only || signinOnly) {
+        await signinFlow('Firefox', f.browser, relay, site.base, name, helpers, null)
+      }
+      if (!only || cardsOnly) await cardFlow('Firefox', f.browser, relay, site.base, name, helpers)
+      if (!only || passkeysOnly) await passkeyFlow('Firefox', f.browser, relay, site)
     }
     log('all flows passed')
     if (keep) {
@@ -413,6 +455,7 @@ async function main() {
     for (const b of open) await b.close().catch(() => {})
     relay.child.kill()
     site.stop()
+    google.stop()
     desktop.stop()
     rmSync(chromiumHome, { recursive: true, force: true })
   }

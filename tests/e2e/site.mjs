@@ -1,7 +1,9 @@
 // A synthetic test site with the forms Nodkey fills: a sign-in, a one-time code page, a row of
 // code boxes, a sign-up, a checkout with card fields, and a passkey page whose server checks the passkeys as a real website
 // does. Invented data only.
+import { createHash, createHmac } from 'node:crypto'
 import { createServer } from 'node:http'
+import { sitePages } from './provider.mjs'
 import { relyingParty } from './webauthn.mjs'
 
 const page = (
@@ -42,7 +44,12 @@ function asJson(cred) {
     Object.assign(response, { authenticatorData: b64u(r.authenticatorData), signature: b64u(r.signature) })
     if (r.userHandle) response.userHandle = b64u(r.userHandle)
   }
-  const json = { id: cred.id, rawId: b64u(cred.rawId), type: cred.type, authenticatorAttachment: cred.authenticatorAttachment, response, clientExtensionResults: cred.getClientExtensionResults() }
+  const ext = cred.getClientExtensionResults()
+  if (ext.prf?.results) {
+    const r = ext.prf.results
+    ext.prf.results = r.second ? { first: b64u(r.first), second: b64u(r.second) } : { first: b64u(r.first) }
+  }
+  const json = { id: cred.id, rawId: b64u(cred.rawId), type: cred.type, authenticatorAttachment: cred.authenticatorAttachment, response, clientExtensionResults: ext }
   if (JSON.stringify(sorted(cred.toJSON())) !== JSON.stringify(sorted(json))) throw new Error('toJSON() differs: ' + JSON.stringify(cred.toJSON()))
   cred.toJSON = () => json
   return json
@@ -56,6 +63,38 @@ document.getElementById('create').addEventListener('click', async () => {
       user: { ...o.user, id: bytes(o.user.id) }, excludeCredentials: ids(o.excludeCredentials) } })
     await post('/passkey/register', { name, credential: asJson(cred) })
     status('Registered ' + name)
+  } catch (e) { status('Error: ' + e.name + ': ' + e.message) }
+})
+// PRF: a passkey made with the extension, and a sign-in that asks for its output. The server
+// checks the output against the fake phone's fixed credRandom.
+const PRF_INPUT = new TextEncoder().encode('nodkey prf test')
+document.getElementById('prf-create').addEventListener('click', async () => {
+  try {
+    status('Creating with PRF')
+    const name = document.getElementById('email').value.replace('@', '-prf@')
+    const o = await post('/passkey/register/options', { name })
+    const cred = await navigator.credentials.create({ publicKey: { ...o, challenge: bytes(o.challenge),
+      user: { ...o.user, id: bytes(o.user.id) }, excludeCredentials: ids(o.excludeCredentials),
+      extensions: { prf: { eval: { first: PRF_INPUT } } } } })
+    const json = asJson(cred)
+    await post('/passkey/register', { name, credential: json })
+    const prf = json.clientExtensionResults.prf
+    if (!prf || prf.enabled !== true) throw new Error('prf.enabled is ' + (prf && prf.enabled))
+    await post('/passkey/prf', { input: b64u(PRF_INPUT), output: prf.results.first })
+    status('PRF enabled for ' + name)
+  } catch (e) { status('Error: ' + e.name + ': ' + e.message) }
+})
+document.getElementById('prf-signin').addEventListener('click', async () => {
+  try {
+    status('Unlocking')
+    const name = document.getElementById('email').value.replace('@', '-prf@')
+    const o = await post('/passkey/login/options', { name })
+    const cred = await navigator.credentials.get({ publicKey: { ...o, challenge: bytes(o.challenge),
+      allowCredentials: ids(o.allowCredentials), extensions: { prf: { eval: { first: PRF_INPUT } } } } })
+    const json = asJson(cred)
+    const v = await post('/passkey/login', { credential: json })
+    await post('/passkey/prf', { input: b64u(PRF_INPUT), output: json.clientExtensionResults.prf.results.first })
+    status('PRF key for ' + v.name)
   } catch (e) { status('Error: ' + e.name + ': ' + e.message) }
 })
 document.getElementById('signin').addEventListener('click', async () => {
@@ -120,9 +159,25 @@ const PAGES = {
     'Passkeys',
     `<label for="email">E-mail</label><input id="email" value="alex@example.com" autocomplete="username webauthn">
     <button id="create">Create a passkey</button> <button id="signin">Sign in with a passkey</button>
+    <button id="prf-create">Create a passkey with PRF</button> <button id="prf-signin">Unlock with PRF</button>
     <p id="status" role="status">Ready</p>
     <script>${PASSKEY_SCRIPT}</script>`,
   ),
+}
+
+/**
+ * The PRF output that Nodkey's fake phone gives for `input`: every passkey it makes has the
+ * fixed credRandom of the nodkey-proto vectors (`prf.cred_random`). As WebAuthn says:
+ * HMAC-SHA256(credRandom, SHA-256("WebAuthn PRF" || 0x00 || input)).
+ */
+const CRED_RANDOM = Buffer.from('NFzGvEstbwdMX6LmiQNdVFvEGvgPQOTVmPrqMvyGqP4', 'base64url')
+function checkPrf(input, output) {
+  const salt = createHash('sha256')
+    .update(Buffer.concat([Buffer.from('WebAuthn PRF\0'), Buffer.from(input, 'base64url')]))
+    .digest()
+  const want = createHmac('sha256', CRED_RANDOM).update(salt).digest('base64url')
+  if (output !== want) throw new Error('the PRF output is not the expected one')
+  return { ok: true }
 }
 
 /** Reads a JSON request body. @param {import('node:http').IncomingMessage} req */
@@ -143,7 +198,8 @@ async function passkeyApi(rp, path, req, res) {
   const routes = {
     '/passkey/register/options': (v) => rp.registerOptions(v.name),
     '/passkey/register': (v) => rp.register(v.credential, v.name),
-    '/passkey/login/options': () => rp.loginOptions(),
+    '/passkey/login/options': (v) => rp.loginOptions(v.name),
+    '/passkey/prf': (v) => checkPrf(v.input, v.output),
     '/passkey/login': (v) => rp.login(v.credential),
   }
   const route = routes[path]
@@ -160,15 +216,18 @@ async function passkeyApi(rp, path, req, res) {
 
 /**
  * Starts the site on a free loopback port; resolves to its base URL, the passkey relying party
- * (`rp`, for checks) and a stop function.
+ * (`rp`, for checks) and a stop function. `google` is the stand-in for Google's sign-in pages.
+ * @param {string} google
  */
-export function startSite() {
+export function startSite(google) {
   /** @type {ReturnType<typeof relyingParty> | null} */
   let rp = null
+  /** @type {Record<string, string>} */
+  let signin = {}
   const server = createServer(async (req, res) => {
     const path = (req.url ?? '/').split('?')[0] ?? '/'
     if (rp && (await passkeyApi(rp, path, req, res))) return
-    const html = PAGES[/** @type {keyof typeof PAGES} */ (path)]
+    const html = PAGES[/** @type {keyof typeof PAGES} */ (path)] ?? signin[path]
     if (!html) {
       res.writeHead(302, { location: '/login' }).end()
       return
@@ -181,6 +240,7 @@ export function startSite() {
       const addr = /** @type {import('node:net').AddressInfo} */ (server.address())
       const base = `http://localhost:${addr.port}`
       rp = relyingParty('localhost', base)
+      signin = sitePages(base, google)
       resolve({ base, rp, stop: () => server.close() })
     })
   })

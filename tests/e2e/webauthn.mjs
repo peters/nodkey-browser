@@ -171,11 +171,14 @@ export function relyingParty(rpId, origin) {
       credentials.set(cred.id, { key, userId: b64u(Buffer.from(`user-${name}`)), name })
       return { ok: true, flags: auth.flags }
     },
-    loginOptions() {
+    /** @param {string} [name] only this user's passkeys */
+    loginOptions(name) {
       return {
         challenge: challenge(),
         rpId,
-        allowCredentials: [...credentials.keys()].map((id) => ({ type: 'public-key', id })),
+        allowCredentials: [...credentials]
+          .filter(([, c]) => name === undefined || c.name === name)
+          .map(([id]) => ({ type: 'public-key', id })),
         userVerification: 'required',
       }
     },
