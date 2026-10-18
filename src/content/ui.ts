@@ -86,6 +86,7 @@ export class PageUi {
     const place = () => {
       this.placeKey()
       this.placeRing()
+      this.placeStepKey()
     }
     window.addEventListener('scroll', place, { passive: true, capture: true })
     window.addEventListener('resize', place, { passive: true })
@@ -231,6 +232,69 @@ export class PageUi {
     )
   }
 
+  /**
+   * Shows the Nodkey button next to `anchor` (a "Try another way" link): a click chooses a
+   * passkey or a code from Nodkey instead of the phone prompt.
+   */
+  showStepKey(anchor: HTMLElement, label: string, onClick: () => void): void {
+    this.stepKey?.remove()
+    const key = document.createElement('button')
+    key.type = 'button'
+    key.className = 'key'
+    key.innerHTML = LOGO
+    key.title = label
+    key.setAttribute('aria-label', label)
+    key.addEventListener('click', (e) => {
+      if (e.isTrusted) onClick()
+    })
+    this.root.append(key)
+    this.stepKey = key
+    this.stepAnchor = anchor
+    this.placeStepKey()
+  }
+
+  hideStepKey(): void {
+    this.stepKey?.remove()
+    this.stepKey = null
+    this.stepAnchor = null
+  }
+
+  private stepKey: HTMLButtonElement | null = null
+  private stepAnchor: HTMLElement | null = null
+
+  private placeStepKey(): void {
+    if (!this.stepKey || !this.stepAnchor) return
+    const r = this.stepAnchor.getBoundingClientRect()
+    this.stepKey.hidden = r.height === 0
+    this.stepKey.style.left = `${r.right + 8}px`
+    this.stepKey.style.top = `${r.top + (r.height - 28) / 2}px`
+  }
+
+  /** How the person signs in to the site, with a button that presses the page's own button. */
+  showMethod(message: string, button?: { label: string; press: () => void }): void {
+    const card = this.newCard(t('extName'))
+    card.setAttribute('role', 'status')
+    const text = document.createElement('p')
+    text.className = 'text'
+    text.textContent = message
+    card.append(text)
+    if (!button) return
+    const row = document.createElement('div')
+    row.className = 'row'
+    const b = document.createElement('button')
+    b.type = 'button'
+    b.className = 'primary'
+    b.textContent = button.label
+    b.addEventListener('click', (e) => {
+      if (!e.isTrusted) return
+      this.closeCard()
+      button.press()
+    })
+    row.append(b)
+    card.append(row)
+    b.focus({ preventScroll: true })
+  }
+
   /** The state of the latest request for this page. */
   showActivity(a: Activity): void {
     const card = this.newCard(t('extName'), a.state === 'error' ? 'error' : '')
@@ -248,15 +312,24 @@ export class PageUi {
     text.textContent = a.message
     line.append(text)
     card.append(line)
+    if (a.note) {
+      const note = document.createElement('p')
+      note.className = 'muted'
+      note.textContent = a.note
+      card.append(note)
+    }
     if (a.state === 'waiting') {
       const hint = document.createElement('p')
       hint.className = 'muted'
       hint.textContent = t('actWaitingHint')
       card.append(hint)
     } else {
-      this.hideTimer = window.setTimeout(() => {
-        this.closeCard()
-      }, 8000)
+      this.hideTimer = window.setTimeout(
+        () => {
+          this.closeCard()
+        },
+        a.note ? 14_000 : 8000,
+      )
     }
   }
 
@@ -266,6 +339,7 @@ export class PageUi {
     answer: (choice: 'save' | 'later' | 'never') => void,
     ask = t('saveAsk', offer.site),
     detail = offer.username,
+    primary = t('saveSave'),
   ): void {
     const card = this.newCard(ask)
     card.setAttribute('role', 'dialog')
@@ -289,7 +363,7 @@ export class PageUi {
       })
       return b
     }
-    const save = button(t('saveSave'), 'primary', 'save')
+    const save = button(primary, 'primary', 'save')
     row.append(
       save,
       button(t('saveNotNow'), 'plain', 'later'),

@@ -173,3 +173,28 @@ pub fn card_brand(number: &str) -> String {
 pub fn card_last4(number: &str) -> Option<String> {
     core::cards::last4(number)
 }
+
+#[wasm_bindgen]
+pub fn signin_site(value: &str) -> Option<String> {
+    core::signin::site(value)
+}
+
+#[wasm_bindgen]
+pub fn may_fill_via(
+    host: &str,
+    target: &str,
+    method_json: &str,
+    via_json: &str,
+) -> Result<bool, JsError> {
+    js(core::signin::may_fill_via(
+        host,
+        target,
+        method_json,
+        via_json,
+    ))
+}
+
+#[wasm_bindgen]
+pub fn second_step_pick(order_json: &str, offered_json: &str) -> Result<Option<String>, JsError> {
+    js(core::signin::second_step_pick(order_json, offered_json))
+}

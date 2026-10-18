@@ -59,7 +59,7 @@ function fill(type: 'fill.login' | 'fill.code') {
       v-if="activity"
       :state="activity.state"
       :message="activity.message"
-      :hint="activity.state === 'waiting' ? t('actWaitingHint') : undefined"
+      :hint="activity.state === 'waiting' ? t('actWaitingHint') : activity.note"
     />
   </NkCard>
 </template>

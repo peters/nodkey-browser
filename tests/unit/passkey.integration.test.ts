@@ -6,7 +6,7 @@
  */
 
 import { type ChildProcess, spawn } from 'node:child_process'
-import { createHash, createPublicKey, verify } from 'node:crypto'
+import { createHash, createHmac, createPublicKey, verify } from 'node:crypto'
 import { existsSync } from 'node:fs'
 import { afterAll, beforeAll, describe, expect, it } from 'vitest'
 import { useKeyStore } from '../../src/background/keys'
@@ -157,4 +157,103 @@ describe('passkeys against the fake phone', () => {
       expect(verifies(test, testKey?.public_key ?? '')).toBe(true)
     },
   )
+
+  it('passes the PRF extension through and returns its outputs', { timeout: 60_000 }, async () => {
+    const { passkey } = await import('../../src/background/passkeys')
+    const page = sender('https://vault.example.com/unlock')
+    const live = new AbortController().signal
+    // nodkey-proto's vector: input "nodkey prf test" with the fake phone's fixed credRandom.
+    const input = 'bm9ka2V5IHByZiB0ZXN0'
+    const output = 'JPl2H-0JODODdNk542gVtl9BvaIZcG_4J8lQ4HIuMfE'
+    const credRandom = buf('NFzGvEstbwdMX6LmiQNdVFvEGvgPQOTVmPrqMvyGqP4')
+    const prf = (b64u: string) => {
+      const salt = createHash('sha256')
+        .update(Buffer.concat([Buffer.from('WebAuthn PRF\0'), buf(b64u)]))
+        .digest()
+      return createHmac('sha256', credRandom).update(salt).digest('base64url')
+    }
+    expect(prf(input)).toBe(output)
+
+    const made = (await passkey(
+      {
+        call: {
+          op: 'create',
+          challenge: challenge(),
+          rp: { id: 'vault.example.com', name: 'Vault' },
+          user: { id: 'dXNlci0y', name: 'alex@example.com', displayName: 'Alex' },
+          algorithms: [-7],
+          prf: { eval: { first: input } },
+        },
+        sameOriginAncestors: true,
+      },
+      page,
+      live,
+    )) as PasskeyCreateResult
+    expect(made.prf).toEqual({ enabled: true, results: { first: output } })
+
+    const second = 'AAEC'
+    const signed = (await passkey(
+      {
+        call: {
+          op: 'get',
+          challenge: challenge(),
+          allowCredentials: [made.credentialId],
+          prf: {
+            eval: { first: 'ZmFsbGJhY2s' },
+            evalByCredential: { [made.credentialId]: { first: input, second } },
+          },
+        },
+        sameOriginAncestors: true,
+      },
+      page,
+      live,
+    )) as PasskeyGetResult
+    // The passkey's own entry wins over eval.
+    expect(signed.prf).toEqual({ results: { first: output, second: prf(second) } })
+    expect(verifies(signed, made.publicKey)).toBe(true)
+    const sent = (await (await fetch(`${base}/_fake/seen`)).json()) as {
+      request: { passkey: Record<string, unknown> }
+    }[]
+    expect(sent.at(-1)?.request.passkey.prf).toEqual({
+      eval: { first: 'ZmFsbGJhY2s' },
+      eval_by_credential: { [made.credentialId]: { first: input, second } },
+    })
+
+    // prf: {} without inputs: nothing to ask for, and an empty result as a browser gives.
+    const plain = (await passkey(
+      {
+        call: {
+          op: 'get',
+          challenge: challenge(),
+          allowCredentials: [made.credentialId],
+          prf: {},
+        },
+        sameOriginAncestors: true,
+      },
+      page,
+      live,
+    )) as PasskeyGetResult
+    expect(plain.prf).toEqual({})
+
+    // The phone's test passkey for webauthn.io was made before PRF: Nodkey asks again without
+    // PRF, and the page gets the sign-in without PRF results.
+    const seen = async () =>
+      (await (await fetch(`${base}/_fake/seen`)).json()) as {
+        request: { passkey: Record<string, unknown> }
+      }[]
+    const before = (await seen()).length
+    const old = (await passkey(
+      {
+        call: { op: 'get', challenge: challenge(), prf: { eval: { first: input } } },
+        sameOriginAncestors: true,
+      },
+      sender('https://webauthn.io/'),
+      live,
+    )) as PasskeyGetResult
+    expect(old.prf).toEqual({})
+    const after = await seen()
+    expect(after.length - before).toBe(2)
+    expect(after.at(-2)?.request.passkey.prf).toEqual({ eval: { first: input } })
+    expect(after.at(-1)?.request.passkey.prf).toBeUndefined()
+  })
 })

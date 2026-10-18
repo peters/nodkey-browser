@@ -9,6 +9,8 @@ import { belongsTo, mayFill } from '../utils/site'
 import { askCardSave, cardFill, cardSubmitted, isCardField, startPay } from './pay'
 import { fillCode, setValue } from './fill'
 import { findLogin, findOtp, isOtpField, submission } from './forms'
+import { smsPage } from './signin'
+import { noteClick, pageLoaded, showMethod, watchPrompt } from './steps'
 import { PageUi } from './ui'
 
 let ui: PageUi | null = null
@@ -20,7 +22,8 @@ function page(): PageUi {
       return
     }
     if (isOtpField(field) || boxRow(field)) {
-      void send({ type: 'fill.code' })
+      // A code the site sent by SMS comes through the person's Shortcuts automation on the phone.
+      void send({ type: smsPage(document) ? 'fill.sms' : 'fill.code' })
       return
     }
     // A user name already in the form (typed, or filled by the browser) names the account.
@@ -60,7 +63,9 @@ document.addEventListener(
     if (isCardField(e.target) && mayFill(location.href)) {
       page().showKey(e.target, e.target, t('cardButton'))
     } else if (isLoginField(e.target) && mayFill(location.href)) {
-      page().showKey(e.target, boxRow(e.target)?.at(-1) ?? e.target)
+      const code = isOtpField(e.target) || boxRow(e.target) !== null
+      const label = code && smsPage(document) ? t('smsButton') : t('fieldButton')
+      page().showKey(e.target, boxRow(e.target)?.at(-1) ?? e.target, label)
     }
   },
   true,
@@ -112,6 +117,7 @@ chrome.runtime.onMessage.addListener((msg: ToContent, sender, sendResponse) => {
     return false
   }
   if (msg.type === 'activity') page().showActivity(msg.activity)
+  if (msg.type === 'method') showMethod(msg, page())
   if (msg.type === 'save.prompt') ask(msg.offer)
   return false
 })
@@ -131,7 +137,11 @@ async function offerSave(): Promise<void> {
     return
   }
   const card = await send<CardOffer | null>({ type: 'card.offer' })
-  if (card) askCardSave(card, page(), send)
+  if (card) {
+    askCardSave(card, page(), send)
+    return
+  }
+  await pageLoaded(page(), send)
 }
 
 let lastSubmit = 0
@@ -171,6 +181,7 @@ document.addEventListener(
 document.addEventListener(
   'click',
   (e) => {
+    noteClick(e, send)
     const target =
       e.target instanceof Element ? e.target.closest('button, input[type=submit]') : null
     if (!target || !e.isTrusted) return
@@ -191,3 +202,18 @@ document.addEventListener(
 )
 
 void offerSave()
+
+// A phone prompt of a second step may come without a page load; look again when the page changes.
+let promptTimer = 0
+const lookForPrompt = () => {
+  window.clearTimeout(promptTimer)
+  promptTimer = window.setTimeout(() => void watchPrompt(page, send), 400)
+}
+if (window === window.top) {
+  new MutationObserver(lookForPrompt).observe(document.documentElement, {
+    childList: true,
+    subtree: true,
+    characterData: true,
+  })
+  lookForPrompt()
+}

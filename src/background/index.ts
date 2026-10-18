@@ -11,6 +11,7 @@ import * as cards from './cards'
 import { finishPairing, rememberPhone, startPairing, unpair } from './agent'
 import { failed } from './outcome'
 import { answer as answerPasskey, syncPasskeyScripts } from './passkeys'
+import * as signin from './signin'
 import * as store from './store'
 
 const ready = init()
@@ -87,15 +88,41 @@ async function handle(msg: ToBackground, sender: chrome.runtime.MessageSender): 
       const tab = await tabOf(msg.tabId, sender)
       if (tab) {
         // Answer at once; the result arrives as the tab's activity.
+        const page = !isExtensionPage(sender)
         void actions.fill(
           msg.type === 'fill.login' ? 'login' : 'code',
           tab,
-          isExtensionPage(sender) ? undefined : sender.frameId,
+          page ? sender.frameId : undefined,
           msg.type === 'fill.login' ? msg.username : undefined,
+          page ? sender.url : undefined,
         )
       }
       return null
     }
+    case 'fill.sms':
+      if (sender.tab && !isExtensionPage(sender)) {
+        void actions.fill('sms', sender.tab, sender.frameId, undefined, sender.url)
+      }
+      return null
+    case 'signin.clicked':
+      if (sender.tab) await signin.providerClicked(sender.tab, msg.provider)
+      return null
+    case 'signin.page':
+      return sender.tab && sender.url ? signin.page(sender.tab, sender.url) : null
+    case 'signin.suggest':
+      if (sender.tab) void signin.suggest(sender.tab, msg.site, msg.provider)
+      return null
+    case 'signin.dismiss':
+      await signin.dismiss(msg.site, msg.never)
+      return null
+    case 'step.available':
+      return sender.tab?.id !== undefined && sender.url
+        ? signin.stepAvailable(sender.tab.id, sender.url)
+        : false
+    case 'step.pick':
+      return sender.tab?.id !== undefined && sender.url
+        ? signin.stepPick(sender.tab.id, sender.url, msg.offered)
+        : null
     case 'save.candidate':
       if (sender.tab && sender.url) {
         await actions.candidate(sender.tab, sender.url, msg.username, msg.password, msg.title)
@@ -216,6 +243,7 @@ chrome.storage.onChanged.addListener((changes, area) => {
 void syncPasskeyScripts()
 
 chrome.tabs.onRemoved.addListener((tabId) => {
+  signin.forget(tabId)
   void chrome.storage.session.remove([
     `activity:${tabId}`,
     `offer:${tabId}`,

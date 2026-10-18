@@ -4,7 +4,7 @@
  * (the native getters only work on objects the browser made). Runs in the page.
  */
 
-import type { PasskeyResult } from '../models/passkey'
+import type { PasskeyResult, PrfResult } from '../models/passkey'
 import { decode } from './b64u'
 
 /** Where the passkey lives: the phone, reached through the relay. Sorted, as WebAuthn asks. */
@@ -33,6 +33,29 @@ function make(name: string, values: Record<string, unknown>): object {
     props[key] = { value, enumerable: false, configurable: true, writable }
   }
   return Object.create(protoOf(name), props) as object
+}
+
+/** `getClientExtensionResults().prf` with ArrayBuffers, and its JSON form in base64url. */
+function prfOutputs(prf: PrfResult | undefined): {
+  value: Record<string, unknown>
+  json: Record<string, unknown>
+} {
+  if (!prf) return { value: {}, json: {} }
+  const value: Record<string, unknown> = {}
+  const json: Record<string, unknown> = {}
+  if (prf.enabled !== undefined) {
+    value.enabled = prf.enabled
+    json.enabled = prf.enabled
+  }
+  if (prf.results) {
+    const { first, second } = prf.results
+    value.results =
+      second === undefined
+        ? { first: buffer(first) }
+        : { first: buffer(first), second: buffer(second) }
+    json.results = second === undefined ? { first } : { first, second }
+  }
+  return { value: { prf: value }, json: { prf: json } }
 }
 
 /** A `PublicKeyCredential` (with its response) for an approved passkey call. */
@@ -86,14 +109,16 @@ export function makeCredential(result: PasskeyResult): PublicKeyCredential {
       attestationObject: result.attestationObject,
     }
   }
+  const extensions = prfOutputs(result.prf)
   const credential = make('PublicKeyCredential', {
     id: result.credentialId,
     rawId,
     type: 'public-key',
     authenticatorAttachment: 'platform',
     response,
+    // A new object each time, as the browser gives: the page may change what it got.
     getClientExtensionResults: function getClientExtensionResults() {
-      return {}
+      return prfOutputs(result.prf).value
     },
     toJSON: function toJSON() {
       return {
@@ -102,7 +127,7 @@ export function makeCredential(result: PasskeyResult): PublicKeyCredential {
         type: 'public-key',
         authenticatorAttachment: 'platform',
         response: { ...responseJSON },
-        clientExtensionResults: {},
+        clientExtensionResults: extensions.json,
       }
     },
   })

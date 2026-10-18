@@ -1,5 +1,12 @@
 import { describe, expect, it } from 'vitest'
-import { ProtocolError, parseAnswer, parseClaimed, parsePhone, parseSealedBox } from './protocol'
+import {
+  ProtocolError,
+  parseAnswer,
+  parseClaimed,
+  parsePhone,
+  parseSealedBox,
+  parseSealedRequest,
+} from './protocol'
 
 describe('protocol checks', () => {
   it('reads an answer and drops unknown fields', () => {
@@ -52,5 +59,53 @@ describe('protocol checks', () => {
     expect(fromModule.name).toBe('Test iPhone')
     expect(parsePhone({ ...fromModule }).name).toBe('Test iPhone')
     expect(() => parsePhone({ ...fromModule, scope: 'everything' })).toThrow(ProtocolError)
+  })
+
+  it('reads sign-in methods, the second step, the agent limit and PRF outputs', () => {
+    const a = parseAnswer(
+      JSON.stringify({
+        v: 1,
+        request_id: 'r',
+        decision: 'approved',
+        lease: { kind: 'once' },
+        error: 'quota_warning',
+        quota: { new_today: 12, limit: 10, burst: true },
+        method: { kind: 'federated', provider: 'google', certainty: 'confirmed' },
+        via: {
+          account: { issuer: 'Google', name: 'alex@example.com', site: 'accounts.google.com' },
+          username: 'alex@example.com',
+          password: 'pw',
+          code: '190274',
+          seconds_left: 21,
+        },
+        second_step: { prefer: ['passkey', 'totp', 'fax'], avoid: ['sms'] },
+        passkey: {
+          credential_id: 'AQID',
+          authenticator_data: 'AAAA',
+          prf: { enabled: true, results: { first: 'BBBB' } },
+        },
+      }),
+    )
+    expect(a.lease).toEqual({ kind: 'once' })
+    expect(a.quota).toEqual({ new_today: 12, limit: 10, burst: true })
+    expect(a.method).toEqual({ kind: 'federated', provider: 'google', certainty: 'confirmed' })
+    expect(a.via?.account.site).toBe('accounts.google.com')
+    expect(a.via?.code).toBe('190274')
+    expect(a.second_step).toEqual({ prefer: ['passkey', 'totp'], avoid: ['sms'] })
+    expect(a.passkey?.prf).toEqual({ enabled: true, results: { first: 'BBBB' } })
+    expect(parseAnswer('{"v":1,"request_id":"r","decision":"queued"}').decision).toBe('queued')
+    expect(
+      parseAnswer('{"v":1,"request_id":"r","decision":"rejected","error":"rate_limited"}').error,
+    ).toBe('rate_limited')
+  })
+
+  it('keeps the relay ttl of an sms_code request', () => {
+    const sealed = parseSealedRequest(
+      JSON.stringify({
+        request_id: 'r',
+        envelope: { request_id: 'r', enc: 'e', ct: 'c', ttl: 180 },
+      }),
+    )
+    expect(sealed.envelope.ttl).toBe(180)
   })
 })

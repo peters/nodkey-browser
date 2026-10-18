@@ -80,4 +80,47 @@ describe('passkey calls from the page', () => {
       expect(() => parsePasskeyCall(v), JSON.stringify(v)).toThrow(PasskeyError)
     }
   })
+
+  it('checks PRF inputs with the rules of WebAuthn', () => {
+    const get = { op: 'get', challenge: CHALLENGE, allowCredentials: ['AQID'] }
+    expect(parsePasskeyCall({ ...get, prf: { eval: { first: '', second: 'AQ' } } })).toMatchObject({
+      prf: { eval: { first: '', second: 'AQ' } },
+    })
+    expect(
+      parsePasskeyCall({ ...get, prf: { evalByCredential: { AQID: { first: 'AQ' } } } }),
+    ).toMatchObject({ prf: { evalByCredential: { AQID: { first: 'AQ' } } } })
+    const name = (v: unknown) => {
+      try {
+        parsePasskeyCall(v)
+        return 'ok'
+      } catch (e) {
+        return e instanceof PasskeyError ? e.domName : 'other'
+      }
+    }
+    // A credential that the allow list does not name: SyntaxError.
+    expect(name({ ...get, prf: { evalByCredential: { BAUG: { first: 'AQ' } } } })).toBe(
+      'SyntaxError',
+    )
+    // By credential without an allow list, or on create: NotSupportedError.
+    expect(
+      name({
+        op: 'get',
+        challenge: CHALLENGE,
+        prf: { evalByCredential: { AQID: { first: 'AQ' } } },
+      }),
+    ).toBe('NotSupportedError')
+    const create = {
+      op: 'create',
+      challenge: CHALLENGE,
+      rp: { name: 'x' },
+      user: { id: 'AQID', name: 'a', displayName: 'a' },
+      algorithms: [-7],
+    }
+    expect(name({ ...create, prf: {} })).toBe('ok')
+    expect(name({ ...create, prf: { evalByCredential: { AQID: { first: 'AQ' } } } })).toBe(
+      'NotSupportedError',
+    )
+    // More than 256 bytes: the phone refuses it, so it is not sent.
+    expect(name({ ...get, prf: { eval: { first: 'A'.repeat(400) } } })).toBe('NotSupportedError')
+  })
 })

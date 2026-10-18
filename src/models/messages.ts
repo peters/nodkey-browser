@@ -3,10 +3,10 @@
  * state the background publishes in `chrome.storage.session` for the pages to show.
  */
 
-import type { Money, Phone, Saved, SealedBox } from './protocol'
+import type { Money, Phone, Saved, SealedBox, SecondStep } from './protocol'
 
 /** What a request is about, as the person sees it. */
-export type ActivityKind = 'login' | 'code' | 'save' | 'passkey' | 'card'
+export type ActivityKind = 'login' | 'code' | 'save' | 'passkey' | 'card' | 'suggest' | 'sms'
 
 export type ActivityState = 'waiting' | 'approved' | 'denied' | 'expired' | 'error'
 
@@ -17,7 +17,24 @@ export interface Activity {
   site: string
   /** Localized text for the person. */
   message: string
+  /** A second line, for example why the phone asked with the agent limit notice. */
+  note?: string
   at: number
+}
+
+/** "Remember that <site> uses <provider> sign-in?": asked once after a sign-in with a provider. */
+export interface MethodOffer {
+  site: string
+  /** The protocol name (`google`) and the name people know (`Google`). */
+  provider: string
+  label: string
+}
+
+/** A provider login that the phone sent for a site, while it waits on the provider's page. */
+export interface ViaHint {
+  site: string
+  label: string
+  username: string
 }
 
 export type PairingState =
@@ -108,6 +125,13 @@ export type ToBackground =
   | { type: 'pair.reject' }
   | { type: 'fill.login'; tabId?: number; username?: string }
   | { type: 'fill.code'; tabId?: number }
+  | { type: 'fill.sms' }
+  | { type: 'signin.clicked'; provider: string }
+  | { type: 'signin.page' }
+  | { type: 'signin.suggest'; site: string; provider: string }
+  | { type: 'signin.dismiss'; site: string; never: boolean }
+  | { type: 'step.available' }
+  | { type: 'step.pick'; offered: SecondStep[] }
   | { type: 'save.candidate'; url: string; username: string; password: string; title?: string }
   | { type: 'save.offer' }
   | { type: 'save.accept'; id: string }
@@ -138,10 +162,19 @@ export type ToContent =
   | { type: 'activity'; activity: Activity }
   | { type: 'save.prompt'; offer: SaveOffer }
   | { type: 'card.fill'; site: string; card: CardToFill; approved: Money }
+  | { type: 'method'; site: string; message: string; provider?: string; label?: string }
 
 /** A frame's answer to `card.fill`. */
 export type CardFillResult =
   { filled: true } | { filled: false; reason: 'no_field' | 'total_higher' | 'other_site' }
+
+/** What a page that loaded gets from `signin.page`. */
+export interface SigninPage {
+  offer: MethodOffer | null
+  via: ViaHint | null
+  /** Nodkey chose a code at the second step before this page loaded: fill it. */
+  fillCode: boolean
+}
 
 export interface SaveResult {
   saved: Saved

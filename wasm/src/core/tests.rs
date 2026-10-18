@@ -218,3 +218,69 @@ fn small_helpers() {
     assert_eq!(b64u_decode(&b64u_encode(b"hi")).unwrap(), b"hi");
     assert_eq!(random_id().len(), 22);
 }
+
+#[test]
+fn sign_in_rules_follow_the_vectors() {
+    let v = vectors();
+    let signin = &v["signin"];
+    for case in signin["sites"].as_array().unwrap() {
+        assert_eq!(
+            signin::site(s(case, "input")),
+            case["site"].as_str().map(str::to_owned),
+            "{case}"
+        );
+    }
+    for case in signin["via_fill"].as_array().unwrap() {
+        let via = json!({"account": {"issuer": "Test", "name": "alex", "site": case["via_site"]}});
+        let allowed = signin::may_fill_via(
+            s(case, "host"),
+            s(case, "target"),
+            &case["method"].to_string(),
+            &via.to_string(),
+        )
+        .unwrap();
+        assert_eq!(allowed, case["allowed"].as_bool().unwrap(), "{case}");
+    }
+    for case in signin["second_step_picks"].as_array().unwrap() {
+        let pick =
+            signin::second_step_pick(&case["order"].to_string(), &case["offered"].to_string())
+                .unwrap();
+        assert_eq!(pick, case["pick"].as_str().map(str::to_owned), "{case}");
+    }
+    // No order in the answer: the default (a passkey, then a code; avoid app prompts and SMS).
+    let pick = signin::second_step_pick("null", r#"["app_prompt","totp","fax"]"#).unwrap();
+    assert_eq!(pick.as_deref(), Some("totp"));
+    assert_eq!(
+        signin::second_step_pick("null", r#"["sms"]"#).unwrap(),
+        None
+    );
+}
+
+#[test]
+fn seals_suggest_and_sms_code_requests() {
+    let v = vectors();
+    let phone = &v["keys"]["phone"];
+    let suggest = json!({
+        "kind": "suggest", "target": "renderfarm.example", "reason": "Signed in with Google",
+        "agent": "Test browser",
+        "suggest": {"method": {"kind": "federated", "provider": "google", "certainty": "seen",
+                               "source": "extension"}, "outcome": "signed_in"}
+    });
+    let out = seal_request(&suggest.to_string(), "agent", s(phone, "kem_pk"), 1.0e9).unwrap();
+    let sealed: Value = serde_json::from_str(&out).unwrap();
+    assert!(sealed["envelope"].get("ttl").is_none());
+    // Only the user confirms a method.
+    let mut confirmed = suggest.clone();
+    confirmed["suggest"]["method"]["certainty"] = json!("confirmed");
+    assert!(seal_request(&confirmed.to_string(), "agent", s(phone, "kem_pk"), 1.0e9).is_err());
+
+    let sms = json!({"kind": "sms_code", "target": "account.example.com",
+                     "reason": "The site sent a code by SMS", "agent": "Test browser",
+                     "wait_seconds": 120});
+    let out = seal_request(&sms.to_string(), "agent", s(phone, "kem_pk"), 1.0e9).unwrap();
+    let sealed: Value = serde_json::from_str(&out).unwrap();
+    assert_eq!(sealed["envelope"]["ttl"], json!(180));
+    let mut long = sms.clone();
+    long["wait_seconds"] = json!(301);
+    assert!(seal_request(&long.to_string(), "agent", s(phone, "kem_pk"), 1.0e9).is_err());
+}

@@ -8,6 +8,27 @@ import { isB64u } from '../passkeys/b64u'
 
 export type Requirement = 'required' | 'preferred' | 'discouraged'
 
+/** One or two PRF inputs (base64url), WebAuthn's `AuthenticationExtensionsPRFValues`. */
+export interface PrfValues {
+  first: string
+  second?: string
+}
+
+/**
+ * `extensions.prf` as the page asked. Create: present means "make the passkey with PRF", `eval`
+ * also asks for outputs. Get: `eval` for any passkey, `evalByCredential` by credential id.
+ */
+export interface PrfCall {
+  eval?: PrfValues
+  evalByCredential?: Record<string, PrfValues>
+}
+
+/** `getClientExtensionResults().prf`. The results are secret keys: never log or keep them. */
+export interface PrfResult {
+  enabled?: boolean
+  results?: PrfValues
+}
+
 export interface PasskeyGetCall {
   op: 'get'
   challenge: string
@@ -15,6 +36,7 @@ export interface PasskeyGetCall {
   rpId?: string
   allowCredentials: string[]
   userVerification: Requirement
+  prf?: PrfCall
 }
 
 export interface PasskeyCreateCall {
@@ -27,6 +49,7 @@ export interface PasskeyCreateCall {
   excludeCredentials: string[]
   residentKey: Requirement
   userVerification: Requirement
+  prf?: PrfCall
 }
 
 export type PasskeyCall = PasskeyGetCall | PasskeyCreateCall
@@ -38,6 +61,7 @@ export interface PasskeyGetResult {
   authenticatorData: string
   signature: string
   userHandle?: string
+  prf?: PrfResult
 }
 
 export interface PasskeyCreateResult {
@@ -48,13 +72,19 @@ export interface PasskeyCreateResult {
   authenticatorData: string
   publicKey: string
   publicKeyAlgorithm: number
+  prf?: PrfResult
 }
 
 export type PasskeyResult = PasskeyGetResult | PasskeyCreateResult
 
 /** The DOMException names a passkey call can reject with. */
 export type PasskeyErrorName =
-  'NotAllowedError' | 'InvalidStateError' | 'SecurityError' | 'NotSupportedError' | 'AbortError'
+  | 'NotAllowedError'
+  | 'InvalidStateError'
+  | 'SecurityError'
+  | 'NotSupportedError'
+  | 'AbortError'
+  | 'SyntaxError'
 
 export type PasskeyReply =
   { ok: true; result: PasskeyResult } | { ok: false; name: PasskeyErrorName; message: string }
@@ -117,6 +147,44 @@ function requirement(v: unknown, fallback: Requirement): Requirement {
   return v === 'required' || v === 'preferred' || v === 'discouraged' ? v : fallback
 }
 
+/** PRF inputs: base64url of 0 to 256 bytes each (nodkey-proto `prf::MAX_INPUT`). */
+function prfValues(v: unknown, what: string): PrfValues {
+  if (!isObject(v)) throw bad(what)
+  const input = (x: unknown) => b64u(x, what, 0, 256)
+  const out: PrfValues = { first: input(v.first) }
+  if (v.second !== undefined) out.second = input(v.second)
+  return out
+}
+
+/**
+ * Checks `prf` from the page with WebAuthn's rules: no `evalByCredential` on create; on get, its
+ * keys are credential ids of a non-empty `allowCredentials`.
+ */
+function prfCall(v: unknown, op: 'get' | 'create', allow: string[]): PrfCall | undefined {
+  if (v === undefined) return undefined
+  if (!isObject(v)) throw bad('prf')
+  const out: PrfCall = {}
+  if (v.eval !== undefined) out.eval = prfValues(v.eval, 'prf.eval')
+  if (v.evalByCredential === undefined) return out
+  if (!isObject(v.evalByCredential)) throw bad('prf.evalByCredential')
+  const entries = Object.entries(v.evalByCredential)
+  if (entries.length === 0) return out
+  if (op === 'create' || allow.length === 0) throw bad('prf.evalByCredential')
+  out.evalByCredential = {}
+  for (const [id, values] of entries) {
+    if (!allow.includes(id)) {
+      throw new PasskeyError('SyntaxError', 'prf.evalByCredential names an unknown credential')
+    }
+    out.evalByCredential[id] = prfValues(values, 'prf.evalByCredential')
+  }
+  return out
+}
+
+/** True when a get asks for PRF outputs (not only `prf: {}`). */
+export function hasPrfInputs(prf: PrfCall | undefined): boolean {
+  return prf?.eval !== undefined || Object.keys(prf?.evalByCredential ?? {}).length > 0
+}
+
 function optRpId(v: unknown): string | undefined {
   if (v === undefined) return undefined
   return text(v, 'rpId')
@@ -135,6 +203,8 @@ export function parsePasskeyCall(v: unknown): PasskeyCall {
     }
     const rpId = optRpId(v.rpId)
     if (rpId !== undefined) call.rpId = rpId
+    const prf = prfCall(v.prf, 'get', call.allowCredentials)
+    if (prf) call.prf = prf
     return call
   }
   if (v.op === 'create') {
@@ -167,6 +237,8 @@ export function parsePasskeyCall(v: unknown): PasskeyCall {
     if (!call.user.name.trim()) throw bad('user.name')
     const rpId = optRpId(rp.id)
     if (rpId !== undefined) call.rp.id = rpId
+    const prf = prfCall(v.prf, 'create', [])
+    if (prf) call.prf = prf
     return call
   }
   throw bad('op')

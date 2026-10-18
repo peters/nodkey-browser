@@ -254,4 +254,47 @@ describe('the page script', () => {
     ).rejects.toBeInstanceOf(TypeError)
     expect(requests).toHaveLength(4)
   })
+
+  it('passes PRF inputs and returns the outputs as ArrayBuffers', async () => {
+    const before = requests.length
+    const pending = creds().get({
+      publicKey: {
+        challenge,
+        allowCredentials: [{ type: 'public-key', id: new Uint8Array([1, 2, 3]) }],
+        extensions: {
+          prf: {
+            eval: { first: new Uint8Array([9]) },
+            evalByCredential: { AQID: { first: new Uint8Array([1]), second: new ArrayBuffer(2) } },
+          },
+        },
+      },
+    })
+    await vi.waitFor(() => {
+      expect(requests).toHaveLength(before + 1)
+    })
+    expect(requests.at(-1)?.call.prf).toEqual({
+      eval: { first: 'CQ' },
+      evalByCredential: { AQID: { first: 'AQ', second: 'AAA' } },
+    })
+    const first = encode(new Uint8Array(32).fill(5))
+    answer({
+      ok: true,
+      result: {
+        op: 'get',
+        clientDataJSON: b('{"type":"webauthn.get"}'),
+        credentialId: 'AQID',
+        authenticatorData: b('auth'),
+        signature: b('sig'),
+        prf: { results: { first } },
+      },
+    })
+    const cred = (await pending) as PublicKeyCredential
+    const ext = cred.getClientExtensionResults() as { prf: { results: { first: ArrayBuffer } } }
+    expect(ext.prf.results.first).toBeInstanceOf(ArrayBuffer)
+    expect(new Uint8Array(ext.prf.results.first)).toEqual(new Uint8Array(32).fill(5))
+    // A new object each time: the page cannot change what the next call gives.
+    expect(cred.getClientExtensionResults()).not.toBe(ext)
+    const json = (cred as unknown as { toJSON(): { clientExtensionResults: unknown } }).toJSON()
+    expect(json.clientExtensionResults).toEqual({ prf: { results: { first } } })
+  })
 })

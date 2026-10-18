@@ -12,7 +12,7 @@ import {
   type SaveOffer,
   type Settings,
 } from '../models/messages'
-import { type Phone, parsePhone } from '../models/protocol'
+import { type Phone, type SecondStepOrder, type SignInMethod, parsePhone } from '../models/protocol'
 
 export interface Agent {
   agent_id: string
@@ -137,4 +137,44 @@ export async function cardOffer(tabId: number): Promise<CardOffer | null> {
 export async function setCardOffer(tabId: number, o: CardOffer | null): Promise<void> {
   if (o) await chrome.storage.session.set({ [`cardOffer:${tabId}`]: o })
   else await chrome.storage.session.remove(`cardOffer:${tabId}`)
+}
+
+/**
+ * What the phone said about how a site is signed in to: its first method and the second step
+ * order, from approved login and code answers. No secret; for this browser session only.
+ */
+export interface KnownSite {
+  method?: SignInMethod
+  order?: SecondStepOrder
+  at: number
+}
+
+export async function knownSites(): Promise<Record<string, KnownSite>> {
+  return (await getSession<Record<string, KnownSite>>('known')) ?? {}
+}
+
+export async function setKnownSite(site: string, known: KnownSite): Promise<void> {
+  const all = await knownSites()
+  await chrome.storage.session.set({ known: { ...all, [site]: known } })
+}
+
+/** A click on "Sign in with <provider>" in a tab, until the person comes back signed in. */
+export interface ProviderFlow {
+  site: string
+  provider: string
+  at: number
+  /** A page of the provider loaded after the click. */
+  visited: boolean
+}
+
+export async function providerFlows(): Promise<Record<string, ProviderFlow>> {
+  const all = (await getSession<Record<string, ProviderFlow>>('flows')) ?? {}
+  // A flow is for the next ten minutes only.
+  return Object.fromEntries(Object.entries(all).filter(([, f]) => Date.now() - f.at < 10 * 60_000))
+}
+
+export async function setProviderFlow(tabId: number, flow: ProviderFlow | null): Promise<void> {
+  const others = Object.entries(await providerFlows()).filter(([id]) => id !== String(tabId))
+  const all = Object.fromEntries(flow ? [...others, [String(tabId), flow]] : others)
+  await chrome.storage.session.set({ flows: all })
 }

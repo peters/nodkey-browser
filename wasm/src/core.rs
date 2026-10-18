@@ -12,7 +12,7 @@
 use nodkey_proto::{
     AttachmentInfo, CardRequest, ClientInfo, ImageType, Kind, PairingClaimed, PasskeyAnswer,
     PasskeyOp, PasskeyRequest, PublicKeys, Purpose, Request, SaveCard, SaveLogin, SealedBox,
-    VERSION, auth, b64u, check, client, code, dh, passkey, webauthn,
+    Suggestion, VERSION, auth, b64u, check, client, code, dh, passkey, webauthn,
 };
 use serde::{Deserialize, Serialize};
 use zeroize::Zeroizing;
@@ -111,6 +111,10 @@ struct Draft {
     save_card: Option<SaveCard>,
     #[serde(default)]
     client: Option<ClientInfo>,
+    #[serde(default)]
+    suggest: Option<Suggestion>,
+    #[serde(default)]
+    wait_seconds: Option<u32>,
 }
 
 #[derive(Serialize)]
@@ -120,7 +124,8 @@ struct Sealed {
 }
 
 /// Checks and seals a request to the phone. `draft_json` is
-/// `{kind, target, reason, agent, attachment?, save?, passkey?, card?, save_card?, client?}`; returns
+/// `{kind, target, reason, agent, attachment?, save?, passkey?, card?, save_card?, client?, suggest?,
+/// wait_seconds?}`; returns
 /// `{request_id, envelope}` where `envelope` is the body of `POST /v1/phones/{id}/requests`.
 pub fn seal_request(
     draft_json: &str,
@@ -145,6 +150,9 @@ pub fn seal_request(
         card: d.card,
         save_card: d.save_card,
         client: d.client.map(ClientInfo::tidy),
+        session_id: None,
+        suggest: d.suggest,
+        wait_seconds: d.wait_seconds,
     };
     client::check_request(&request)?;
     let kem = b64u::decode_array::<32>(phone_kem).map_err(js)?;
@@ -277,6 +285,7 @@ pub fn open_grant(
 }
 
 pub mod cards;
+pub mod signin;
 
 #[cfg(test)]
 mod tests;

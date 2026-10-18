@@ -27,6 +27,10 @@ import * as store from './store'
 
 /** How long a request waits for the person (protocol: 120 s). */
 export const REQUEST_MS = 120_000
+/** How long to wait for an answer: the envelope's `ttl` (an `sms_code` request), else 120 s. */
+export function waitMs(ttl: number | undefined): number {
+  return ttl === undefined ? REQUEST_MS : ttl * 1000
+}
 /** How long pairing waits for the phone to claim the code (protocol: 300 s). */
 export const PAIRING_MS = 300_000
 
@@ -125,6 +129,10 @@ export interface Ask {
   card?: Record<string, unknown>
   /** The `save_card` object of a card save (number and CVC sealed already). */
   saveCard?: Record<string, unknown>
+  /** The `suggest` object of a suggestion: a sign-in method and what happened. No secret. */
+  suggest?: Record<string, unknown>
+  /** `sms_code`: how long the phone waits for the SMS, in seconds (30 to 300). */
+  waitSeconds?: number
   client: ClientInfo
 }
 
@@ -132,8 +140,9 @@ export interface Ask {
 export type Outcome = { answer: Answer; phone: Phone } | { answer: null; phone: Phone }
 
 /**
- * Sends one request to the current phone and waits up to two minutes for the answer. After
- * `signal` aborts, the wait ends as if the phone did not answer.
+ * Sends one request to the current phone and waits up to two minutes for the answer (an
+ * `sms_code` request as long as the relay keeps it). After `signal` aborts, the wait ends as if
+ * the phone did not answer.
  */
 export async function ask(a: Ask, phone: Phone, signal?: AbortSignal): Promise<Outcome> {
   const agent = await store.agent()
@@ -157,6 +166,8 @@ export async function ask(a: Ask, phone: Phone, signal?: AbortSignal): Promise<O
   if (a.passkey) draft.passkey = a.passkey
   if (a.card) draft.card = a.card
   if (a.saveCard) draft.save_card = a.saveCard
+  if (a.suggest) draft.suggest = a.suggest
+  if (a.waitSeconds !== undefined) draft.wait_seconds = a.waitSeconds
   const nowSeconds = Math.floor(Date.now() / 1000)
   const sealed = parseSealedRequest(
     seal_request(JSON.stringify(draft), agent.agent_id, phone.kem, nowSeconds),
@@ -176,7 +187,7 @@ export async function ask(a: Ask, phone: Phone, signal?: AbortSignal): Promise<O
     }
   }
   const box = await keepAlive(
-    pollUntil(REQUEST_MS - (Date.now() - started), (wait) =>
+    pollUntil(waitMs(sealed.envelope.ttl) - (Date.now() - started), (wait) =>
       signal?.aborted
         ? Promise.resolve({ kind: 'gone' as const })
         : r.waitAnswer(sealed.request_id, wait),

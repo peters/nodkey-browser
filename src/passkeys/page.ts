@@ -12,6 +12,8 @@ import {
   type PasskeyCreateCall,
   type PasskeyGetCall,
   type PasskeyReply,
+  type PrfCall,
+  type PrfValues,
   type Requirement,
 } from '../models/passkey'
 import { encode } from './b64u'
@@ -52,6 +54,33 @@ function requirement(v: unknown, fallback: Requirement): Requirement {
   return typeof v === 'string' ? (v as Requirement) : fallback
 }
 
+function prfValues(v: unknown, what: string): PrfValues {
+  const o = loose(v, what)
+  const out: PrfValues = { first: bytes(o.first, `${what}.first`) }
+  if (o.second !== undefined) out.second = bytes(o.second, `${what}.second`)
+  return out
+}
+
+/**
+ * `extensions.prf` with its BufferSources in base64url. The keys of `evalByCredential` are
+ * base64url credential ids already; the background checks them against `allowCredentials`.
+ */
+function prfCall(extensions: unknown): PrfCall | undefined {
+  if (extensions === undefined) return undefined
+  const prf = loose(extensions, 'extensions').prf
+  if (prf === undefined) return undefined
+  const o = loose(prf, 'prf')
+  const out: PrfCall = {}
+  if (o.eval !== undefined) out.eval = prfValues(o.eval, 'prf.eval')
+  if (o.evalByCredential !== undefined) {
+    const by = loose(o.evalByCredential, 'prf.evalByCredential')
+    out.evalByCredential = Object.fromEntries(
+      Object.entries(by).map(([id, values]) => [id, prfValues(values, 'prf.evalByCredential')]),
+    )
+  }
+  return out
+}
+
 function getCall(o: Loose): PasskeyGetCall {
   const call: PasskeyGetCall = {
     op: 'get',
@@ -61,6 +90,8 @@ function getCall(o: Loose): PasskeyGetCall {
   }
   const rpId = optText(o.rpId, 'rpId')
   if (rpId !== undefined) call.rpId = rpId
+  const prf = prfCall(o.extensions)
+  if (prf) call.prf = prf
   return call
 }
 
@@ -96,6 +127,8 @@ function createCall(o: Loose): PasskeyCreateCall {
   }
   const rpId = optText(rp.id, 'rp.id')
   if (rpId !== undefined) call.rp.id = rpId
+  const prf = prfCall(o.extensions)
+  if (prf) call.prf = prf
   return call
 }
 

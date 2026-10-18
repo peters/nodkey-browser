@@ -11,6 +11,9 @@ import {
   PasskeyError,
   type PasskeyReply,
   type PasskeyResult,
+  type PrfCall,
+  type PrfResult,
+  hasPrfInputs,
   parsePasskeyCall,
 } from '../models/passkey'
 import type { Answer, PasskeyAnswer } from '../models/protocol'
@@ -29,17 +32,38 @@ const ES256 = -7
 /** Tabs with a passkey request on the phone: one at a time per tab. */
 const busy = new Set<number>()
 
-function snake(call: PasskeyCall, rpId: string, cdj: string): Record<string, unknown> {
+/** `prf` in the protocol's names. A get without inputs sends none (the phone refuses it). */
+function prfRequest(
+  prf: PrfCall | undefined,
+  op: 'get' | 'create',
+): Record<string, unknown> | null {
+  if (!prf) return null
+  if (op === 'get' && !hasPrfInputs(prf)) return null
+  const out: Record<string, unknown> = {}
+  if (prf.eval) out.eval = prf.eval
+  if (prf.evalByCredential) out.eval_by_credential = prf.evalByCredential
+  return out
+}
+
+function snake(
+  call: PasskeyCall,
+  rpId: string,
+  cdj: string,
+  withPrf = true,
+): Record<string, unknown> {
+  const prf = withPrf ? prfRequest(call.prf, call.op) : null
   if (call.op === 'get') {
-    return {
+    const get: Record<string, unknown> = {
       op: 'get',
       rp_id: rpId,
       client_data_json: cdj,
       allow_credentials: call.allowCredentials,
       user_verification: call.userVerification,
     }
+    if (prf) get.prf = prf
+    return get
   }
-  return {
+  const create: Record<string, unknown> = {
     op: 'create',
     rp_id: rpId,
     rp_name: call.rp.name,
@@ -50,6 +74,21 @@ function snake(call: PasskeyCall, rpId: string, cdj: string): Record<string, unk
     resident_key: call.residentKey,
     user_verification: call.userVerification,
   }
+  if (prf) create.prf = prf
+  return create
+}
+
+/**
+ * `getClientExtensionResults().prf` for the page, when it asked for PRF. A get whose passkey has no
+ * PRF gets no results, as a browser gives for an authenticator without PRF; a create from an app
+ * without PRF says `enabled: false`.
+ */
+function prfResult(call: PasskeyCall, p: PasskeyAnswer): PrfResult | undefined {
+  if (!call.prf) return undefined
+  const out: PrfResult = {}
+  if (call.op === 'create') out.enabled = p.prf?.enabled ?? false
+  if (p.prf?.results) out.results = { ...p.prf.results }
+  return out
 }
 
 function equal(a: Uint8Array, b: Uint8Array): boolean {
@@ -85,6 +124,8 @@ function result(
       signature: p.signature,
     }
     if (p.user_handle !== undefined) out.userHandle = p.user_handle
+    const prf = prfResult(call, p)
+    if (prf) out.prf = prf
     return out
   }
   const data = decode(p.authenticator_data)
@@ -97,7 +138,7 @@ function result(
   ) {
     throw new PasskeyError('NotAllowedError', 'the new passkey does not match its data')
   }
-  return {
+  const out: PasskeyResult = {
     op: 'create',
     clientDataJSON: cdj,
     credentialId: p.credential_id,
@@ -106,6 +147,9 @@ function result(
     publicKey: p.public_key,
     publicKeyAlgorithm: p.public_key_algorithm,
   }
+  const prf = prfResult(call, p)
+  if (prf) out.prf = prf
+  return out
 }
 
 /** The DOMException and the text for an answer that is not an approval. */
@@ -174,14 +218,25 @@ export async function passkey(
       info.browser,
     )
     let answer: Answer | null
+    let sent = request
     try {
-      const asked = ask(
-        { kind: 'passkey', site: rpId, reason, passkey: request, client: client() },
-        phone,
-        signal,
-      )
-      answer = (await Promise.race([asked, abortion(signal)])).answer
-      if (signal.aborted) throw new Error('aborted')
+      const once = async (passkey: Record<string, unknown>) => {
+        const asked = ask(
+          { kind: 'passkey', site: rpId, reason, passkey, client: client() },
+          phone,
+          signal,
+        )
+        const got = (await Promise.race([asked, abortion(signal)])).answer
+        if (signal.aborted) throw new Error('aborted')
+        return got
+      }
+      answer = await once(request)
+      // The site's passkey was made before PRF: sign in without it, as a browser does with an
+      // authenticator without PRF (the person approves once more).
+      if (answer?.error === 'prf_unsupported' && call.op === 'get') {
+        sent = snake(call, rpId, cdj, false)
+        answer = await once(sent)
+      }
     } catch (e) {
       if (signal.aborted) {
         await show('denied', t('actPasskeyCancelled'))
@@ -199,9 +254,14 @@ export async function passkey(
       )
       throw error
     }
+    // PRF needs Face ID each time: a PRF answer from a lease is refused (protocol, "PRF").
+    if ('prf' in sent && answer.lease && answer.lease.kind !== 'once') {
+      await show('error', t('actError', 'a PRF answer came from a lease'))
+      throw new PasskeyError('NotAllowedError', 'a PRF answer came from a lease')
+    }
     let out: PasskeyResult
     try {
-      out = result(call, request, cdj, answer.passkey)
+      out = result(call, sent, cdj, answer.passkey)
     } catch (e) {
       await show('error', t('actError', e instanceof Error ? e.message : String(e)))
       throw e

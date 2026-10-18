@@ -4,8 +4,20 @@
  * peters/nodkey-cli.
  */
 
-export type Kind = 'code' | 'login' | 'list' | 'insights' | 'cleanup' | 'save' | 'passkey' | 'card'
-export type Decision = 'approved' | 'denied' | 'expired'
+export type Kind =
+  | 'code'
+  | 'login'
+  | 'list'
+  | 'insights'
+  | 'cleanup'
+  | 'save'
+  | 'passkey'
+  | 'card'
+  | 'suggest'
+  | 'sms_code'
+/** `queued` and `rejected` come only for `suggest`. */
+export type Decision = 'approved' | 'denied' | 'expired' | 'queued' | 'rejected'
+export type LeaseKind = 'once' | 'day' | 'week' | 'always' | 'session'
 export type Scope = 'selected' | 'codes' | 'logins' | 'all'
 export type Saved = 'added' | 'updated' | 'unchanged'
 
@@ -20,20 +32,64 @@ export interface Account {
   site?: string
 }
 
+/** How a site is signed in to ("Sign-in methods" in the protocol). It holds no secret. */
+export type SignInKind = 'password' | 'federated' | 'passkey' | 'email_code' | 'sso' | 'sms'
+export type Provider = 'google' | 'apple' | 'github' | 'microsoft' | 'facebook' | 'other'
+export type SecondStep = 'passkey' | 'totp' | 'app_prompt' | 'sms' | 'email'
+
+export interface SignInMethod {
+  kind: SignInKind
+  provider?: Provider
+  provider_name?: string
+  certainty?: 'confirmed' | 'seen' | 'likely'
+  mailbox?: string
+  source?: 'manual' | 'agent' | 'extension' | 'import'
+}
+
+/** The provider login of a `federated` method: fill it only on the provider's own pages. */
+export interface Via {
+  account: Account
+  username?: string
+  password?: string
+  code?: string
+  seconds_left?: number
+  next_code?: string
+  next_seconds_left?: number
+}
+
+export interface SecondStepOrder {
+  prefer: SecondStep[]
+  avoid: SecondStep[]
+}
+
+/** The agent limit's count (`quota_warning`, or `paused` by the limit). */
+export interface Quota {
+  new_today: number
+  limit: number
+  burst?: boolean
+}
+
 /** The phone's answer, after opening. May hold a code or a password: never store it. */
 export interface Answer {
   v: number
   request_id: string
   decision: Decision
+  lease?: { kind: LeaseKind; until?: number }
   account?: Account
   code?: string
   seconds_left?: number
+  next_code?: string
+  next_seconds_left?: number
   username?: string
   password?: string
   saved?: Saved
   passkey?: PasskeyAnswer
   card?: CardAnswer
   error?: string
+  method?: SignInMethod
+  via?: Via
+  second_step?: SecondStepOrder
+  quota?: Quota
 }
 
 /** An amount: a decimal string with a dot and an ISO 4217 code (`docs/agent-protocol.md`). */
@@ -67,6 +123,14 @@ export interface PasskeyAnswer {
   attestation_object?: string
   public_key?: string
   public_key_algorithm?: number
+  /** The WebAuthn PRF outputs (secret keys: never log or keep them). */
+  prf?: PrfOutput
+}
+
+export interface PrfOutput {
+  /** Create only: the new passkey supports PRF. */
+  enabled?: boolean
+  results?: { first: string; second?: string }
 }
 
 /** A paired phone, as kept in storage (public keys only). */
@@ -93,7 +157,7 @@ export interface PairingClaimed {
 /** What `seal_request` in the WebAssembly module returns. */
 export interface SealedRequest {
   request_id: string
-  envelope: { request_id: string; enc: string; ct: string; attachment?: boolean }
+  envelope: { request_id: string; enc: string; ct: string; attachment?: boolean; ttl?: number }
 }
 
 export class ProtocolError extends Error {
@@ -163,17 +227,22 @@ export function parseAnswer(json: string): Answer {
   const answer: Answer = {
     v: typeof v.v === 'number' ? v.v : 0,
     request_id: str(v, 'request_id'),
-    decision: oneOf(v, 'decision', ['approved', 'denied', 'expired'] as const),
+    decision: oneOf(v, 'decision', [
+      'approved',
+      'denied',
+      'expired',
+      'queued',
+      'rejected',
+    ] as const),
   }
-  const account = v.account
-  if (isObject(account)) {
-    answer.account = { issuer: str(account, 'issuer'), name: str(account, 'name') }
-    const site = optStr(account, 'site')
-    if (site !== undefined) answer.account.site = site
+  if (isObject(v.lease)) {
+    answer.lease = {
+      kind: oneOf(v.lease, 'kind', ['once', 'day', 'week', 'always', 'session'] as const),
+    }
+    if (typeof v.lease.until === 'number') answer.lease.until = v.lease.until
   }
-  const code = optStr(v, 'code')
-  if (code !== undefined) answer.code = code
-  if (typeof v.seconds_left === 'number') answer.seconds_left = v.seconds_left
+  if (isObject(v.account)) answer.account = parseAccount(v.account)
+  Object.assign(answer, codes(v))
   const username = optStr(v, 'username')
   if (username !== undefined) answer.username = username
   const password = optStr(v, 'password')
@@ -185,7 +254,72 @@ export function parseAnswer(json: string): Answer {
   if (isObject(v.card)) answer.card = parseCardAnswer(v.card)
   const error = optStr(v, 'error')
   if (error !== undefined) answer.error = error
+  // The WebAssembly module read these tolerantly already (an unknown kind or step is left out).
+  if (isObject(v.method)) answer.method = parseMethod(v.method)
+  if (isObject(v.via)) answer.via = parseVia(v.via)
+  if (isObject(v.second_step)) answer.second_step = parseOrder(v.second_step)
+  if (isObject(v.quota) && typeof v.quota.new_today === 'number') {
+    answer.quota = {
+      new_today: v.quota.new_today,
+      limit: typeof v.quota.limit === 'number' ? v.quota.limit : 0,
+    }
+    if (v.quota.burst === true) answer.quota.burst = true
+  }
   return answer
+}
+
+function parseAccount(o: Record<string, unknown>): Account {
+  const account: Account = { issuer: str(o, 'issuer'), name: str(o, 'name') }
+  const site = optStr(o, 'site')
+  if (site !== undefined) account.site = site
+  return account
+}
+
+/** The code fields of an answer or of its `via`. */
+function codes(o: Record<string, unknown>): Partial<Via> {
+  const out: Partial<Via> = {}
+  const code = optStr(o, 'code')
+  if (code !== undefined) out.code = code
+  if (typeof o.seconds_left === 'number') out.seconds_left = o.seconds_left
+  const next = optStr(o, 'next_code')
+  if (next !== undefined) out.next_code = next
+  if (typeof o.next_seconds_left === 'number') out.next_seconds_left = o.next_seconds_left
+  return out
+}
+
+const KINDS = ['password', 'federated', 'passkey', 'email_code', 'sso', 'sms'] as const
+const PROVIDERS = ['google', 'apple', 'github', 'microsoft', 'facebook', 'other'] as const
+const STEPS = ['passkey', 'totp', 'app_prompt', 'sms', 'email'] as const
+
+function parseMethod(o: Record<string, unknown>): SignInMethod {
+  const method: SignInMethod = { kind: oneOf(o, 'kind', KINDS) }
+  if (o.provider !== undefined) method.provider = oneOf(o, 'provider', PROVIDERS)
+  const name = optStr(o, 'provider_name')
+  if (name !== undefined) method.provider_name = name.slice(0, 40)
+  if (o.certainty !== undefined) {
+    method.certainty = oneOf(o, 'certainty', ['confirmed', 'seen', 'likely'] as const)
+  }
+  const mailbox = optStr(o, 'mailbox')
+  if (mailbox !== undefined) method.mailbox = mailbox
+  return method
+}
+
+function parseVia(o: Record<string, unknown>): Via {
+  if (!isObject(o.account)) throw new ProtocolError('via needs its account')
+  const via: Via = { account: parseAccount(o.account), ...codes(o) }
+  const username = optStr(o, 'username')
+  if (username !== undefined) via.username = username
+  const password = optStr(o, 'password')
+  if (password !== undefined) via.password = password
+  return via
+}
+
+function parseOrder(o: Record<string, unknown>): SecondStepOrder {
+  const steps = (v: unknown): SecondStep[] =>
+    Array.isArray(v)
+      ? v.filter((s): s is SecondStep => (STEPS as readonly unknown[]).includes(s))
+      : []
+  return { prefer: steps(o.prefer), avoid: steps(o.avoid) }
 }
 
 export function parseMoney(v: unknown): Money {
@@ -252,6 +386,18 @@ function parsePasskeyAnswer(o: Record<string, unknown>): PasskeyAnswer {
   if (typeof o.public_key_algorithm === 'number') {
     out.public_key_algorithm = o.public_key_algorithm
   }
+  if (isObject(o.prf)) {
+    const prf: PrfOutput = {}
+    if (typeof o.prf.enabled === 'boolean') prf.enabled = o.prf.enabled
+    if (isObject(o.prf.results)) {
+      const first = optB64u(o.prf.results, 'first')
+      if (first === undefined) throw new ProtocolError('prf.results needs first')
+      prf.results = { first }
+      const second = optB64u(o.prf.results, 'second')
+      if (second !== undefined) prf.results.second = second
+    }
+    out.prf = prf
+  }
   return out
 }
 
@@ -279,5 +425,6 @@ export function parseSealedRequest(json: string): SealedRequest {
     ct: str(env, 'ct'),
   }
   if (env.attachment === true) envelope.attachment = true
+  if (typeof env.ttl === 'number') envelope.ttl = env.ttl
   return { request_id: str(v, 'request_id'), envelope }
 }

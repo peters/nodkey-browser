@@ -8,17 +8,41 @@ import { RelayError } from './relay'
 export interface Shown {
   state: ActivityState
   message: string
+  note?: string
+}
+
+/** The text for a pause: by the person, or by the agent limit (the answer then has `quota`). */
+export function paused(answer: Answer): string {
+  return answer.quota ? t('actPausedLimit') : t('actPaused')
+}
+
+/**
+ * The agent limit's notice, when the phone asked because of it (`quota_warning`, with any
+ * decision). It says why the phone asked; nothing failed.
+ */
+export function quotaNote(answer: Answer | null): string | undefined {
+  if (answer?.error !== 'quota_warning') return undefined
+  return t('actQuotaWarning', String(answer.quota?.new_today ?? ''))
 }
 
 /** The text for a request that did not get an approval (or failed). */
 export function notApproved(answer: Answer | null, kind: ActivityKind): Shown {
   if (!answer || answer.decision === 'expired') {
-    return { state: 'expired', message: kind === 'save' ? t('saveKept') : t('actExpired') }
+    const message =
+      kind === 'save' ? t('saveKept') : kind === 'sms' ? t('smsExpired') : t('actExpired')
+    return { state: 'expired', message }
   }
-  if (answer.error === 'paused') return { state: 'denied', message: t('actPaused') }
+  if (answer.error === 'paused') return { state: 'denied', message: paused(answer) }
   if (answer.error === 'unsupported_version' || answer.error === 'unsupported_kind')
     return { state: 'error', message: t('actOldProtocol') }
-  return { state: 'denied', message: kind === 'save' ? t('saveDenied') : t('actDenied') }
+  if (kind === 'suggest') return { state: 'denied', message: t('learnRejected') }
+  const shown: Shown = {
+    state: 'denied',
+    message: kind === 'save' ? t('saveDenied') : t('actDenied'),
+  }
+  const note = quotaNote(answer)
+  if (note) shown.note = note
+  return shown
 }
 
 /** The text for an approved save. */
@@ -48,7 +72,7 @@ export function cardRefusal(answer: Answer | null): Shown {
   if (!answer || answer.decision === 'expired')
     return { state: 'expired', message: t('actExpired') }
   const byError: Partial<Record<string, Shown>> = {
-    paused: { state: 'denied', message: t('actPaused') },
+    paused: { state: 'denied', message: paused(answer) },
     unsupported_version: { state: 'error', message: t('actOldProtocol') },
     unsupported_kind: { state: 'error', message: t('actOldProtocol') },
     cards_off: { state: 'denied', message: t('cardOff') },

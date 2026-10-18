@@ -82,3 +82,24 @@ describe('SitePanel', () => {
     expect(waiting.text()).toContain('Approve on your iPhone')
   })
 })
+
+describe('SitePanel notes', () => {
+  it('shows the agent limit note under the result', () => {
+    const w = mount(SitePanel, {
+      props: {
+        site: 'vg.no',
+        canFill: true,
+        tabId: 7,
+        activity: {
+          kind: 'login',
+          state: 'approved',
+          site: 'vg.no',
+          message: 'Filled the login for vg.no.',
+          note: 'This browser got 12 new logins and codes today.',
+          at: 0,
+        },
+      },
+    })
+    expect(w.text()).toContain('This browser got 12 new logins and codes today.')
+  })
+})

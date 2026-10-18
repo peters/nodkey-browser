@@ -240,4 +240,34 @@ describe('passkeys in the background', () => {
     )
     expect(asked).toHaveLength(0)
   })
+
+  it('refuses a PRF answer from a lease, and reads an old app without PRF as no results', async () => {
+    const signed = (extra: Partial<Answer>) => () =>
+      Promise.resolve<Answer>({
+        v: 1,
+        request_id: 'r',
+        decision: 'approved',
+        passkey: {
+          credential_id: 'AQID',
+          authenticator_data: authData('example.com'),
+          signature: SIGNATURE,
+        },
+        ...extra,
+      })
+    const prfGet = {
+      call: { op: 'get', challenge: CHALLENGE, prf: { eval: { first: 'AQ' } } },
+      sameOriginAncestors: true,
+    }
+    const page = sender('https://example.com/')
+    next = signed({ lease: { kind: 'day', until: 2_000_000_000 } })
+    expect(await refusal(passkey(prfGet, page, live()))).toBe('NotAllowedError')
+    // An app without PRF signs and sends no results: the page gets an empty prf, as a browser
+    // gives for an authenticator without PRF. Nothing is asked again.
+    asked.length = 0
+    next = signed({})
+    const out = await passkey(prfGet, page, live())
+    expect(out.prf).toEqual({})
+    expect(asked).toHaveLength(1)
+    expect(asked[0]?.passkey?.prf).toEqual({ eval: { first: 'AQ' } })
+  })
 })

@@ -4,14 +4,15 @@
  */
 
 import { random_id, seal_password } from '../wasm/nodkey.js'
-import type { ActivityKind, SaveOffer, Status, ToContent } from '../models/messages'
+import type { Activity, ActivityKind, SaveOffer, Status, ToContent } from '../models/messages'
 import { type Phone, parseSealedBox } from '../models/protocol'
 import { t } from '../i18n/t'
 import { browserInfo, defaultAgentName } from '../utils/browser'
 import { belongsTo, mayFill, requestTarget, siteOf } from '../utils/site'
-import { type ClientInfo, ask } from './agent'
-import { failed, notApproved, saved } from './outcome'
+import { type Ask, type ClientInfo, ask } from './agent'
+import { failed, notApproved, quotaNote, saved } from './outcome'
 import { capture } from './screenshot'
+import * as signin from './signin'
 import * as store from './store'
 
 export const info = browserInfo(navigator.userAgent)
@@ -35,8 +36,10 @@ export async function publish(
   state: 'waiting' | 'approved' | 'denied' | 'expired' | 'error',
   message: string,
   frameId?: number,
+  note?: string,
 ): Promise<void> {
-  const activity = { kind, state, site, message, at: Date.now() }
+  const activity: Activity = { kind, state, site, message, at: Date.now() }
+  if (note) activity.note = note
   await store.setActivity(tabId, activity)
   const msg: ToContent = { type: 'activity', activity }
   const options = frameId === undefined ? { frameId: 0 } : { frameId }
@@ -74,15 +77,23 @@ async function fillKey(site: string, username: string, password: string): Promis
   return Array.from(new Uint8Array(digest), (b) => b.toString(16).padStart(2, '0')).join('')
 }
 
+/** A login Nodkey filled on `site`: not offered for saving when the person submits it. */
+export async function noteFill(site: string, username: string, password: string): Promise<void> {
+  recentFills.set(await fillKey(site, username, password), Date.now())
+}
+
 /**
  * Asks the phone for a login or a code for the tab's site and fills it into the page. A known user
- * name (from the page, or the sign-in just submitted on this tab) names the account.
+ * name (from the page, or the sign-in just submitted on this tab) names the account. `sms` asks
+ * for a code the site sent by SMS. On the provider's own page, a provider login that the phone
+ * sent with an earlier answer fills without a new request. `frameUrl` is the frame that asked.
  */
 export async function fill(
-  kind: 'login' | 'code',
+  kind: 'login' | 'code' | 'sms',
   tab: chrome.tabs.Tab,
   frameId?: number,
   username?: string,
+  frameUrl?: string,
 ) {
   const tabId = tab.id
   if (tabId === undefined) return
@@ -90,28 +101,50 @@ export async function fill(
   const site = siteOf(url)
   if (!site) return publish(tabId, kind, '', 'error', t('siteNone'), frameId)
   if (!mayFill(url)) return publish(tabId, kind, site, 'error', t('siteInsecure'), frameId)
+  const here = frameUrl ?? url
+  if (kind !== 'login') signin.codeFilled(tabId)
+  if (kind !== 'sms' && (await signin.fillFromVia(tabId, frameId ?? 0, here, kind))) return
   const phone = await store.currentPhone()
   if (!phone) return publish(tabId, kind, site, 'error', t('actNeedsPairing'), frameId)
 
-  await publish(tabId, kind, site, 'waiting', t('actWaiting'), frameId)
+  await publish(
+    tabId,
+    kind,
+    site,
+    'waiting',
+    kind === 'sms' ? t('smsWaiting') : t('actWaiting'),
+    frameId,
+  )
   try {
     const settings = await store.settings()
     const picture = settings.screenshots ? await capture(tab.windowId, site) : null
-    const reason = t(kind === 'login' ? 'reasonLogin' : 'reasonCode', site, info.browser)
     let account = username
-    if (!account && kind === 'code') {
+    if (!account && kind !== 'login') {
       const hinted = await store.usernameHint(tabId)
       if (hinted && (hinted.site === site || belongsTo(url, hinted.site))) account = hinted.username
     }
-    const target = requestTarget(site, account)
-    const { answer } = await ask({ kind, site: target, reason, picture, client: client() }, phone)
+    const reasons = { login: 'reasonLogin', code: 'reasonCode', sms: 'reasonSms' } as const
+    const request: Ask = {
+      kind: kind === 'sms' ? 'sms_code' : kind,
+      site: kind === 'sms' ? site : requestTarget(site, account),
+      reason: t(reasons[kind], site, info.browser),
+      picture,
+      client: client(),
+    }
+    // The phone waits up to two minutes for the SMS; the relay keeps the request a minute longer.
+    if (kind === 'sms') request.waitSeconds = 120
+    const { answer } = await ask(request, phone)
+    if (answer) await signin.remember(site, answer, tabId)
     if (answer?.decision !== 'approved') {
       const shown = notApproved(answer, kind)
-      await publish(tabId, kind, site, shown.state, shown.message, frameId)
+      await publish(tabId, kind, site, shown.state, shown.message, frameId, shown.note)
       return
     }
+    const note = quotaNote(answer)
     if (kind === 'login' && !answer.password) {
-      await publish(tabId, kind, site, 'error', t('actNoPassword', site), frameId)
+      // Signed in to with a provider, a passkey or a code: tell the person, fill nothing here.
+      if (await signin.showMethod(tabId, frameId, site, answer)) return
+      await publish(tabId, kind, site, 'error', t('actNoPassword', site), frameId, note)
       return
     }
     const msg: ToContent = { type: 'fill', site }
@@ -119,9 +152,7 @@ export async function fill(
       if (answer.username !== undefined) msg.username = answer.username
       if (answer.password !== undefined) msg.password = answer.password
       if (answer.code !== undefined) msg.code = answer.code
-      if (answer.password) {
-        recentFills.set(await fillKey(site, answer.username ?? '', answer.password), Date.now())
-      }
+      if (answer.password) await noteFill(site, answer.username ?? '', answer.password)
     } else if (answer.code !== undefined) {
       msg.code = answer.code
     }
@@ -130,11 +161,11 @@ export async function fill(
       .sendMessage(tabId, msg, frameId === undefined ? {} : { frameId })
       .catch(() => false)
     if (filled !== true) {
-      await publish(tabId, kind, site, 'error', t('actNoField'), frameId)
+      await publish(tabId, kind, site, 'error', t('actNoField'), frameId, note)
       return
     }
     const done = kind === 'login' ? t('actFilledLogin', site) : t('actFilledCode', site)
-    await publish(tabId, kind, site, 'approved', done, frameId)
+    await publish(tabId, kind, site, 'approved', done, frameId, note)
   } catch (e) {
     const shown = failed(e)
     await publish(tabId, kind, site, shown.state, shown.message, frameId)
