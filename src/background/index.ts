@@ -92,6 +92,25 @@ async function confirm(same: boolean): Promise<void> {
   })
 }
 
+/**
+ * Logins and cards a page sent when the person submitted a form, while they are sealed, by tab.
+ * The next page can load and ask for its save question before the sealing is done; it waits.
+ */
+const sealing = new Map<number, Promise<void>>()
+
+function track(tabId: number | undefined, work: Promise<void>): Promise<void> {
+  if (tabId === undefined) return work
+  const done = work.finally(() => {
+    if (sealing.get(tabId) === done) sealing.delete(tabId)
+  })
+  sealing.set(tabId, done)
+  return done
+}
+
+async function sealed(tabId: number | undefined): Promise<void> {
+  if (tabId !== undefined) await sealing.get(tabId)?.catch(() => undefined)
+}
+
 /** True for the popup and the options page; false for content scripts in web pages. */
 function isExtensionPage(sender: chrome.runtime.MessageSender): boolean {
   return sender.url?.startsWith(chrome.runtime.getURL('')) === true
@@ -156,10 +175,14 @@ async function handle(msg: ToBackground, sender: chrome.runtime.MessageSender): 
         : null
     case 'save.candidate':
       if (sender.tab && sender.url) {
-        await actions.candidate(sender.tab, sender.url, msg.username, msg.password, msg.title)
+        await track(
+          sender.tab.id,
+          actions.candidate(sender.tab, sender.url, msg.username, msg.password, msg.title),
+        )
       }
       return null
     case 'save.offer':
+      await sealed(sender.tab?.id)
       return sender.tab && sender.url ? actions.takeOffer(sender.tab, sender.url) : null
     case 'save.accept':
       if (sender.tab) void actions.acceptOffer(sender.tab, msg.id)
@@ -183,9 +206,12 @@ async function handle(msg: ToBackground, sender: chrome.runtime.MessageSender): 
         await cards.cleared(sender.tab, sender.frameId, sender.url, msg.total)
       return null
     case 'card.candidate':
-      if (sender.tab && sender.url) await cards.candidate(sender.tab, sender.url, msg)
+      if (sender.tab && sender.url) {
+        await track(sender.tab.id, cards.candidate(sender.tab, sender.url, msg))
+      }
       return null
     case 'card.offer':
+      await sealed(sender.tab?.id)
       return sender.tab && sender.url ? cards.takeOffer(sender.tab, sender.url) : null
     case 'card.accept':
       if (sender.tab) void cards.acceptOffer(sender.tab, msg.id)
