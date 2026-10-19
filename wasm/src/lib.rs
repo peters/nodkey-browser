@@ -195,6 +195,21 @@ pub fn may_fill_via(
 }
 
 #[wasm_bindgen]
+pub fn fill_only_on(target: &str, answer_json: &str) -> Result<String, JsError> {
+    js(core::sites::fill_only_on(target, answer_json))
+}
+
+#[wasm_bindgen]
+pub fn may_fill(page: &str, sites_json: &str) -> Result<bool, JsError> {
+    js(core::sites::may_fill(page, sites_json))
+}
+
+#[wasm_bindgen]
+pub fn is_public_suffix(host: &str) -> bool {
+    core::sites::is_public_suffix(host)
+}
+
+#[wasm_bindgen]
 pub fn second_step_pick(order_json: &str, offered_json: &str) -> Result<Option<String>, JsError> {
     js(core::signin::second_step_pick(order_json, offered_json))
 }

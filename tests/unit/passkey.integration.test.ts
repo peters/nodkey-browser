@@ -146,6 +146,21 @@ describe('passkeys against the fake phone', () => {
         ),
       ).rejects.toBeInstanceOf(PasskeyError)
 
+      // A shared hosting domain is never a relying party, also for a page below it.
+      const before = (await (await fetch(`${base}/_fake/seen`)).json()) as unknown[]
+      await expect(
+        passkey(
+          {
+            call: { op: 'get', challenge: challenge(), rpId: 'github.io' },
+            sameOriginAncestors: true,
+          },
+          sender('https://alice.github.io/'),
+          live,
+        ),
+      ).rejects.toMatchObject({ domName: 'SecurityError' })
+      const after = (await (await fetch(`${base}/_fake/seen`)).json()) as unknown[]
+      expect(after.length).toBe(before.length)
+
       // The phone's own test passkey for webauthn.io, found without an allow list.
       const test = (await passkey(
         { call: { op: 'get', challenge: challenge() }, sameOriginAncestors: true },

@@ -4,7 +4,7 @@
  * the page script and the bridge registered while the bridge is on and a phone is paired.
  */
 
-import { check_passkey_answer, client_data_json } from '../wasm/nodkey.js'
+import { check_passkey_answer, client_data_json, is_public_suffix } from '../wasm/nodkey.js'
 import type { ActivityState } from '../models/messages'
 import {
   type PasskeyCall,
@@ -192,6 +192,11 @@ export async function passkey(
   checkFrame(sender.frameId, origin, sender.tab?.url, msg.sameOriginAncestors === true)
   const call = parsePasskeyCall(msg.call)
   const rpId = rpIdFor(host, call.op === 'get' ? call.rpId : call.rp.id)
+  // An ending (co.uk) or a shared hosting domain (github.io) is never a relying party, as in the
+  // browsers: separate sites below it must not share passkeys. The phone refuses it too.
+  if (rpId !== 'localhost' && is_public_suffix(rpId)) {
+    throw new PasskeyError('SecurityError', `the page may not use passkeys for ${rpId}`)
+  }
   if (call.op === 'create' && !call.algorithms.includes(ES256)) {
     throw new PasskeyError('NotSupportedError', 'Nodkey makes ES256 (-7) passkeys only')
   }

@@ -28,6 +28,8 @@
   "actFilledLogin": "Fylte inn innloggingen for $1.",
   "actFilledCode": "Fylte inn koden for $1.",
   "actNoField": "Nodkey fant ikke noe felt å fylle inn på denne siden.",
+  "fillOtherSite": "Ikke fylt ut: Nodkey har lagret denne kontoen for $1, ikke for $2.",
+  "fillNoSite": "Ikke fylt ut: denne kontoen har ikke noe nettsted i Nodkey som passer til $1.",
   "actNoPassword": "iPhonen sendte ikke noe passord for $1.",
   "actDenied": "Du avviste forespørselen på iPhonen.",
   "actExpired": "iPhonen svarte ikke i tide.",

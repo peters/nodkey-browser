@@ -284,3 +284,33 @@ fn seals_suggest_and_sms_code_requests() {
     long["wait_seconds"] = json!(301);
     assert!(seal_request(&long.to_string(), "agent", s(phone, "kem_pk"), 1.0e9).is_err());
 }
+
+#[test]
+fn fills_only_on_the_answered_accounts_website() {
+    // The cases of the shared vectors, as the command line has them.
+    for f in vectors()["sites"]["fill_only_on"].as_array().unwrap() {
+        let answer = json!({"account": f["account"], "match": f["match"]}).to_string();
+        let sites: Value =
+            serde_json::from_str(&sites::fill_only_on(s(f, "target"), &answer).unwrap()).unwrap();
+        assert_eq!(sites, f["fill_only_on"], "{f}");
+    }
+    for m in vectors()["sites"]["may_fill"].as_array().unwrap() {
+        let allowed = sites::may_fill(s(m, "page"), &m["sites"].to_string()).unwrap();
+        assert_eq!(allowed, m["allowed"].as_bool().unwrap(), "{m}");
+    }
+    // An account saved for another website: the page of the request is not among its sites.
+    let other =
+        json!({"account": {"issuer": "VG", "name": "alex", "site": "vg.no"}, "match": "direct"});
+    let only = sites::fill_only_on("vg.example", &other.to_string()).unwrap();
+    assert_eq!(only, r#"["vg.no"]"#);
+    assert!(!sites::may_fill("https://vg.example/login", &only).unwrap());
+    assert!(sites::may_fill("https://www.vg.no/login", &only).unwrap());
+    // A newer match value is not "chosen"; no account means nowhere.
+    let newer =
+        json!({"account": {"issuer": "VG", "name": "alex", "site": "vg.no"}, "match": "someday"});
+    assert_eq!(
+        sites::fill_only_on("vg.example", &newer.to_string()).unwrap(),
+        r#"["vg.no"]"#
+    );
+    assert_eq!(sites::fill_only_on("vg.no", "{}").unwrap(), "[]");
+}

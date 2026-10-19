@@ -92,6 +92,44 @@ beforeEach(async () => {
   fillReply = true
   await put('/_fake/mode', 'approve')
   await put('/_fake/quota', { state: 'off' })
+  await put('/_fake/account', null)
+})
+
+describe('the answered account against the page', () => {
+  it('fills only on the account website, unless the person picked it for this site', async () => {
+    const actions = await import('../../src/background/actions')
+    const page = tabAt('https://login.example.com/signin')
+    // The phone answers with an account saved for this website: filled.
+    await actions.fill('login', page, 0, undefined, page.url)
+    expect(fills().at(-1)).toMatchObject({ site: 'login.example.com', password: PASSWORD })
+
+    // An account saved for another website (a fault on the phone side): nothing is filled.
+    toPage = []
+    await put('/_fake/account', { site: 'example.org', match: 'direct' })
+    await actions.fill('login', page, 0, undefined, page.url)
+    await actions.fill('code', page, 0, undefined, page.url)
+    expect(fills()).toEqual([])
+    expect(activity()?.state).toBe('error')
+    expect(activity()?.message).toBe(
+      'Not filled: Nodkey saved this account for example.org, not for login.example.com.',
+    )
+
+    // No website at all, and the person did not pick it for this site: nothing either.
+    await put('/_fake/account', { match: 'direct' })
+    await actions.fill('code', page, 0, undefined, page.url)
+    expect(fills()).toEqual([])
+    expect(activity()?.message).toBe(
+      'Not filled: this account has no website in Nodkey that matches login.example.com.',
+    )
+
+    // An extra website of the account, or picked by hand for this site on the phone: filled.
+    await put('/_fake/account', { site: 'example.org', sites: ['example.com'], match: 'alias' })
+    await actions.fill('code', page, 0, undefined, page.url)
+    expect(fills().at(-1)).toEqual({ type: 'fill', site: 'login.example.com', code: '190274' })
+    await put('/_fake/account', { site: 'example.org', match: 'chosen' })
+    await actions.fill('login', page, 0, undefined, page.url)
+    expect(fills().at(-1)).toMatchObject({ site: 'login.example.com', password: PASSWORD })
+  })
 })
 
 describe('sign-in methods against the fake phone', () => {

@@ -28,6 +28,8 @@
   "actFilledLogin": "已填写 $1 的登录信息。",
   "actFilledCode": "已填写 $1 的验证码。",
   "actNoField": "Nodkey 在此页面上没有找到可填写的字段。",
+  "fillOtherSite": "未填写：Nodkey 将此账户保存给 $1，而不是 $2。",
+  "fillNoSite": "未填写：此账户在 Nodkey 中没有与 $1 匹配的网站。",
   "actNoPassword": "你的 iPhone 没有发送 $1 的密码。",
   "actDenied": "你在 iPhone 上拒绝了请求。",
   "actExpired": "你的 iPhone 没有及时回应。",

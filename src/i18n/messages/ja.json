@@ -28,6 +28,8 @@
   "actFilledLogin": "$1 のログインを入力しました。",
   "actFilledCode": "$1 のコードを入力しました。",
   "actNoField": "このページに入力できる欄が見つかりませんでした。",
+  "fillOtherSite": "入力していません：Nodkey はこのアカウントを $2 ではなく $1 用に保存しています。",
+  "fillNoSite": "入力していません：このアカウントには、Nodkey に $1 と一致するウェブサイトがありません。",
   "actNoPassword": "iPhone から $1 のパスワードが送られてきませんでした。",
   "actDenied": "iPhone でリクエストを拒否しました。",
   "actExpired": "iPhone から時間内に応答がありませんでした。",

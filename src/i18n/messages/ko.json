@@ -28,6 +28,8 @@
   "actFilledLogin": "$1 로그인을 입력했어요.",
   "actFilledCode": "$1 코드를 입력했어요.",
   "actNoField": "이 페이지에서 입력할 칸을 찾지 못했어요.",
+  "fillOtherSite": "입력하지 않았어요: Nodkey에 이 계정은 $2이(가) 아니라 $1용으로 저장돼 있어요.",
+  "fillNoSite": "입력하지 않았어요: 이 계정에는 Nodkey에 $1과(와) 맞는 웹사이트가 없어요.",
   "actNoPassword": "iPhone이 $1 비밀번호를 보내지 않았어요.",
   "actDenied": "iPhone에서 요청을 거부했어요.",
   "actExpired": "iPhone이 제시간에 응답하지 않았어요.",

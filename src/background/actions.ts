@@ -3,9 +3,9 @@
  * just used, and send saves. Each publishes its progress as the tab's activity.
  */
 
-import { random_id, seal_password } from '../wasm/nodkey.js'
+import { fill_only_on, may_fill, random_id, seal_password } from '../wasm/nodkey.js'
 import type { Activity, ActivityKind, SaveOffer, Status, ToContent } from '../models/messages'
-import { type Phone, parseSealedBox } from '../models/protocol'
+import { type Answer, type Phone, parseSealedBox } from '../models/protocol'
 import { t } from '../i18n/t'
 import { browserInfo, defaultAgentName } from '../utils/browser'
 import { belongsTo, mayFill, requestTarget, siteOf } from '../utils/site'
@@ -64,6 +64,24 @@ export async function status(tabId: number | undefined): Promise<Status> {
     settings: await store.settings(),
     siteAccess: await chrome.permissions.contains({ origins: ['<all_urls>'] }),
   }
+}
+
+/**
+ * Why the login or code of `answer` must not be filled on the page at `url`, or null when it may
+ * be: the page must be the website of the answered account (its site or an extra website), unless
+ * the person picked the account for this site on the phone (`match: chosen`). A fault on the phone
+ * side then never becomes a fill on another website. Only the account and the match go to the
+ * WebAssembly module, never a secret.
+ */
+export function notForThisPage(target: string, answer: Answer, url: string): string | null {
+  const sites = fill_only_on(
+    target,
+    JSON.stringify({ account: answer.account, match: answer.match }),
+  )
+  if (may_fill(url, sites)) return null
+  const page = siteOf(url) ?? url
+  const savedFor = (JSON.parse(sites) as string[])[0]
+  return savedFor ? t('fillOtherSite', savedFor, page) : t('fillNoSite', page)
 }
 
 /** Logins Nodkey filled in the last two minutes: not offered for saving again. */
@@ -146,6 +164,13 @@ export async function fill(
       if (await signin.showMethod(tabId, frameId, site, answer)) return
       await publish(tabId, kind, site, 'error', t('actNoPassword', site), frameId, note)
       return
+    }
+    if (kind !== 'sms') {
+      const refused = notForThisPage(request.site, answer, url)
+      if (refused) {
+        await publish(tabId, kind, site, 'error', refused, frameId, note)
+        return
+      }
     }
     const msg: ToContent = { type: 'fill', site }
     if (kind === 'login') {

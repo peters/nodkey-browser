@@ -30,7 +30,12 @@ export interface Account {
   issuer: string
   name: string
   site?: string
+  /** The account's extra websites ("Also used on" in the app). */
+  sites?: string[]
 }
+
+/** How the phone found the account: its site, an extra website, or picked by hand for this site. */
+export type MatchKind = 'direct' | 'alias' | 'chosen'
 
 /** How a site is signed in to ("Sign-in methods" in the protocol). It holds no secret. */
 export type SignInKind = 'password' | 'federated' | 'passkey' | 'email_code' | 'sso' | 'sms'
@@ -76,6 +81,7 @@ export interface Answer {
   decision: Decision
   lease?: { kind: LeaseKind; until?: number }
   account?: Account
+  match?: MatchKind
   code?: string
   seconds_left?: number
   next_code?: string
@@ -242,6 +248,8 @@ export function parseAnswer(json: string): Answer {
     if (typeof v.lease.until === 'number') answer.lease.until = v.lease.until
   }
   if (isObject(v.account)) answer.account = parseAccount(v.account)
+  // A match this version does not know counts as absent, never as chosen.
+  if (v.match === 'direct' || v.match === 'alias' || v.match === 'chosen') answer.match = v.match
   Object.assign(answer, codes(v))
   const username = optStr(v, 'username')
   if (username !== undefined) answer.username = username
@@ -272,6 +280,10 @@ function parseAccount(o: Record<string, unknown>): Account {
   const account: Account = { issuer: str(o, 'issuer'), name: str(o, 'name') }
   const site = optStr(o, 'site')
   if (site !== undefined) account.site = site
+  if (Array.isArray(o.sites)) {
+    const sites = o.sites.filter((x): x is string => typeof x === 'string')
+    if (sites.length > 0) account.sites = sites
+  }
   return account
 }
 

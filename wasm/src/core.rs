@@ -153,6 +153,8 @@ pub fn seal_request(
         session_id: None,
         suggest: d.suggest,
         wait_seconds: d.wait_seconds,
+        save_secret: None,
+        project: None,
     };
     client::check_request(&request)?;
     let kem = b64u::decode_array::<32>(phone_kem).map_err(js)?;
@@ -286,6 +288,7 @@ pub fn open_grant(
 
 pub mod cards;
 pub mod signin;
+pub mod sites;
 
 #[cfg(test)]
 mod tests;

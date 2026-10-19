@@ -28,6 +28,8 @@
   "actFilledLogin": "Login de $1 preenchido.",
   "actFilledCode": "Código de $1 preenchido.",
   "actNoField": "O Nodkey não encontrou nenhum campo para preencher nesta página.",
+  "fillOtherSite": "Não preenchido: o Nodkey salvou esta conta para $1, não para $2.",
+  "fillNoSite": "Não preenchido: esta conta não tem no Nodkey um site que corresponda a $1.",
   "actNoPassword": "Seu iPhone não enviou senha para $1.",
   "actDenied": "Você recusou a solicitação no seu iPhone.",
   "actExpired": "Seu iPhone não respondeu a tempo.",

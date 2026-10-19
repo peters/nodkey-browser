@@ -36,3 +36,16 @@ The browser is paired with the fake phone. Set the mode of the fake phone with
 
    Result: The card shows "Nodkey cannot reach the relay. Check your connection
    and try again."
+
+7. Start the fake relay again. Set the account of the fake phone to another
+   website with `curl -X PUT -H 'content-type: application/json' -d
+   '{"site":"example.org","match":"direct"}' <relay>/_fake/account`. Set the
+   mode to `approve`. Fill a login.
+
+   Result: The card shows "Not filled: Nodkey saved this account for
+   example.org, not for localhost." The fields stay empty. (screenshot)
+
+8. Set the account to `{"site":"example.org","match":"chosen"}`. Fill a login.
+
+   Result: The login is filled. The person picked the account for this site.
+   Set the account to `null` after the test.

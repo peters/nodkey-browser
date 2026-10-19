@@ -28,6 +28,8 @@
   "actFilledLogin": "Fyllde i inloggningen för $1.",
   "actFilledCode": "Fyllde i koden för $1.",
   "actNoField": "Nodkey hittade inget fält att fylla i på den här sidan.",
+  "fillOtherSite": "Inte ifyllt: Nodkey har sparat det här kontot för $1, inte för $2.",
+  "fillNoSite": "Inte ifyllt: det här kontot har ingen webbplats i Nodkey som matchar $1.",
   "actNoPassword": "Din iPhone skickade inget lösenord för $1.",
   "actDenied": "Du nekade förfrågan på din iPhone.",
   "actExpired": "Din iPhone svarade inte i tid.",

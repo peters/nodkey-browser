@@ -28,6 +28,8 @@
   "actFilledLogin": "Acceso de $1 rellenado.",
   "actFilledCode": "Código de $1 rellenado.",
   "actNoField": "Nodkey no encontró ningún campo que rellenar en esta página.",
+  "fillOtherSite": "No se rellenó: Nodkey guardó esta cuenta para $1, no para $2.",
+  "fillNoSite": "No se rellenó: esta cuenta no tiene en Nodkey ningún sitio que coincida con $1.",
   "actNoPassword": "Tu iPhone no envió ninguna contraseña para $1.",
   "actDenied": "Rechazaste la solicitud en tu iPhone.",
   "actExpired": "Tu iPhone no respondió a tiempo.",
