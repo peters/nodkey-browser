@@ -73,6 +73,7 @@ h2 { font: 700 20px var(--display); margin: 0; }
     <div class="field"><div class="top"><span>Name</span><span id="c-name" class="count"></span></div><div id="v-name" class="name"></div></div>
     <div class="field"><div class="top"><span>Summary</span><span id="c-summary" class="count"></span></div><div id="v-summary"></div></div>
     <div class="field"><div class="top"><span>Description</span><span id="c-desc" class="count"></span></div><div id="v-desc" class="desc"></div></div>
+    <div class="field"><div class="top"><span>Version notes</span><span id="c-notes" class="count"></span></div><div id="v-notes" class="desc"></div></div>
     <div class="locale" id="v-locale"></div>
   </section>
   <section aria-labelledby="t-shots" style="display:grid;gap:14px">
@@ -126,6 +127,8 @@ function render() {
   count(document.getElementById('c-name'), d.name.length, LIMITS.name)
   count(document.getElementById('c-summary'), d.summary.length, LIMITS.summary)
   count(document.getElementById('c-desc'), d.description.length)
+  document.getElementById('v-notes').textContent = d.notes
+  count(document.getElementById('c-notes'), d.notes.length)
   document.getElementById('v-locale').textContent = `Store locale: ${loc} · files in store/out/${store}/${loc}/`
   document.getElementById('shot-count').textContent = store === 'chrome' ? '(five: the store takes at most five)' : `(${SHOTS.length})`
   document.getElementById('shots').replaceChildren(...PICK[store].map((s) => {

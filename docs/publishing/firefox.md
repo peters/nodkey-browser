@@ -131,8 +131,11 @@ upload, also replace the privacy policy text of the listing (step 10).
    Result: "Your add-on was validated with no errors". Version 0.2.2 had 4
    warnings ("Unsafe assignment to innerHTML").
 
-5. On the first listed version, AMO shows the page "Describe Add-on". (A new
-   version of a listed add-on shows only the version notes.) Fill in:
+5. On the first listed version, AMO shows the page "Describe Add-on". A new
+   version of a listed add-on shows only "Release notes" and "Notes to
+   Reviewer": paste the version notes of each language from "Version notes"
+   in `store/out/firefox/<AMO locale>/listing.txt`, and the notes to the
+   reviewer below. On the first version, fill in:
    - Name and summary: AMO takes them from `_locales` in the package. AMO has
      no field for a language that it gets in another code. Thus add Norwegian
      Bokmål (`nb-NO`) by hand from `store/out/firefox/nb-NO/listing.txt`.
@@ -159,8 +162,9 @@ upload, also replace the privacy policy text of the listing (step 10).
 
      To test:
      1. Click the toolbar icon, then "Get a code".
-     2. In Nodkey on the iPhone: Agents > Add agent, type the code, and
-        compare the check number.
+     2. In Nodkey on the iPhone: Agents > Add agent, type the code. The
+        browser and the iPhone show the same check number: confirm it on
+        both (version 0.3.0 needs the newest Nodkey from the App Store).
      3. Open a sign-in page and click the Nodkey button in the field.
         Approve on the iPhone.
 

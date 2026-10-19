@@ -6,7 +6,7 @@ extension does or how it looks.
 
 | Source | What it holds |
 |---|---|
-| `store/listing/<lang>.json` | Name, summary, description, screenshot captions and the text in the images, for one language |
+| `store/listing/<lang>.json` | Name, summary, description, version notes (`notes`), screenshot captions and the text in the images, for one language |
 | `store/scenes.html` | The images: six screenshots (1280×800), a small promo tile (440×280) and a marquee (1400×560) |
 | `store/assets/phone/<lang>.jpg` | The Passwords screen of the iPhone app in that language, from `peters/nodkey` `marketing/raw/<lang>/passwords.png` (sample data only) |
 | `store/preview.html` | The review page that `scripts/store.mjs` fills in |
@@ -39,7 +39,8 @@ review before the first public listing.
 ## Make the material
 
 1. Change the texts in `store/listing/<lang>.json` for all twelve languages.
-   Keep the same keys in all files.
+   Keep the same keys in all files. Write `notes` new for each version: what
+   is new, in short lines that start with "•".
 
 2. If the iPhone app looks different now, copy the new Passwords screens from
    `peters/nodkey` (`marketing/raw/<lang>/passwords.png`, 520 px wide, JPEG,
@@ -53,7 +54,7 @@ review before the first public listing.
    ```
 
    Result: "texts ok (12 languages)". The limits are: name 45, summary 132,
-   caption title 44 and caption text 90 characters.
+   version notes 3000, caption title 44 and caption text 90 characters.
 
 4. Render:
 
@@ -100,11 +101,13 @@ declare this as "Location" (Chrome) and `locationInfo` (Firefox), from 0.3.0.
 | `sms_code` | The person clicks the Nodkey button in the code field of a page that says the code came by SMS | The site and the wait (120 seconds) |
 | `suggest` | The person clicks "Remember" on "Remember that <site> uses <provider> sign-in?" | The site and the name of the provider only (`federated`, `seen`, `extension`) |
 | `save`, `save_card` | The person clicks "Save" | The page address, the user name or the card's brand, last digits and expiry; the password, number and CVC sealed for the phone only |
-| `card` | The person clicks "Approve on iPhone" at a checkout | The shop, the amount, the origin and the total on the page |
+| `card` | The person clicks "Approve on iPhone" at a checkout, or "Add the card for later payments" on a page without a total | The shop (the site of the top page), the origin of the frame with the card fields, the host of a payment provider's frame (`via`), and for a payment the amount and the total on the page; no amount for a card for later payments (`purpose: setup`) |
+| `pairing_check` | Once, while the person pairs | A random value (nonce) for the check number, nothing else |
 | `passkey` | A page asks for a passkey (and its PRF inputs) | The relying party, the client data that the extension makes, the credential ids and the PRF inputs |
 
-The answers can hold a password, a code, a card, a provider login (`via`) or
-PRF outputs. The extension fills or returns them at once and keeps none in
+Each request is signed with the extension's key, and the extension uses only
+answers that the iPhone signed (ADR-0012). The answers can hold a password, a
+code, a card, a provider login (`via`) or PRF outputs. The extension fills or returns them at once and keeps none in
 storage. It keeps a provider login in memory for 3 minutes, for the provider's
 own pages only ([ADR-0010](../adr/0010-sign-in-methods.md)).
 

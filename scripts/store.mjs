@@ -18,7 +18,14 @@ const only = args.includes('--only') ? args[args.indexOf('--only') + 1] : null
 const checkOnly = args.includes('--check')
 
 // The strictest limit of AMO and the Chrome Web Store for each field.
-const LIMITS = { name: 45, summary: 132, description: 15000, captionTitle: 44, captionText: 90 }
+const LIMITS = {
+  name: 45,
+  summary: 132,
+  description: 15000,
+  notes: 3000,
+  captionTitle: 44,
+  captionText: 90,
+}
 const SHOTS = ['01-sign-in', '02-codes', '03-save', '04-passkeys', '05-one-place', '06-cards']
 // The Chrome Web Store takes at most five screenshots: cards replace the save screenshot there.
 const CHROME_SHOTS = ['01-sign-in', '02-codes', '06-cards', '04-passkeys', '05-one-place']
@@ -26,7 +33,8 @@ const CHROME_SHOTS = ['01-sign-in', '02-codes', '06-cards', '04-passkeys', '05-o
 /**
  * @typedef {{ title: string, text: string }} Caption
  * @typedef {{ lang: string, label: string, chromeLocale: string, amoLocale: string, name: string,
- *   summary: string, description: string, captions: Caption[], ui: Record<string, string> }} Listing
+ *   summary: string, description: string, notes: string, captions: Caption[],
+ *   ui: Record<string, string> }} Listing
  */
 
 /** @type {Listing[]} */
@@ -47,6 +55,9 @@ for (const l of listings) {
   if (l.summary.length > LIMITS.summary)
     problems.push(`${l.lang}.summary: ${l.summary.length} > ${LIMITS.summary}`)
   if (l.description.length > LIMITS.description) problems.push(`${l.lang}.description too long`)
+  // The version notes of this release (AMO "Release notes"; the Chrome Web Store has none).
+  if (!l.notes) problems.push(`${l.lang}.notes is missing`)
+  else if (l.notes.length > LIMITS.notes) problems.push(`${l.lang}.notes too long`)
   if (l.captions.length !== SHOTS.length)
     problems.push(`${l.lang}: ${SHOTS.length} captions expected`)
   l.captions.forEach((c, i) => {
@@ -153,7 +164,7 @@ for (const l of listings) {
       .join('\n')
     writeFileSync(
       join(dir, 'listing.txt'),
-      `Name\n${l.name}\n\nSummary\n${l.summary}\n\nDescription\n${l.description}\n\nScreenshot captions\n${captions}\n`,
+      `Name\n${l.name}\n\nSummary\n${l.summary}\n\nDescription\n${l.description}\n\nVersion notes\n${l.notes}\n\nScreenshot captions\n${captions}\n`,
     )
   }
   console.log(`${l.lang}: done`)
@@ -173,6 +184,7 @@ if (!only) {
         name: l.name,
         summary: l.summary,
         description: l.description,
+        notes: l.notes,
         captions: l.captions,
       },
     ]),

@@ -98,8 +98,10 @@ contact e-mail nodkey@kh-labs.dev.
      tells about the browser extension.
 
 5. "Test instructions" (under "Access"): no user name or password. Tell the
-   reviewer to pair with "Get a code" and Agents > Add agent in Nodkey, then
-   to click the Nodkey button in a sign-in field.
+   reviewer to pair with "Get a code" and Agents > Add agent in Nodkey, to
+   confirm the same check number in the browser and on the iPhone (0.3.0
+   needs the newest Nodkey from the App Store), then to click the Nodkey button in a sign-in
+   field.
 
 6. "Distribution": select the visibility that the owner chose (see the top of
    this page) and the regions (all).
@@ -124,7 +126,10 @@ contact e-mail nodkey@kh-labs.dev.
 
 3. Look at "Privacy" again if the permissions or the data usage changed. Each
    new permission needs a justification. For 0.3.0: select "Location" in
-   "Data usage" (see step 4 of the first submission).
+   "Data usage" (see step 4 of the first submission). The permissions did not
+   change in 0.3.0. Update "Test instructions" (step 5 of the first
+   submission) and the description of each language from `listing.txt`. The
+   Chrome Web Store has no field for version notes.
 
 4. Click "Submit for review".
 

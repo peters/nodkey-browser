@@ -105,3 +105,27 @@ submission. It thinks that they publish something or send a password.
 8. Tag the commit only after the owner confirms that the published version
    works: `git tag v<version>` and `git push origin v<version>`. Do not push
    a tag before that.
+
+## Version 0.3.0
+
+Status on 2026-10-19: the code, the texts and the disclosures are ready in
+`main` (version 0.3.0 in `package.json`). Nothing is uploaded. Version 0.3.0
+goes to the stores after the Nodkey app with the pairing check (peters/nodkey
+`cc6e54a`, the 1.3 batch) is on the App Store: a pairing needs the phone's
+commitment (ADR-0012). An iPhone with an older app gets "Update Nodkey on your
+iPhone, then pair again." Cards for later payments also need the app part of
+peters/nodkey#125; an older app gets "Update Nodkey on your iPhone to add
+cards for later payments."
+
+What changes for the stores:
+
+- Firefox: `locationInfo` in `data_collection_permissions` (in the package),
+  the version notes, the notes to the reviewer (the check number on both
+  screens) and the privacy policy text (step 10 of the listed version).
+- Chrome: "Location" in "Data usage", the test instructions and the
+  descriptions. No new permission.
+- Both: the description of each language (cards for later payments, payment
+  frames, the check number, the relay and the IP address). The screenshots
+  did not change.
+- The texts are machine translations: get a native review before the public
+  listing.
