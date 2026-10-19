@@ -19,6 +19,14 @@ async function control(path: string, init?: RequestInit): Promise<Response> {
   return fetch(base + path, init)
 }
 
+async function put(path: string, body: unknown): Promise<void> {
+  await control(path, {
+    method: 'PUT',
+    headers: { 'content-type': 'application/json' },
+    body: JSON.stringify(body),
+  })
+}
+
 beforeAll(async () => {
   if (!existsSync(BIN)) throw new Error(`${BIN} is missing: run cargo build -p fake-relay`)
   const child = spawn(BIN, ['127.0.0.1:0'], { stdio: ['ignore', 'pipe', 'inherit'] })
@@ -48,12 +56,17 @@ describe('the background against the fake phone', () => {
     const agent = await import('../../src/background/agent')
     const store = await import('../../src/background/store')
 
-    // Pairing: the code, then the phone's grant with a check number both sides agree on.
+    // Pairing: the code, the phone's grant with its commitment, the pairing check with this
+    // browser's nonce, and a check number both sides agree on. Nothing is kept before the
+    // person confirms it.
     const { code } = await agent.startPairing('Test browser')
     expect(code).toMatch(/^[0-9A-Z]{6}$/)
     const phone = await agent.finishPairing(code)
     expect(phone?.name).toBe('Test iPhone')
     if (!phone) return
+    expect(phone.signs).toBe(true)
+    expect(phone.check).toMatch(/^\d{3} \d{3}$/)
+    expect(await store.phones()).toEqual([])
     await agent.rememberPhone(phone)
     const me = await store.agent()
     const check = (await (await control(`/_fake/check/${me?.agent_id ?? ''}`)).json()) as {
@@ -126,11 +139,20 @@ describe('the background against the fake phone', () => {
 
     // What the phone saw.
     const seen = (await (await control('/_fake/seen')).json()) as {
-      request: { kind: string; agent: string; save?: { username: string } }
+      request: {
+        kind: string
+        agent: string
+        save?: { username: string }
+        attachment?: { sha256?: string }
+      }
       attachment: number[] | null
       saved_password: string | null
+      signed: boolean
     }[]
     expect(seen.map((s) => s.request.kind)).toEqual(['login', 'code', 'code', 'save'])
+    // Every request carries this browser's signature, and the picture its hash.
+    expect(seen.every((s) => s.signed)).toBe(true)
+    expect(seen[0]?.request.attachment?.sha256).toMatch(/^[\w-]{43}$/)
     expect(seen[0]?.attachment?.length).toBe(png.length)
     expect(seen[3]?.request.save?.username).toBe('alex@example.com')
     // The phone can open the password that was sealed to it on its own.
@@ -140,5 +162,49 @@ describe('the background against the fake phone', () => {
     // Unpair: the relay forgets the pairing and the phone is gone here.
     await agent.unpair(phone.phone_id)
     expect(await store.phones()).toEqual([])
+  })
+
+  it(
+    'refuses an old app and a check that does not fit, and leaves',
+    { timeout: 60_000 },
+    async () => {
+      const agent = await import('../../src/background/agent')
+      const store = await import('../../src/background/store')
+      // An app made before the commitment: never paired by its old number.
+      await put('/_fake/pairing', { old_app: true })
+      const old = await agent.startPairing('Test browser')
+      await expect(agent.finishPairing(old.code)).rejects.toMatchObject({ code: 'old_app' })
+
+      // A nonce that does not fit the commitment.
+      await put('/_fake/pairing', { bad_nonce: true })
+      const bad = await agent.startPairing('Test browser')
+      await expect(agent.finishPairing(bad.code)).rejects.toMatchObject({ code: 'check' })
+      expect(await store.phones()).toEqual([])
+      await put('/_fake/pairing', {})
+    },
+  )
+
+  it('refuses an unsigned answer from a phone that signs', { timeout: 60_000 }, async () => {
+    const agent = await import('../../src/background/agent')
+    const store = await import('../../src/background/store')
+    const { code } = await agent.startPairing('Test browser')
+    const phone = await agent.finishPairing(code)
+    if (!phone) throw new Error('not paired')
+    await agent.rememberPhone(phone)
+    const client = { app: 'Nodkey test', app_version: '0', os: 'Linux' }
+    const ask = (p: typeof phone) =>
+      agent.ask({ kind: 'code', site: 'github.com', reason: 'Code', client }, p)
+
+    await put('/_fake/pairing', { unsigned_answers: true })
+    await expect(ask(phone)).rejects.toMatchObject({ name: 'NotSignedError' })
+    // A pairing made before signatures takes an unsigned answer, until its phone signs once.
+    const before = { ...phone, signs: false }
+    await store.setPhones([before])
+    expect((await ask(before)).answer?.code).toBe('190274')
+    await put('/_fake/pairing', {})
+    const signed = await ask(before)
+    expect(signed.phone.signs).toBe(true)
+    expect((await store.phones())[0]?.signs).toBe(true)
+    await agent.unpair(phone.phone_id)
   })
 })

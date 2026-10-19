@@ -18,11 +18,13 @@ Start [the browser run](browser-e2e.md) with `--browser chromium`.
    `K7P-2QX`), a spinner with "Waiting for your iPhone" and "The code is valid
    for 5 minutes". (screenshot)
 
-3. The fake phone claims the code.
+3. The fake phone claims the code. The extension sends the pairing check, and
+   the fake phone answers with its nonce.
 
-   Result: The card "Compare the numbers" shows the phone name "Test iPhone"
-   and a check number with two groups of 3 digits. The number is the same as
-   the number of the fake phone (`/_fake/check/<agent_id>`). (screenshot)
+   Result: The card "Compare the numbers" shows "Test iPhone answered." and a
+   check number with two groups of 3 digits. The number is the same as the
+   number of the fake phone (`/_fake/check/<agent_id>`). The settings page
+   does not show the phone yet. (screenshot)
 
 4. The run clicks "Same number".
 
@@ -32,5 +34,11 @@ Start [the browser run](browser-e2e.md) with `--browser chromium`.
 ## Also check
 
 - Click "Different number" instead in step 4. Result: The text says that the
-  pairing was removed and tells you to remove the browser under Agents.
+  pairing was not saved and tells you to cancel it on the iPhone too. The
+  fake phone's `/_fake/seen` shows no new request.
 - Click "Cancel" while the code shows. Result: The first card shows again.
+- Set `PUT /_fake/pairing` to `{"old_app": true}` before step 2. Result: After
+  the claim, the card says "Update Nodkey on your iPhone, then pair again."
+  No check number shows.
+- Set `PUT /_fake/pairing` to `{"bad_nonce": true}` before step 2. Result:
+  The card says that the pairing did not finish and that nothing was saved.

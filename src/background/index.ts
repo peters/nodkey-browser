@@ -8,7 +8,7 @@ import type { Reply, ToBackground } from '../models/messages'
 import { t } from '../i18n/t'
 import * as actions from './actions'
 import * as cards from './cards'
-import { finishPairing, rememberPhone, startPairing, unpair } from './agent'
+import { PairingError, finishPairing, leave, rememberPhone, startPairing, unpair } from './agent'
 import { failed } from './outcome'
 import { answer as answerPasskey, syncPasskeyScripts } from './passkeys'
 import * as signin from './signin'
@@ -39,26 +39,56 @@ async function pair(name: string): Promise<void> {
   }
 }
 
+/** How long a pairing waits for the person to compare the numbers (as the command line). */
+const CONFIRM_MS = 10 * 60_000
+
 async function finish(run: number, code: string): Promise<void> {
   try {
     const phone = await finishPairing(code)
-    if (run !== pairingRun) return
+    if (run !== pairingRun) {
+      if (phone) await leave(phone.phone_id)
+      return
+    }
     if (!phone) {
       await store.setPairing({ state: 'error', message: t('pairExpired') })
       return
     }
-    await rememberPhone(phone)
+    // Kept only after the person confirms that both screens show the same number.
     await store.setPairing({
       state: 'check',
       check: phone.check,
       phoneName: phone.name,
       phoneId: phone.phone_id,
+      phone,
+      until: Date.now() + CONFIRM_MS,
     })
   } catch (e) {
-    if (run === pairingRun) {
-      await store.setPairing({ state: 'error', message: t('pairFailed', failed(e).message) })
-    }
+    if (run === pairingRun) await store.setPairing({ state: 'error', message: pairingFailed(e) })
   }
+}
+
+function pairingFailed(e: unknown): string {
+  if (e instanceof PairingError) return t(e.code === 'old_app' ? 'pairOldApp' : 'pairCheckFailed')
+  return t('pairFailed', failed(e).message)
+}
+
+/** The person compared the numbers: keep the phone when they are the same, else leave it. */
+async function confirm(same: boolean): Promise<void> {
+  const p = await store.pairing()
+  if (p.state !== 'check') {
+    await store.setPairing({ state: 'idle' })
+    return
+  }
+  if (same && Date.now() <= p.until) {
+    await rememberPhone(p.phone)
+    await store.setPairing({ state: 'idle' })
+    return
+  }
+  await leave(p.phoneId)
+  await store.setPairing({
+    state: 'error',
+    message: same ? t('pairConfirmLate') : t('pairDifferentDone'),
+  })
 }
 
 /** True for the popup and the options page; false for content scripts in web pages. */
@@ -163,19 +193,19 @@ async function handle(msg: ToBackground, sender: chrome.runtime.MessageSender): 
     case 'pair.start':
       await pair(msg.name)
       return null
-    case 'pair.cancel':
+    case 'pair.cancel': {
       pairingRun++
-      await store.setPairing({ state: 'idle' })
-      return null
-    case 'pair.confirm':
-      await store.setPairing({ state: 'idle' })
-      return null
-    case 'pair.reject': {
       const p = await store.pairing()
-      if (p.state === 'check') await unpair(p.phoneId)
-      await store.setPairing({ state: 'error', message: t('pairDifferentDone') })
+      if (p.state === 'check') await leave(p.phoneId)
+      await store.setPairing({ state: 'idle' })
       return null
     }
+    case 'pair.confirm':
+      await confirm(true)
+      return null
+    case 'pair.reject':
+      await confirm(false)
+      return null
     case 'save.retry':
       void actions.retryPending(msg.id, msg.tabId)
       return null

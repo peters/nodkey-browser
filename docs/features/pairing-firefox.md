@@ -32,12 +32,13 @@ procedure with real input on the isolated desktop: the `horizon-device` tool
 
    Result: A 6-character code and "Waiting for your iPhone" show. (screenshot)
 
-4. Wait for the fake phone.
+4. Wait for the fake phone. It claims the code and answers the pairing check
+   of the extension.
 
-   Result: "Compare the numbers" shows "Test iPhone" and a check number.
-   Compare it with `/_fake/check/<agent_id>`. Get the agent id (`agent_id`)
-   from the relay's `/_fake/seen` after the first request of the run.
-   (screenshot)
+   Result: "Compare the numbers" shows "Test iPhone answered." and a check
+   number. Compare it with `/_fake/check/<agent_id>` (the run prints the
+   number of the fake phone in the log as `fake_check`). The two numbers must
+   be the same. (screenshot)
 
 5. Click "Same number".
 

@@ -31,6 +31,6 @@ describe('localization', () => {
   }
 
   it('fills placeholders outside the browser', () => {
-    expect(t('pairDone', 'Test iPhone')).toBe('Paired with Test iPhone.')
+    expect(t('pairAnswered', 'Test iPhone')).toBe('Test iPhone answered.')
   })
 })

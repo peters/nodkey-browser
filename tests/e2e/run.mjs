@@ -16,6 +16,7 @@ import puppeteer from 'puppeteer-core'
 import { cardFlow } from './cards.mjs'
 import { findVnc, startDesktop } from './desktop.mjs'
 import { startGoogle } from './provider.mjs'
+import { startRelayProxy } from './relayproxy.mjs'
 import { signinFlow } from './signin.mjs'
 import { startSite } from './site.mjs'
 
@@ -121,8 +122,12 @@ async function pairByDriver(name, browser, base, relay) {
  */
 async function pairByHand(name, relay) {
   const marker = join(state, 'firefox-paired')
-  console.log(JSON.stringify({ manual_pairing: { browser: name, relay: relay.base, marker } }))
-  log(name, `pair by hand, then: touch ${marker}`)
+  // The relay address to type goes through a pass-through that prints the fake phone's number.
+  const proxy = await startRelayProxy(relay.base, (line) => {
+    console.log(line)
+  })
+  console.log(JSON.stringify({ manual_pairing: { browser: name, relay: proxy.base, marker } }))
+  log(name, `pair by hand, compare the number with fake_check, then: touch ${marker}`)
   await waitFor('the pairing by hand', () => existsSync(marker), 15 * 60_000)
   return readFileSync(marker, 'utf8').trim() || `${name} test`
 }

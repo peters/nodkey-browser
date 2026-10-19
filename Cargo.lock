@@ -927,7 +927,7 @@ dependencies = [
 [[package]]
 name = "nodkey-fake-relay"
 version = "0.2.0"
-source = "git+https://github.com/peters/nodkey-cli?rev=88bef4d9dc9b7af72b4825486d67c5a17c12e315#88bef4d9dc9b7af72b4825486d67c5a17c12e315"
+source = "git+https://github.com/peters/nodkey-cli?rev=9937269ee3e4d5e4b8d701680e50c3275c30bdbe#9937269ee3e4d5e4b8d701680e50c3275c30bdbe"
 dependencies = [
  "axum",
  "nodkey-proto",
@@ -940,7 +940,7 @@ dependencies = [
 [[package]]
 name = "nodkey-proto"
 version = "0.2.0"
-source = "git+https://github.com/peters/nodkey-cli?rev=88bef4d9dc9b7af72b4825486d67c5a17c12e315#88bef4d9dc9b7af72b4825486d67c5a17c12e315"
+source = "git+https://github.com/peters/nodkey-cli?rev=9937269ee3e4d5e4b8d701680e50c3275c30bdbe#9937269ee3e4d5e4b8d701680e50c3275c30bdbe"
 dependencies = [
  "chacha20poly1305",
  "ed25519-dalek",

@@ -82,7 +82,7 @@ async function run(msg: Parameters<typeof call>[0]) {
   </NkCard>
 
   <NkCard v-else-if="pairing.state === 'check'" :label="t('pairCheckTitle')" :tile="3">
-    <p>{{ t('pairDone', pairing.phoneName) }} {{ t('pairCheckHelp') }}</p>
+    <p>{{ t('pairAnswered', pairing.phoneName) }} {{ t('pairCheckHelp') }}</p>
     <div class="text-center">
       <p class="text-xs text-muted">{{ t('pairCheckLabel') }}</p>
       <p

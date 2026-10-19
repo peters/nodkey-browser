@@ -40,6 +40,7 @@ const PHONE: Phone = {
   check: '000 000',
   scope: 'all',
   paired_at: 1,
+  signs: true,
 }
 
 function authData(rpId: string, flags = 0x1d, credentialId?: Uint8Array): string {

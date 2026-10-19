@@ -41,7 +41,16 @@ export type PairingState =
   | { state: 'idle' }
   | { state: 'starting'; name: string }
   | { state: 'waiting'; code: string; expiresAt: number; name: string }
-  | { state: 'check'; check: string; phoneName: string; phoneId: string }
+  | {
+      state: 'check'
+      check: string
+      phoneName: string
+      phoneId: string
+      /** The phone to keep when the person confirms the number (public keys only). */
+      phone: Phone
+      /** Until when the confirmation counts (ms). */
+      until: number
+    }
   | { state: 'error'; message: string }
 
 /** A login the person may save in Nodkey. The password is sealed to the phone already. */

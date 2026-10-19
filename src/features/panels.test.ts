@@ -35,7 +35,23 @@ describe('PairingPanel', () => {
   it('asks to compare the check number', async () => {
     const w = mount(PairingPanel, {
       props: {
-        pairing: { state: 'check', check: '418 902', phoneName: 'Test iPhone', phoneId: 'p' },
+        pairing: {
+          state: 'check',
+          check: '418 902',
+          phoneName: 'Test iPhone',
+          phoneId: 'p',
+          phone: {
+            phone_id: 'p',
+            name: 'Test iPhone',
+            sign: 'AA',
+            kem: 'AA',
+            check: '418 902',
+            scope: 'selected',
+            paired_at: 1,
+            signs: true,
+          },
+          until: Date.now() + 60_000,
+        },
         defaultName: 'x',
       },
     })

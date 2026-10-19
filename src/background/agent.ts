@@ -6,20 +6,26 @@
 
 import {
   b64u_decode,
+  finish_pairing,
   open_answer,
   open_grant,
+  pairing_check_to_sign,
   random_id,
+  request_to_sign,
   seal_attachment,
-  seal_request,
+  seal_signed_request,
 } from '../wasm/nodkey.js'
 import {
   type Answer,
   type Kind,
   type Phone,
   type SealedBox,
-  parseAnswer,
-  parsePhone,
+  type SealedRequest,
+  type ToSign,
+  parseGrant,
+  parseRead,
   parseSealedRequest,
+  parseToSign,
 } from '../models/protocol'
 import * as keys from './keys'
 import { Relay, RelayError, pollUntil } from './relay'
@@ -78,8 +84,55 @@ export async function startPairing(name: string): Promise<{ code: string; expire
 }
 
 /**
- * Waits for the phone to claim `code`, opens the grant and checks the check number. Returns `null`
- * when the code expired unclaimed. The caller keeps the phone with [`rememberPhone`].
+ * Why a pairing stopped without a phone: Nodkey on the iPhone is too old for the pairing with the
+ * commitment (`old_app`), or the pairing check did not come or did not fit (`check`).
+ */
+export class PairingError extends Error {
+  override name = 'PairingError'
+  constructor(readonly code: 'old_app' | 'check') {
+    super(code)
+  }
+}
+
+/** An answer without a valid signature from a phone that signs: never used. */
+export class NotSignedError extends Error {
+  override name = 'NotSignedError'
+  constructor() {
+    super('the answer is not signed by the phone')
+  }
+}
+
+/** Signs a request in WebCrypto and seals it to the phone. */
+async function sealSigned(t: ToSign, agentId: string, phoneKem: string): Promise<SealedRequest> {
+  const signature = await keys.signBytes(b64u_decode(t.message))
+  return parseSealedRequest(seal_signed_request(t.body, signature, agentId, phoneKem))
+}
+
+/** Opens and checks the phone's answer; `not_signed` becomes a [`NotSignedError`]. */
+async function openAnswer(
+  box: SealedBox,
+  requestId: string,
+  agentId: string,
+  phone: Pick<Phone, 'phone_id' | 'sign' | 'signs'>,
+): Promise<{ answer: Answer; signed: boolean }> {
+  const pub = await keys.publicKeys()
+  const dh = await keys.dh(b64u_decode(box.enc))
+  const from = { agent_id: agentId, phone_id: phone.phone_id, sign: phone.sign, signs: phone.signs }
+  try {
+    return parseRead(open_answer(dh, pub.kem, JSON.stringify(box), requestId, JSON.stringify(from)))
+  } catch (e) {
+    if (e instanceof Error && e.message === 'not_signed') throw new NotSignedError()
+    throw e
+  }
+}
+
+/**
+ * Waits for the phone to claim `code`, opens the grant with the phone's commitment, sends the one
+ * pairing check with this agent's nonce and gets the check number from the phone's answer
+ * ("Pairing and the check number" in the protocol). Returns `null` when the code expired
+ * unclaimed. Returns the phone, but does not keep it: the person must first confirm that both
+ * screens show the same number ([`rememberPhone`]). When the pairing cannot finish, this agent
+ * leaves the phone at the relay, so the phone drops it, and a [`PairingError`] says why.
  */
 export async function finishPairing(code: string): Promise<Phone | null> {
   const agent = await store.agent()
@@ -87,18 +140,86 @@ export async function finishPairing(code: string): Promise<Phone | null> {
   const r = await relay(agent.agent_id)
   const claimed = await keepAlive(pollUntil(PAIRING_MS, (wait) => r.waitPairing(code, wait)))
   if (!claimed) return null
-  const pub = await keys.publicKeys()
-  const dh = await keys.dh(b64u_decode(claimed.enc))
-  const paired: unknown = JSON.parse(
-    open_grant(dh, pub.sign, pub.kem, JSON.stringify(claimed), code),
-  )
-  return parsePhone({ ...(paired as object), paired_at: Math.floor(Date.now() / 1000) })
+  const stop = async (why: unknown): Promise<never> => {
+    try {
+      await r.leave(claimed.phone_id)
+    } catch {
+      // The phone gives up by itself after 120 s without a pairing check.
+    }
+    throw why
+  }
+  try {
+    const pub = await keys.publicKeys()
+    let grant
+    try {
+      const dh = await keys.dh(b64u_decode(claimed.enc))
+      grant = parseGrant(open_grant(dh, pub.kem, JSON.stringify(claimed), code))
+    } catch (e) {
+      // Never pair by the number of an app made before the commitment: a relay could pretend
+      // to be such an app.
+      throw e instanceof Error && e.message === 'old_app' ? new PairingError('old_app') : e
+    }
+    const now = Math.floor(Date.now() / 1000)
+    const check = parseToSign(
+      pairing_check_to_sign(agent.name, agent.agent_id, grant.phone_id, now),
+    )
+    const sealed = await sealSigned(check, agent.agent_id, grant.kem)
+    await r.postRequest(grant.phone_id, sealed)
+    const box = await keepAlive(
+      pollUntil(REQUEST_MS, (wait) => r.waitAnswer(sealed.request_id, wait)),
+    )
+    if (!box) throw new PairingError('check')
+    let number: string
+    try {
+      const { answer } = await openAnswer(box, sealed.request_id, agent.agent_id, {
+        phone_id: grant.phone_id,
+        sign: grant.sign,
+        signs: true,
+      })
+      number = finish_pairing(
+        JSON.stringify({
+          answer,
+          commit: grant.commit,
+          nonce: check.nonce,
+          agent_sign: pub.sign,
+          agent_kem: pub.kem,
+          phone_sign: grant.sign,
+          phone_kem: grant.kem,
+        }),
+      )
+    } catch {
+      throw new PairingError('check')
+    }
+    return {
+      phone_id: grant.phone_id,
+      name: grant.phone_name,
+      sign: grant.sign,
+      kem: grant.kem,
+      check: number,
+      scope: grant.scope,
+      paired_at: now,
+      signs: true,
+    }
+  } catch (e) {
+    return stop(e)
+  }
 }
 
 /** Keeps a paired phone, replacing an earlier pairing with the same phone. */
 export async function rememberPhone(phone: Phone): Promise<void> {
   const others = (await store.phones()).filter((p) => p.phone_id !== phone.phone_id)
   await store.setPhones([...others, phone])
+}
+
+/** Leaves a phone at the relay without keeping it (a pairing the person did not confirm). */
+export async function leave(phoneId: string): Promise<void> {
+  const agent = await store.agent()
+  if (!agent) return
+  try {
+    await (await relay(agent.agent_id)).leave(phoneId)
+  } catch {
+    // Not kept here anyway; the phone gives up the pairing by itself.
+  }
 }
 
 /** Leaves a phone: tells the relay (best effort) and forgets it here. */
@@ -155,13 +276,7 @@ export async function ask(a: Ask, phone: Phone, signal?: AbortSignal): Promise<O
     agent: agent.name,
     client: a.client,
   }
-  if (a.picture) {
-    draft.attachment = {
-      type: a.picture.type,
-      bytes: a.picture.bytes.length,
-      caption: a.picture.caption,
-    }
-  }
+  if (a.picture) draft.caption = a.picture.caption
   if (a.save) draft.save = a.save
   if (a.passkey) draft.passkey = a.passkey
   if (a.card) draft.card = a.card
@@ -169,8 +284,14 @@ export async function ask(a: Ask, phone: Phone, signal?: AbortSignal): Promise<O
   if (a.suggest) draft.suggest = a.suggest
   if (a.waitSeconds !== undefined) draft.wait_seconds = a.waitSeconds
   const nowSeconds = Math.floor(Date.now() / 1000)
-  const sealed = parseSealedRequest(
-    seal_request(JSON.stringify(draft), agent.agent_id, phone.kem, nowSeconds),
+  // The request says the picture's type, size and SHA-256; the phone shows only that picture.
+  const image = a.picture?.bytes ?? new Uint8Array()
+  const sealed = await sealSigned(
+    parseToSign(
+      request_to_sign(JSON.stringify(draft), agent.agent_id, phone.phone_id, nowSeconds, image),
+    ),
+    agent.agent_id,
+    phone.kem,
   )
   // Seal the picture before posting, so its upload follows the request at once (the relay holds
   // the push for it at most 5 s).
@@ -194,12 +315,18 @@ export async function ask(a: Ask, phone: Phone, signal?: AbortSignal): Promise<O
     ),
   )
   if (!box) return { answer: null, phone }
-  const pub = await keys.publicKeys()
-  const dh = await keys.dh(b64u_decode(box.enc))
-  const answer = parseAnswer(
-    open_answer(dh, pub.kem, JSON.stringify(box), sealed.request_id, phone.phone_id),
-  )
+  const { answer, signed } = await openAnswer(box, sealed.request_id, agent.agent_id, phone)
+  if (signed && !phone.signs) {
+    // From the first signed answer on, this phone must sign ("Signed requests and answers").
+    phone = { ...phone, signs: true }
+    await markSigns(phone.phone_id)
+  }
   return { answer, phone }
+}
+
+async function markSigns(phoneId: string): Promise<void> {
+  const list = await store.phones()
+  await store.setPhones(list.map((p) => (p.phone_id === phoneId ? { ...p, signs: true } : p)))
 }
 
 export { RelayError }

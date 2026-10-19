@@ -116,9 +116,15 @@ export async function publicKeys(): Promise<PublicKeys> {
 
 /** Ed25519 signature over the UTF-8 bytes of `message`. */
 export async function sign(message: string): Promise<Uint8Array> {
+  return signBytes(new TextEncoder().encode(message))
+}
+
+/** Ed25519 signature over `data`: a signed request ("Signed requests and answers"). */
+export async function signBytes(data: Uint8Array): Promise<Uint8Array> {
   const keys = await required()
-  const data = new TextEncoder().encode(message)
-  return new Uint8Array(await crypto.subtle.sign({ name: 'Ed25519' }, keys.sign.privateKey, data))
+  return new Uint8Array(
+    await crypto.subtle.sign({ name: 'Ed25519' }, keys.sign.privateKey, new Uint8Array(data)),
+  )
 }
 
 /** `X25519(agent secret, enc)`: the key agreement for opening what the phone sealed to us. */

@@ -58,6 +58,9 @@ export function saved(answer: Answer): Shown {
 
 /** The text for an error before or while waiting. */
 export function failed(e: unknown): Shown {
+  if (e instanceof Error && e.name === 'NotSignedError') {
+    return { state: 'error', message: t('actNotSigned') }
+  }
   if (e instanceof RelayError) {
     if (e.status === 0) return { state: 'error', message: t('actUnreachable') }
     if (e.status === 403) return { state: 'error', message: t('actNotPaired') }

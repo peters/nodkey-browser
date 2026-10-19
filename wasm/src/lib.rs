@@ -42,18 +42,6 @@ pub fn display_code(code: &str) -> String {
 }
 
 #[wasm_bindgen]
-pub fn check_number(
-    agent_sign: &str,
-    agent_kem: &str,
-    phone_sign: &str,
-    phone_kem: &str,
-) -> Result<String, JsError> {
-    js(core::check_number(
-        agent_sign, agent_kem, phone_sign, phone_kem,
-    ))
-}
-
-#[wasm_bindgen]
 pub fn auth_message(method: &str, path: &str, ts: f64, body: &[u8]) -> String {
     core::auth_message(method, path, ts, body)
 }
@@ -69,13 +57,28 @@ pub fn sniff_image(bytes: &[u8]) -> Option<String> {
 }
 
 #[wasm_bindgen]
-pub fn seal_request(
+pub fn request_to_sign(
     draft_json: &str,
     agent_id: &str,
-    phone_kem: &str,
+    phone_id: &str,
     ts: f64,
+    image: &[u8],
 ) -> Result<String, JsError> {
-    js(core::seal_request(draft_json, agent_id, phone_kem, ts))
+    js(core::request_to_sign(
+        draft_json, agent_id, phone_id, ts, image,
+    ))
+}
+
+#[wasm_bindgen]
+pub fn seal_signed_request(
+    body: &str,
+    signature: &[u8],
+    agent_id: &str,
+    phone_kem: &str,
+) -> Result<String, JsError> {
+    js(core::seal_signed_request(
+        body, signature, agent_id, phone_kem,
+    ))
 }
 
 #[wasm_bindgen]
@@ -101,32 +104,42 @@ pub fn open_answer(
     agent_kem: &str,
     sealed_json: &str,
     request_id: &str,
-    phone_id: &str,
+    from_json: &str,
 ) -> Result<String, JsError> {
     js(core::open_answer(
         dh,
         agent_kem,
         sealed_json,
         request_id,
-        phone_id,
+        from_json,
     ))
 }
 
 #[wasm_bindgen]
 pub fn open_grant(
     dh: &[u8],
-    agent_sign: &str,
     agent_kem: &str,
     claimed_json: &str,
     code: &str,
 ) -> Result<String, JsError> {
-    js(core::open_grant(
-        dh,
-        agent_sign,
-        agent_kem,
-        claimed_json,
-        code,
+    js(core::pairing::open_grant(dh, agent_kem, claimed_json, code))
+}
+
+#[wasm_bindgen]
+pub fn pairing_check_to_sign(
+    agent_name: &str,
+    agent_id: &str,
+    phone_id: &str,
+    ts: f64,
+) -> Result<String, JsError> {
+    js(core::pairing::pairing_check_to_sign(
+        agent_name, agent_id, phone_id, ts,
     ))
+}
+
+#[wasm_bindgen]
+pub fn finish_pairing(input_json: &str) -> Result<String, JsError> {
+    js(core::pairing::finish_pairing(input_json))
 }
 
 #[wasm_bindgen]

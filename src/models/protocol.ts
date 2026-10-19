@@ -96,6 +96,8 @@ export interface Answer {
   via?: Via
   second_step?: SecondStepOrder
   quota?: Quota
+  /** The phone's nonce, in its answer to the pairing check. */
+  nonce?: string
 }
 
 /** An amount: a decimal string with a dot and an ISO 4217 code (`docs/agent-protocol.md`). */
@@ -149,6 +151,33 @@ export interface Phone {
   check: string
   scope: Scope
   paired_at: number
+  /**
+   * The phone signs its answers: a pairing with the commitment, or a signed answer seen before.
+   * An answer without a valid signature is then refused.
+   */
+  signs: boolean
+}
+
+/** The opened pairing grant, before the pairing check (`open_grant` in the module). */
+export interface Grant {
+  phone_id: string
+  phone_name: string
+  scope: Scope
+  /** b64u of the phone's commitment to its keys and its nonce. */
+  commit: string
+  sign: string
+  kem: string
+}
+
+/** A request ready to sign (`request_to_sign` and `pairing_check_to_sign` in the module). */
+export interface ToSign {
+  request_id: string
+  /** b64u of the request's JSON. */
+  body: string
+  /** b64u of the bytes to sign with the agent's Ed25519 key. */
+  message: string
+  /** The agent's nonce of a pairing check. */
+  nonce?: string
 }
 
 /** `GET /v1/pairings/{code}` once a phone claimed the code. */
@@ -160,7 +189,7 @@ export interface PairingClaimed {
   ct: string
 }
 
-/** What `seal_request` in the WebAssembly module returns. */
+/** What `seal_signed_request` in the WebAssembly module returns. */
 export interface SealedRequest {
   request_id: string
   envelope: { request_id: string; enc: string; ct: string; attachment?: boolean; ttl?: number }
@@ -228,7 +257,10 @@ export function parsePairingCode(v: unknown): { code: string; expires: number } 
 
 /** Checks an opened answer from the WebAssembly module. */
 export function parseAnswer(json: string): Answer {
-  const v: unknown = JSON.parse(json)
+  return answerOf(JSON.parse(json))
+}
+
+function answerOf(v: unknown): Answer {
   if (!isObject(v)) throw new ProtocolError('expected an answer')
   const answer: Answer = {
     v: typeof v.v === 'number' ? v.v : 0,
@@ -266,6 +298,8 @@ export function parseAnswer(json: string): Answer {
   if (isObject(v.method)) answer.method = parseMethod(v.method)
   if (isObject(v.via)) answer.via = parseVia(v.via)
   if (isObject(v.second_step)) answer.second_step = parseOrder(v.second_step)
+  const nonce = optB64u(v, 'nonce')
+  if (nonce !== undefined) answer.nonce = nonce
   if (isObject(v.quota) && typeof v.quota.new_today === 'number') {
     answer.quota = {
       new_today: v.quota.new_today,
@@ -424,7 +458,41 @@ export function parsePhone(v: unknown): Phone {
     check: str(v, 'check'),
     scope: oneOf(v, 'scope', ['selected', 'codes', 'logins', 'all'] as const),
     paired_at: typeof v.paired_at === 'number' ? v.paired_at : 0,
+    signs: v.signs === true,
   }
+}
+
+export function parseGrant(json: string): Grant {
+  const v: unknown = JSON.parse(json)
+  if (!isObject(v)) throw new ProtocolError('expected a grant')
+  return {
+    phone_id: str(v, 'phone_id'),
+    phone_name: str(v, 'phone_name'),
+    scope: oneOf(v, 'scope', ['selected', 'codes', 'logins', 'all'] as const),
+    commit: str(v, 'commit'),
+    sign: str(v, 'sign'),
+    kem: str(v, 'kem'),
+  }
+}
+
+export function parseToSign(json: string): ToSign {
+  const v: unknown = JSON.parse(json)
+  if (!isObject(v)) throw new ProtocolError('expected a request to sign')
+  const out: ToSign = {
+    request_id: str(v, 'request_id'),
+    body: str(v, 'body'),
+    message: str(v, 'message'),
+  }
+  const nonce = optStr(v, 'nonce')
+  if (nonce !== undefined) out.nonce = nonce
+  return out
+}
+
+/** `open_answer` in the module: the answer, and whether it had a valid signature. */
+export function parseRead(json: string): { answer: Answer; signed: boolean } {
+  const v: unknown = JSON.parse(json)
+  if (!isObject(v)) throw new ProtocolError('expected an opened answer')
+  return { answer: answerOf(v.answer), signed: v.signed === true }
 }
 
 export function parseSealedRequest(json: string): SealedRequest {
