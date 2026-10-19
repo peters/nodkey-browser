@@ -48,6 +48,7 @@
   "actPasskeyCreated": "$1의 새 패스키를 Nodkey에 저장했습니다.",
   "actPasskeyExists": "iPhone의 Nodkey에 $1의 이 계정에 대한 패스키가 이미 있습니다.",
   "actPasskeyNone": "iPhone의 Nodkey에 $1의 패스키가 없습니다.",
+  "actPasskeyNoPasscode": "iPhone에 암호가 없어서 Nodkey가 이 패스키에 대해 본인인지 확인할 수 없어요. 설정 → Face ID 및 암호에서 설정할 수 있어요.",
   "actPasskeyCancelled": "페이지가 패스키 요청을 중지했습니다.",
   "actNeedsPairing": "먼저 Nodkey를 iPhone과 페어링하세요. 도구 모음의 Nodkey 버튼을 클릭하세요.",
   "saveAsk": "$1 로그인을 Nodkey에 저장할까요?",

@@ -48,6 +48,7 @@
   "actPasskeyCreated": "Lagret en ny passnøkkel for $1 i Nodkey.",
   "actPasskeyExists": "Nodkey på iPhonen din har allerede en passnøkkel for denne kontoen på $1.",
   "actPasskeyNone": "Nodkey på iPhonen din har ingen passnøkkel for $1.",
+  "actPasskeyNoPasscode": "iPhonen din har ingen kode, så Nodkey kan ikke bekrefte at det er deg, for denne passkeyen. Du kan legge inn en i Innstillinger → Face ID og kode.",
   "actPasskeyCancelled": "Siden stoppet passnøkkelforespørselen.",
   "actNeedsPairing": "Koble Nodkey til iPhonen først: klikk på Nodkey-knappen i verktøylinjen.",
   "saveAsk": "Lagre innloggingen for $1 i Nodkey?",

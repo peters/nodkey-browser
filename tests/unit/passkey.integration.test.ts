@@ -173,6 +173,47 @@ describe('passkeys against the fake phone', () => {
     },
   )
 
+  it('a phone without a passcode: no verified sign-in, others without UV', async () => {
+    const { passkey } = await import('../../src/background/passkeys')
+    const put = (on: boolean) =>
+      fetch(`${base}/_fake/passcode`, {
+        method: 'PUT',
+        headers: { 'content-type': 'application/json' },
+        body: JSON.stringify(on),
+      })
+    const live = new AbortController().signal
+    const page = sender('https://webauthn.io/')
+    await put(false)
+    try {
+      // The page asks for user verification: refused, with a calm note.
+      await expect(
+        passkey(
+          {
+            call: { op: 'get', challenge: challenge(), userVerification: 'required' },
+            sameOriginAncestors: true,
+          },
+          page,
+          live,
+        ),
+      ).rejects.toMatchObject({ domName: 'NotAllowedError' })
+      const shown = await chrome.storage.session.get<{ 'activity:7'?: { message: string } }>(
+        'activity:7',
+      )
+      expect(shown['activity:7']?.message).toBe(
+        'Your iPhone has no passcode, so Nodkey cannot confirm that it is you for this passkey. You can set one in Settings → Face ID & Passcode.',
+      )
+      // Without that, the phone signs, with user presence but no user verification (0x19).
+      const signed = (await passkey(
+        { call: { op: 'get', challenge: challenge() }, sameOriginAncestors: true },
+        page,
+        live,
+      )) as PasskeyGetResult
+      expect(buf(signed.authenticatorData)[32]).toBe(0x19)
+    } finally {
+      await put(true)
+    }
+  })
+
   it('passes the PRF extension through and returns its outputs', { timeout: 60_000 }, async () => {
     const { passkey } = await import('../../src/background/passkeys')
     const page = sender('https://vault.example.com/unlock')

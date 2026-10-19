@@ -70,3 +70,10 @@ makes ES256 passkeys and signs as the app does.
   and the page gets a sign-in with `prf: {}` (no results).
 - Set the fake phone mode to `deny` and sign in. Result: The status shows
   `NotAllowedError`. The card shows "You denied the request on your iPhone."
+- Set `PUT /_fake/passcode` to `false` (a phone without a passcode). Click
+  "Sign in with a passkey" (the page asks for user verification). Result: The
+  status shows `NotAllowedError`. The card shows "Your iPhone has no passcode,
+  so Nodkey cannot confirm that it is you for this passkey. You can set one in
+  Settings → Face ID & Passcode." A request without user verification and
+  without PRF still signs, with the flags `0x19` (no UV). Set it to `true`
+  again.

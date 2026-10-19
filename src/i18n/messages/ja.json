@@ -48,6 +48,7 @@
   "actPasskeyCreated": "$1 の新しいパスキーを Nodkey に保存しました。",
   "actPasskeyExists": "iPhone の Nodkey には $1 のこのアカウントのパスキーがすでにあります。",
   "actPasskeyNone": "iPhone の Nodkey には $1 のパスキーがありません。",
+  "actPasskeyNoPasscode": "iPhone にパスコードがないため、Nodkey はこのパスキーで本人確認ができません。設定 →「Face ID とパスコード」で設定できます。",
   "actPasskeyCancelled": "ページがパスキーのリクエストを中止しました。",
   "actNeedsPairing": "まず Nodkey を iPhone とペアリングしてください。ツールバーの Nodkey ボタンをクリックします。",
   "saveAsk": "$1 のログインを Nodkey に保存しますか?",

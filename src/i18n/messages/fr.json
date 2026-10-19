@@ -48,6 +48,7 @@
   "actPasskeyCreated": "Nouvelle clé d’accès pour $1 enregistrée dans Nodkey.",
   "actPasskeyExists": "Nodkey sur ton iPhone a déjà une clé d’accès pour ce compte sur $1.",
   "actPasskeyNone": "Nodkey sur ton iPhone n’a aucune clé d’accès pour $1.",
+  "actPasskeyNoPasscode": "Ton iPhone n’a pas de code, donc Nodkey ne peut pas confirmer que c’est toi pour cette clé d’accès. Tu peux en définir un dans Réglages → Face ID et code.",
   "actPasskeyCancelled": "La page a arrêté la demande de clé d’accès.",
   "actNeedsPairing": "Associe d’abord Nodkey à ton iPhone : clique sur le bouton Nodkey dans la barre d’outils.",
   "saveAsk": "Enregistrer l’identifiant de $1 dans Nodkey ?",

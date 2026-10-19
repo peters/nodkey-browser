@@ -48,6 +48,7 @@
   "actPasskeyCreated": "Saved a new passkey for $1 in Nodkey.",
   "actPasskeyExists": "Nodkey on your iPhone has a passkey for this account on $1 already.",
   "actPasskeyNone": "Nodkey on your iPhone has no passkey for $1.",
+  "actPasskeyNoPasscode": "Your iPhone has no passcode, so Nodkey cannot confirm that it is you for this passkey. You can set one in Settings → Face ID & Passcode.",
   "actPasskeyCancelled": "The page stopped the passkey request.",
   "actNeedsPairing": "Pair Nodkey with your iPhone first: click the Nodkey button in the toolbar.",
   "saveAsk": "Save the login for $1 in Nodkey?",

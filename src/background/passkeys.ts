@@ -162,7 +162,14 @@ function refusal(answer: Answer | null, site: string): { error: PasskeyError; me
       message: t('actPasskeyExists', site),
     }
   }
-  const message = why === 'no_passkey' ? t('actPasskeyNone', site) : shown.message
+  // A phone without a passcode refuses a passkey that needs user verification or PRF
+  // (peters/nodkey#126); it answers the others without UV.
+  const message =
+    why === 'no_passkey'
+      ? t('actPasskeyNone', site)
+      : why === 'no_passcode'
+        ? t('actPasskeyNoPasscode')
+        : shown.message
   const name = why === 'unsupported_algorithm' ? 'NotSupportedError' : 'NotAllowedError'
   return { error: new PasskeyError(name, why ?? answer?.decision ?? 'expired'), message }
 }

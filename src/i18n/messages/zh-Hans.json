@@ -48,6 +48,7 @@
   "actPasskeyCreated": "已在 Nodkey 中保存 $1 的新通行密钥。",
   "actPasskeyExists": "你 iPhone 上的 Nodkey 已有 $1 上此账户的通行密钥。",
   "actPasskeyNone": "你 iPhone 上的 Nodkey 没有 $1 的通行密钥。",
+  "actPasskeyNoPasscode": "你的 iPhone 没有设置密码，所以 Nodkey 无法为这个通行密钥确认是你本人。你可以在“设置”→“面容 ID 与密码”中设置。",
   "actPasskeyCancelled": "页面已停止通行密钥请求。",
   "actNeedsPairing": "请先将 Nodkey 与你的 iPhone 配对：点按工具栏中的 Nodkey 按钮。",
   "saveAsk": "要把 $1 的登录信息保存到 Nodkey 吗？",

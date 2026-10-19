@@ -83,7 +83,10 @@ website. Thus the page must not choose the origin.
 - The phone examines `clientDataJSON` again before it asks the person. Thus a
   damaged extension cannot get a signature for another origin from the phone.
 - WebAuthn errors: `denied`, `expired` and other refusals give
-  `NotAllowedError`. `excluded` gives `InvalidStateError`.
+  `NotAllowedError`. `excluded` gives `InvalidStateError`. A phone without a
+  passcode refuses a request that needs user verification or PRF
+  (`no_passcode`, peters/nodkey#126); the card says how to set a passcode.
+  It answers other requests without UV.
 - The relay has no way to cancel a request. When the page aborts, the phone
   can still show the request. The extension ignores a late answer.
 - A page cannot ask the phone for a passkey when it loads. A site that starts
