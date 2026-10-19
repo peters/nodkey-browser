@@ -147,7 +147,18 @@ export type ToBackground =
   | { type: 'save.dismiss'; id: string; never: boolean }
   | { type: 'save.retry'; id: string; tabId?: number }
   | { type: 'save.discard'; id: string }
-  | { type: 'card.fill'; amount: Money; pageTotal: Money | null; totalSource: 'page' | 'user' }
+  /** A card field in a frame below the top page was clicked: the top page shows the card. */
+  | { type: 'card.start' }
+  | {
+      type: 'card.fill'
+      /** `pay` one amount, or `setup`: add the card for later payments (no amount). */
+      purpose: CardPurpose
+      amount: Money | null
+      pageTotal: Money | null
+      totalSource: 'page' | 'user'
+      /** From `card.ask`: the card goes into the frame that asked, not into the top page. */
+      ticket?: string
+    }
   | { type: 'card.cleared'; total: Money }
   | {
       type: 'card.candidate'
@@ -170,8 +181,22 @@ export type ToContent =
   | { type: 'fill'; site: string; username?: string; password?: string; code?: string }
   | { type: 'activity'; activity: Activity }
   | { type: 'save.prompt'; offer: SaveOffer }
-  | { type: 'card.fill'; site: string; card: CardToFill; approved: Money }
+  /** Fill the card into this frame, when it is still on `origin`. No `approved` for `setup`. */
+  | { type: 'card.fill'; origin: string; card: CardToFill; approved: Money | null }
+  /** The top page shows the card for a card field in a frame below it (`via`: another site). */
+  | { type: 'card.ask'; ticket: string; via: string | null }
+  /** The top page's total now (the answer is `Money | null`). */
+  | { type: 'card.total' }
+  /** The top page watches its total after a fill in a frame below it. */
+  | { type: 'card.watch'; approved: Money }
+  /** The expiry, CVC and name, for card fields split over more frames of `origin`. */
+  | { type: 'card.parts'; origin: string; card: Omit<CardToFill, 'number'> }
+  /** The total went up: frames of `origin` empty their card fields. */
+  | { type: 'card.clear'; origin: string }
   | { type: 'method'; site: string; message: string; provider?: string; label?: string }
+
+/** What a card request is for (`purpose` in the protocol). */
+export type CardPurpose = 'pay' | 'setup'
 
 /** A frame's answer to `card.fill`. */
 export type CardFillResult =

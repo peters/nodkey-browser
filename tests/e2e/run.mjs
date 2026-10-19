@@ -13,9 +13,11 @@ import { cpSync, existsSync, mkdirSync, readFileSync, rmSync } from 'node:fs'
 import { homedir } from 'node:os'
 import { join, resolve } from 'node:path'
 import puppeteer from 'puppeteer-core'
+import { cardFrameFlow } from './cardframes.mjs'
 import { cardFlow } from './cards.mjs'
 import { coveredFlow } from './covered.mjs'
 import { findVnc, startDesktop } from './desktop.mjs'
+import { PAY_HOST, startPayFrames } from './payframe.mjs'
 import { startGoogle } from './provider.mjs'
 import { startRelayProxy } from './relayproxy.mjs'
 import { signinFlow } from './signin.mjs'
@@ -348,7 +350,7 @@ async function chromium(env, site, relay) {
       '--no-default-browser-check',
       '--password-store=basic',
       // Never reach the real relay from a test. The stand-in Google pages run on this computer.
-      '--host-resolver-rules=MAP relay.nodkey.app 127.0.0.1, MAP accounts.google.com 127.0.0.1',
+      `--host-resolver-rules=MAP relay.nodkey.app 127.0.0.1, MAP accounts.google.com 127.0.0.1, MAP ${PAY_HOST} 127.0.0.1`,
     ],
   })
   const worker = await browser.waitForTarget(
@@ -397,7 +399,7 @@ async function firefox(env) {
       'signon.rememberSignons': false,
       // Never reach the real relay from a test: it resolves to this computer, where nothing answers.
       // The stand-in Google pages run on this computer too.
-      'network.dns.localDomains': 'relay.nodkey.app,accounts.google.com',
+      'network.dns.localDomains': `relay.nodkey.app,accounts.google.com,${PAY_HOST}`,
       ...(xpi
         ? {
             'extensions.autoDisableScopes': 0,
@@ -437,13 +439,15 @@ async function main() {
   if (desktop.vncAddress) console.log(JSON.stringify({ vnc_address: desktop.vncAddress }))
   const relay = await startRelay()
   const google = await startGoogle(state)
-  const site = await startSite(google.base)
+  const pay = await startPayFrames(state)
+  const site = await startSite(google.base, pay.base)
   const open = []
   cleanup = () => {
     for (const b of open) b.process()?.kill()
     relay.child.kill()
     site.stop()
     google.stop()
+    pay.stop()
     desktop.stop()
     rmSync(chromiumHome, { recursive: true, force: true })
   }
@@ -461,7 +465,10 @@ async function main() {
       if (!only || signinOnly) {
         await signinFlow('Chromium', c.browser, relay, site.base, name, helpers, c.activities)
       }
-      if (!only || cardsOnly) await cardFlow('Chromium', c.browser, relay, site.base, name, helpers)
+      if (!only || cardsOnly) {
+        await cardFlow('Chromium', c.browser, relay, site.base, name, helpers)
+        await cardFrameFlow('Chromium', c.browser, relay, site.base, pay.base, helpers)
+      }
       if (!only || passkeysOnly) {
         await passkeyFlow('Chromium', c.browser, relay, site)
         await passkeysOff('Chromium', c.browser, c.base, site)
@@ -478,7 +485,10 @@ async function main() {
       if (!only || signinOnly) {
         await signinFlow('Firefox', f.browser, relay, site.base, name, helpers, null)
       }
-      if (!only || cardsOnly) await cardFlow('Firefox', f.browser, relay, site.base, name, helpers)
+      if (!only || cardsOnly) {
+        await cardFlow('Firefox', f.browser, relay, site.base, name, helpers)
+        await cardFrameFlow('Firefox', f.browser, relay, site.base, pay.base, helpers)
+      }
       if (!only || passkeysOnly) await passkeyFlow('Firefox', f.browser, relay, site)
     }
     log('all flows passed')
@@ -491,6 +501,7 @@ async function main() {
     relay.child.kill()
     site.stop()
     google.stop()
+    pay.stop()
     desktop.stop()
     rmSync(chromiumHome, { recursive: true, force: true })
   }

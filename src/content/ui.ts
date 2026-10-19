@@ -301,9 +301,14 @@ export class PageUi {
     })
   }
 
-  /** The payment card: the amount, where it comes from, and "Approve on iPhone". */
+  /**
+   * The payment card: the amount, where it comes from, and "Approve on iPhone"; without a total,
+   * the choice between adding the card for later payments and typing an amount.
+   */
   showPay(view: PayView, choose: (choice: PayChoice) => void): void {
-    const card = this.newCard(t('cardPayTitle', view.shown ?? ''))
+    const card = this.newCard(
+      view.shown ? t('cardPayTitle', view.shown) : t('cardSetupTitle', view.site),
+    )
     card.setAttribute('role', 'dialog')
     const focus = buildPayCard(card, view, (choice) => {
       this.closeCard()

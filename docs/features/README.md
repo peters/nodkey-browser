@@ -23,7 +23,7 @@ and it needs the owner.
 | [Sign-in methods](sign-in-methods.md) | "Sign in with Google": the method card, the Google login on Google only, the Nodkey button at "Check your phone", the question to remember the method | All |
 | [Codes sent by SMS](sms-code.md) | The code field asks for the SMS code; the hint when no SMS comes | All |
 | [The agent limit](agent-limit.md) | The notice and the pause of the agent limit | All |
-| [Pay with a card](fill-card.md) | Fill a test card for the total on the page, clear it when the total goes up, save a typed card | All |
+| [Pay with a card](fill-card.md) | Fill a test card for the total on the page, clear it when the total goes up, save a typed card; add a card for later payments and pay an amount in a payment provider's frames | All |
 | [Refusals](refusals.md) | Denied, paused and no answer | None |
 | [Pages without HTTPS](insecure-pages.md) | No fill on HTTP pages on the internet | None |
 | [Settings page](settings-page.md) | Name, phone, requests, saving and relay settings | None |

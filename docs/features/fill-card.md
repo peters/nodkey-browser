@@ -62,17 +62,62 @@ for each purchase (the default; change it with `PUT /_fake/cards`).
    `save_card.last4: 4444`, and `saved_card` is the number you typed. The fake
    phone opened the number that the extension sealed to it.
 
+## Cards in a payment provider's frames
+
+Many shops show the card fields in a frame from a payment provider. The browser
+run has a stand-in provider on `https://js.pay.example:<port>` (ADR-0013).
+
+9. Open `/billing`. The page has no total. The card fields are in one frame
+   of `js.pay.example`.
+
+   Result: The page shows "Betalingskort" and a frame with "Card number",
+   "Expiry" and "CVC".
+
+10. Click "Card number" in the frame, then the Nodkey button in the field.
+
+    Result: The card of Nodkey shows at the top right of the page, not in the
+    frame. It says "Nodkey found no total on this page.", "at localhost" and
+    "via js.pay.example", and has the buttons "Add the card for later
+    payments" and "Pay an amount". "Add the card for later payments" has the
+    focus. (screenshot)
+
+11. Push Enter.
+
+    Result: The card shows "Approve adding your card on your iPhone", then
+    "Visa ····4242 filled in to add it for later payments. No payment was
+    approved." The frame shows the test card, `12 / 30` and the CVC. In
+    `/_fake/seen`, the last card request has `card.purpose: setup`,
+    `card.merchant: localhost`, `card.via: js.pay.example`, `card.origin` the
+    origin of the frame, and no amount. (screenshot)
+
+12. Open `/billing-split`. Each of the three fields is in a frame of its own.
+    Click "Card number", then the Nodkey button. Push Tab, then Enter.
+
+    Result: The card shows an amount field and a currency (NOK), with "Approve
+    on iPhone". The amount field has the focus.
+
+13. Type `250` and push Enter.
+
+    Result: The card shows "Approve the payment of 250,00 kr on your iPhone",
+    then "Visa ····4242 filled in for at most 250,00 kr." The number, the
+    expiry and the CVC are each in their frame. The last card request has
+    `card.amount` 250 NOK, `card.total_source: user` and `card.via:
+    js.pay.example`. (screenshot)
+
 ## Also check
 
+- Set `setup: false` (`PUT /_fake/cards`) and do steps 9 to 11. Result:
+  "Adding cards for later payments is off for this browser. Turn it on under
+  Agents in Nodkey on your iPhone." The frame stays empty.
 - Set the limit to 100 NOK (`PUT /_fake/cards`). Do steps 1 to 4. Result: "The
   amount is above your limit for this browser. Your iPhone said no without
   asking you." The fields stay empty.
 - Set `enabled: false`. Result: "Cards are off for this browser." The fields
   stay empty.
 - Remove the total from the page (DevTools). Click the Nodkey button. Result:
-  The card asks you to type the amount and to select the currency. Type `abc`
-  and push "Approve on iPhone". Result: "Type the amount as a number, for
-  example 499,00." Nothing is sent.
+  The card offers "Add the card for later payments" and "Pay an amount". Click
+  "Pay an amount", type `abc` and push "Approve on iPhone". Result: "Type the
+  amount as a number, for example 499,00." Nothing is sent.
 - Raise the total while the request waits on the phone, then approve. Result:
   "The total on the page is higher than the amount you approved. Nodkey did not
   fill in the card."

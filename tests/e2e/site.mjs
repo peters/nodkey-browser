@@ -3,6 +3,7 @@
 // does. Invented data only.
 import { createHash, createHmac } from 'node:crypto'
 import { createServer } from 'node:http'
+import { billingPages } from './payframe.mjs'
 import { sitePages } from './provider.mjs'
 import { relyingParty } from './webauthn.mjs'
 
@@ -243,10 +244,11 @@ async function passkeyApi(rp, path, req, res) {
 
 /**
  * Starts the site on a free loopback port; resolves to its base URL, the passkey relying party
- * (`rp`, for checks) and a stop function. `google` is the stand-in for Google's sign-in pages.
- * @param {string} google
+ * (`rp`, for checks) and a stop function. `google` is the stand-in for Google's sign-in pages,
+ * `pay` the stand-in payment provider's frames.
+ * @param {string} google @param {string} pay
  */
-export function startSite(google) {
+export function startSite(google, pay) {
   /** @type {ReturnType<typeof relyingParty> | null} */
   let rp = null
   /** @type {Record<string, string>} */
@@ -268,6 +270,9 @@ export function startSite(google) {
       const base = `http://localhost:${addr.port}`
       rp = relyingParty('localhost', base)
       signin = sitePages(base, google)
+      for (const [path, p] of Object.entries(billingPages(pay))) {
+        signin[path] = page(p.title, p.body, 'nb')
+      }
       resolve({ base, rp, stop: () => server.close() })
     })
   })

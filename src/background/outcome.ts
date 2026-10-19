@@ -70,10 +70,24 @@ export function failed(e: unknown): Shown {
   return { state: 'error', message: t('actError', text) }
 }
 
-/** The text for a card request that did not get an approval. */
-export function cardRefusal(answer: Answer | null): Shown {
+/**
+ * The text for a card request that did not get an approval. `setup`: a card for later payments,
+ * which an app made before it refuses as a request without an amount.
+ */
+export function cardRefusal(answer: Answer | null, setup = false): Shown {
   if (!answer || answer.decision === 'expired')
     return { state: 'expired', message: t('actExpired') }
+  if (setup) {
+    const bySetup: Partial<Record<string, Shown>> = {
+      setup_off: { state: 'denied', message: t('cardSetupOff') },
+      amount_missing: { state: 'error', message: t('cardSetupOldApp') },
+    }
+    const known = answer.error === undefined ? undefined : bySetup[answer.error]
+    if (known) return known
+    if (answer.decision === 'denied' && answer.error === undefined) {
+      return { state: 'denied', message: t('cardSetupDenied') }
+    }
+  }
   const byError: Partial<Record<string, Shown>> = {
     paused: { state: 'denied', message: paused(answer) },
     unsupported_version: { state: 'error', message: t('actOldProtocol') },

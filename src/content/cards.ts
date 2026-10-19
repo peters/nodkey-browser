@@ -87,6 +87,25 @@ export function findCard(
   const fields = Array.from(scopeOf(number).querySelectorAll<Field>('input, select')).filter(
     (el) => el !== number && usable(el, isVisible),
   )
+  return { number, ...partsOf(fields) }
+}
+
+/**
+ * The expiry, CVC and name fields of a page without a number field: a payment provider's frame
+ * that holds only some parts of the card. `null` when it has none.
+ */
+export function findCardParts(
+  root: Document,
+  isVisible: Visible = layoutVisible,
+): Omit<CardFields, 'number'> | null {
+  const fields = Array.from(root.querySelectorAll<Field>('input, select')).filter(
+    (el) => !(el instanceof HTMLInputElement && isCardNumberField(el)) && usable(el, isVisible),
+  )
+  const parts = partsOf(fields)
+  return Object.values(parts).some((f) => f !== null) ? parts : null
+}
+
+function partsOf(fields: Field[]): Omit<CardFields, 'number'> {
   const input = (el: Field): el is HTMLInputElement => el instanceof HTMLInputElement
   const by = (ac: string, re: RegExp, extra: (el: Field) => boolean = () => true) =>
     fields.find((el) => auto(el) === ac) ??
@@ -105,7 +124,6 @@ export function findCard(
       : by('cc-exp', EXPIRY, (el) => input(el) && el !== cvc && el !== month && el !== year)
   const holder = by('cc-name', HOLDER, (el) => input(el) && el.type !== 'password')
   return {
-    number,
     expiry: expiry && input(expiry) ? expiry : null,
     month: expiry ? null : month,
     year: expiry ? null : year,
@@ -149,6 +167,11 @@ function setPart(el: Field, n: number, kind: 'month' | 'year'): void {
 /** Fills `card` into `f` the way typing would. */
 export function fillCard(f: CardFields, card: Card): void {
   setValue(f.number, card.number)
+  fillParts(f, card)
+}
+
+/** Fills the expiry, the CVC and (when empty) the name. */
+export function fillParts(f: Omit<CardFields, 'number'>, card: Omit<Card, 'number'>): void {
   if (f.expiry) setValue(f.expiry, expiryText(f.expiry, card.exp_month, card.exp_year))
   if (f.month) setPart(f.month, card.exp_month, 'month')
   if (f.year) setPart(f.year, card.exp_year, 'year')
@@ -157,7 +180,7 @@ export function fillCard(f: CardFields, card: Card): void {
 }
 
 /** Empties the number, expiry and CVC again (the holder stays). */
-export function clearCard(f: CardFields): void {
+export function clearCard(f: Partial<CardFields> & Omit<CardFields, 'number'>): void {
   for (const el of [f.number, f.expiry, f.cvc]) if (el) setValue(el, '')
   for (const el of [f.month, f.year]) {
     if (el instanceof HTMLSelectElement) {

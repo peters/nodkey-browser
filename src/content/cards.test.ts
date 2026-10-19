@@ -1,5 +1,14 @@
 import { beforeEach, describe, expect, it } from 'vitest'
-import { clearCard, expiryText, fillCard, findCard, isCardNumberField, typedCard } from './cards'
+import {
+  clearCard,
+  expiryText,
+  fillCard,
+  fillParts,
+  findCard,
+  findCardParts,
+  isCardNumberField,
+  typedCard,
+} from './cards'
 
 const visible = () => true
 const CARD = {
@@ -17,6 +26,23 @@ function input(id: string): HTMLInputElement {
 describe('card fields', () => {
   beforeEach(() => {
     document.body.innerHTML = ''
+  })
+
+  it('fills the parts of a card that a payment provider puts in frames of their own', () => {
+    // The expiry frame, then the CVC frame: no number field in either.
+    document.body.innerHTML = `<input id="e" autocomplete="cc-exp" placeholder="MM / YY">`
+    expect(findCard(document, visible)).toBeNull()
+    const expiry = findCardParts(document, visible)
+    expect(expiry?.expiry?.id).toBe('e')
+    if (expiry) fillParts(expiry, CARD)
+    expect(input('e').value).toBe('03 / 30')
+    document.body.innerHTML = `<input id="c" name="cvc" inputmode="numeric">`
+    const cvc = findCardParts(document, visible)
+    if (cvc) fillParts(cvc, CARD)
+    expect(input('c').value).toBe('123')
+    // A frame with nothing of a card.
+    document.body.innerHTML = `<input id="q" name="search">`
+    expect(findCardParts(document, visible)).toBeNull()
   })
 
   it('finds the fields by autocomplete and fills them', () => {

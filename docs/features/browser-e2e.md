@@ -52,7 +52,10 @@ synthetic test site. It does not use the real relay or a real phone.
       the amount, the total and the origin, raises the total and waits for the
       empty card fields. Then it types a second test card, pays and saves the
       card. The fake phone opens the sealed card number, and the script
-      compares it.
+      compares it. Then it adds the card for later payments on `/billing`
+      (the card fields in a frame of the stand-in provider `js.pay.example`)
+      and pays 250 NOK on `/billing-split` (one provider frame for each
+      field).
    8. Opens `/passkey` and does [Passkeys](passkeys.md): a conditional request
       and a request without a click, which must not reach the phone, Create a
       passkey and Sign in with a passkey, then the same with PRF. The server of the test site examines
@@ -71,6 +74,10 @@ synthetic test site. It does not use the real relay or a real phone.
 
 - `--passkeys-only` pairs and then does only step 8. `--cards-only` pairs and
   then does only step 7. `--signin-only` pairs and then does only step 6.
+- The run starts a stand-in payment provider on `https://js.pay.example:<port>`
+  in the same way. Its frames tell the test page where their fields are and
+  what they hold (`postMessage`), because the driver cannot always read frames
+  of another site.
 - The run starts a stand-in for Google's sign-in pages on
   `https://accounts.google.com:<port>`, with a certificate that `openssl`
   makes for the run. The browsers resolve `accounts.google.com` to this

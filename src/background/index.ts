@@ -167,6 +167,11 @@ async function handle(msg: ToBackground, sender: chrome.runtime.MessageSender): 
     case 'save.dismiss':
       if (sender.tab) await actions.dismissOffer(sender.tab, msg.id, msg.never)
       return null
+    case 'card.start':
+      if (sender.tab && sender.url && !isExtensionPage(sender)) {
+        await cards.start(sender.tab, sender.frameId ?? 0, sender.url)
+      }
+      return null
     case 'card.fill':
       // Answer at once; the result arrives as the tab's activity. Only from the page's own frame.
       if (sender.tab && sender.url && !isExtensionPage(sender)) {

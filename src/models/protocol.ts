@@ -116,7 +116,8 @@ export interface CardAnswer {
   exp_month: number
   exp_year: number
   cvc?: string
-  approved_amount: Money
+  /** The most the person approved; absent for `purpose: setup` (no payment). */
+  approved_amount?: Money
 }
 
 /** The phone's passkey answer (base64url values): an assertion (get) or a new passkey (create). */
@@ -394,8 +395,8 @@ function parseCardAnswer(o: Record<string, unknown>): CardAnswer {
     number: str(o, 'number'),
     exp_month: int(o, 'exp_month', 1, 12),
     exp_year: int(o, 'exp_year', 2000, 2099),
-    approved_amount: parseMoney(o.approved_amount),
   }
+  if (o.approved_amount !== undefined) card.approved_amount = parseMoney(o.approved_amount)
   if (!/^\d{12,19}$/.test(card.number) || !/^\d{4}$/.test(card.last4)) {
     throw new ProtocolError('not a card number')
   }

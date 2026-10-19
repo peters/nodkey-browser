@@ -6,7 +6,17 @@
 import type { CardOffer, Reply, SaveOffer, ToBackground, ToContent } from '../models/messages'
 import { t } from '../i18n/t'
 import { belongsTo, mayFill } from '../utils/site'
-import { askCardSave, cardFill, cardSubmitted, isCardField, startPay } from './pay'
+import {
+  askCardSave,
+  cardClear,
+  cardFill,
+  cardParts,
+  cardSubmitted,
+  isCardField,
+  startPay,
+  totalNow,
+  watchTotal,
+} from './pay'
 import { fillCode, setValue } from './fill'
 import { findLogin, findOtp, isOtpField, submission } from './forms'
 import { smsPage } from './signin'
@@ -22,7 +32,10 @@ let ui: PageUi | null = null
 function page(): PageUi {
   ui ??= new PageUi((field) => {
     if (isCardField(field)) {
-      startPay(field, page(), send)
+      // A card field in a frame below the top page (a payment provider's frame, for example):
+      // the top page shows the card, with the shop of the address bar and its total.
+      if (window === window.top) startPay(field, page(), send)
+      else void send({ type: 'card.start' })
       return
     }
     if (isOtpField(field) || boxRow(field)) {
@@ -61,19 +74,26 @@ function isLoginField(el: EventTarget | null): el is HTMLInputElement {
   return login?.username === el
 }
 
+/** A field got the focus: the Nodkey button for a sign-in, code or card field. */
+function focused(target: EventTarget | null): void {
+  if (isCardField(target) && mayFill(location.href)) {
+    page().showKey(target, target, t('cardButton'))
+  } else if (isLoginField(target) && mayFill(location.href)) {
+    const code = isOtpField(target) || boxRow(target) !== null
+    const label = code && smsPage(document) ? t('smsButton') : t('fieldButton')
+    page().showKey(target, boxRow(target)?.at(-1) ?? target, label)
+  }
+}
+
 document.addEventListener(
   'focusin',
   (e) => {
-    if (isCardField(e.target) && mayFill(location.href)) {
-      page().showKey(e.target, e.target, t('cardButton'))
-    } else if (isLoginField(e.target) && mayFill(location.href)) {
-      const code = isOtpField(e.target) || boxRow(e.target) !== null
-      const label = code && smsPage(document) ? t('smsButton') : t('fieldButton')
-      page().showKey(e.target, boxRow(e.target)?.at(-1) ?? e.target, label)
-    }
+    focused(e.target)
   },
   true,
 )
+// A field that had the focus before this script ran (it runs when the page is loaded).
+focused(document.activeElement)
 
 document.addEventListener(
   'focusout',
@@ -120,6 +140,15 @@ chrome.runtime.onMessage.addListener((msg: ToContent, sender, sendResponse) => {
     sendResponse(cardFill(msg, send))
     return false
   }
+  if (msg.type === 'card.total') {
+    if (window !== window.top) return false
+    sendResponse(totalNow())
+    return false
+  }
+  if (msg.type === 'card.ask' && window === window.top) startPay(null, page(), send, msg)
+  if (msg.type === 'card.watch' && window === window.top) watchTotal(null, msg.approved, send)
+  if (msg.type === 'card.parts') cardParts(msg)
+  if (msg.type === 'card.clear') cardClear(msg)
   if (msg.type === 'activity') page().showActivity(msg.activity)
   if (msg.type === 'method') showMethod(msg, page())
   if (msg.type === 'save.prompt') ask(msg.offer)

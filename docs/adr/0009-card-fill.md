@@ -1,6 +1,6 @@
 # ADR-0009: Fill a payment card only for an amount that the person sees
 
-Status: Accepted.
+Status: Accepted. ADR-0013 changes decision 3 and 4 and the limit "Payment frames".
 Date: 2026-10-14.
 
 ## Context
