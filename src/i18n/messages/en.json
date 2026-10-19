@@ -97,6 +97,7 @@
   "optAdvanced": "Advanced",
   "optRelay": "Relay address",
   "optRelayHelp": "The relay forwards encrypted messages between this browser and your iPhone. Change it only if you run your own relay.",
+  "optRelayHttps": "Type an address that starts with https://. Plain http:// works only for a relay on this computer.",
   "optRelaySave": "Save relay",
   "optSaved": "Saved.",
   "loading": "Loading",

@@ -97,6 +97,7 @@
   "optAdvanced": "Avançado",
   "optRelay": "Endereço do relay",
   "optRelayHelp": "O relay encaminha mensagens criptografadas entre este navegador e seu iPhone. Mude-o só se você tiver seu próprio relay.",
+  "optRelayHttps": "Digite um endereço que comece com https://. http:// simples só funciona para um relay neste computador.",
   "optRelaySave": "Salvar relay",
   "optSaved": "Salvo.",
   "loading": "Carregando",

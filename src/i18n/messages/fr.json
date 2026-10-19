@@ -97,6 +97,7 @@
   "optAdvanced": "Avancé",
   "optRelay": "Adresse du relais",
   "optRelayHelp": "Le relais transmet des messages chiffrés entre ce navigateur et ton iPhone. Change-le seulement si tu as ton propre relais.",
+  "optRelayHttps": "Saisis une adresse qui commence par https://. Le simple http:// ne fonctionne que pour un relais sur cet ordinateur.",
   "optRelaySave": "Enregistrer le relais",
   "optSaved": "Enregistré.",
   "loading": "Chargement",

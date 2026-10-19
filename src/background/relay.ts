@@ -12,6 +12,7 @@ import {
   parsePairingCode,
   parseSealedBox,
 } from '../models/protocol'
+import { relayAddressOk } from '../utils/relay'
 import { sign } from './keys'
 
 /** A relay answer that was not what the call expects. */
@@ -52,9 +53,8 @@ export class Relay {
     private readonly fetcher: typeof fetch = fetch.bind(globalThis),
   ) {
     const trimmed = base.trim().replace(/\/+$/, '')
-    const url = new URL(trimmed)
-    if (url.protocol !== 'https:' && url.protocol !== 'http:') {
-      throw new Error('the relay address must start with https://')
+    if (!relayAddressOk(trimmed)) {
+      throw new Error('the relay address must start with https:// (http:// only on this computer)')
     }
     this.base = trimmed
   }
@@ -78,7 +78,14 @@ export class Relay {
       controller.abort()
     }, timeoutMs)
     try {
-      const init: RequestInit = { method, headers, signal: controller.signal, cache: 'no-store' }
+      // A relay never redirects: a redirect is an error, never followed.
+      const init: RequestInit = {
+        method,
+        headers,
+        signal: controller.signal,
+        cache: 'no-store',
+        redirect: 'error',
+      }
       if (body) init.body = new Uint8Array(body)
       const resp = await this.fetcher(this.base + path, init)
       return { status: resp.status, text: await resp.text() }

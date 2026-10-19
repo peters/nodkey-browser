@@ -97,6 +97,7 @@
   "optAdvanced": "Avansert",
   "optRelay": "Relé-adresse",
   "optRelayHelp": "Reléet sender krypterte meldinger mellom denne nettleseren og iPhonen. Endre det bare hvis du har ditt eget relé.",
+  "optRelayHttps": "Skriv en adresse som starter med https://. Vanlig http:// virker bare for et relé på denne datamaskinen.",
   "optRelaySave": "Lagre relé",
   "optSaved": "Lagret.",
   "loading": "Laster",

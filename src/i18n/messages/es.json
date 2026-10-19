@@ -97,6 +97,7 @@
   "optAdvanced": "Avanzado",
   "optRelay": "Dirección del relé",
   "optRelayHelp": "El relé reenvía mensajes cifrados entre este navegador y tu iPhone. Cámbialo solo si tienes tu propio relé.",
+  "optRelayHttps": "Escribe una dirección que empiece por https://. http:// sin cifrar solo sirve para un relé en este ordenador.",
   "optRelaySave": "Guardar relé",
   "optSaved": "Guardado.",
   "loading": "Cargando",

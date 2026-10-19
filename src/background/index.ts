@@ -5,6 +5,7 @@
 
 import init, { display_code } from '../wasm/nodkey.js'
 import type { Reply, ToBackground } from '../models/messages'
+import { relayAddressOk } from '../utils/relay'
 import { t } from '../i18n/t'
 import * as actions from './actions'
 import * as cards from './cards'
@@ -216,6 +217,9 @@ async function handle(msg: ToBackground, sender: chrome.runtime.MessageSender): 
       await unpair(msg.phoneId)
       return null
     case 'settings.set':
+      if (msg.patch.relay !== undefined && !relayAddressOk(msg.patch.relay)) {
+        throw new Error('the relay address must start with https://')
+      }
       return store.setSettings(msg.patch)
     case 'agent.rename': {
       const agent = await store.agent()

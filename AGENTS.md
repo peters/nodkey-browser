@@ -38,7 +38,7 @@ Shared company rules apply: `fintermobilityas/company` (checkout `~/github/compa
 | `npm run validate` | Lint, format check, type checks, tests and build |
 | `npm run build` | `dist/chromium`, `dist/firefox` and a zip of each; `dist/safari` for the Mac app |
 | `npm run store` | Check the store texts and render the store images into `store/out/` |
-| `scripts/safari.sh` | Build, sign and install the Safari Mac app on the Mac build host (after `npm run build`) |
+| `NODKEY_MAC_HOST=<ssh host> scripts/safari.sh` | Build, sign and install the Safari Mac app on the Mac build host (after `npm run build`) |
 | `npm run e2e -- --keep` | Real Chromium and Firefox on an isolated desktop |
 | `cargo test` | The WebAssembly crate's tests (native) |
 | `scripts/icons.sh` | Render the toolbar icons from `public/icons/logo.svg` (cairosvg) |

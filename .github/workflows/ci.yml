@@ -4,12 +4,20 @@ on:
     branches: [main]
   pull_request:
   workflow_dispatch:
+  # Weekly, so that a new advisory for a locked dependency shows without a push.
+  schedule:
+    - cron: '23 5 * * 1'
+# Read only: no job writes to the repository.
+permissions:
+  contents: read
 jobs:
   validate:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v7
-      - uses: actions/setup-node@v6
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@249970729cb0ef3589644e2896645e5dc5ba9c38 # v6.5.0
         with:
           node-version-file: .nvmrc
           cache: npm
@@ -21,15 +29,35 @@ jobs:
       - run: npm ci
       - run: npm run validate
       - run: cargo test --locked
-      - uses: actions/upload-artifact@v7
+      - uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
         with:
           name: nodkey-browser
           path: dist/nodkey-*.zip
+  audit:
+    name: Dependency audit
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@249970729cb0ef3589644e2896645e5dc5ba9c38 # v6.5.0
+        with:
+          node-version-file: .nvmrc
+      # The packages that go into the extension (vue); the build tools are not shipped.
+      - name: Audit npm packages
+        run: npm audit --omit=dev
+      # A fixed version from crates.io, built from its own lock file.
+      - name: Install cargo-audit
+        run: cargo install cargo-audit --version 0.22.2 --locked
+      # Fails on every RustSec advisory for a crate in Cargo.lock (the WebAssembly crate and the
+      # fake relay of the tests).
+      - name: Audit Cargo.lock
+        run: cargo audit
   horizon-pins:
     name: Horizon worker pins
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v7
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
           persist-credentials: false
       - name: Verify Horizon worker pins

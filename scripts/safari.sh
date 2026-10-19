@@ -1,12 +1,12 @@
 #!/usr/bin/env bash
 # Builds the Mac app that carries the extension into Safari (safari/, ADR-0008) on the Mac build
 # host and installs it in ~/Applications there.
-#   npm run build && scripts/safari.sh          # build, install and open the app
-#   NODKEY_MAC_HOST=other-mac scripts/safari.sh
+#   npm run build && NODKEY_MAC_HOST=<ssh host> scripts/safari.sh   # build, install and open the app
+# NODKEY_MAC_HOST is the SSH host name of the Mac (no default: no machine name in the repository).
 # The host needs Xcode, xcodegen and the signing keychain named in ~/.appstoreconnect/config.
 set -euo pipefail
 cd "$(dirname "$0")/.."
-HOST="${NODKEY_MAC_HOST:-fintermac}"
+HOST="${NODKEY_MAC_HOST:?Set NODKEY_MAC_HOST to the SSH host name of the Mac build host.}"
 REMOTE="${NODKEY_REMOTE:-github/nodkey-browser}"
 test -f dist/safari/manifest.json || { echo "Run npm run build first." >&2; exit 1; }
 

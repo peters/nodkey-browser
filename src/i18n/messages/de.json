@@ -97,6 +97,7 @@
   "optAdvanced": "Erweitert",
   "optRelay": "Relay-Adresse",
   "optRelayHelp": "Das Relay leitet verschlüsselte Nachrichten zwischen diesem Browser und deinem iPhone weiter. Ändere es nur, wenn du ein eigenes Relay betreibst.",
+  "optRelayHttps": "Gib eine Adresse ein, die mit https:// beginnt. Einfaches http:// funktioniert nur für ein Relay auf diesem Computer.",
   "optRelaySave": "Relay speichern",
   "optSaved": "Gespeichert.",
   "loading": "Lädt",

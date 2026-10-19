@@ -13,6 +13,7 @@ import { t } from '../../i18n/t'
 import type { Settings } from '../../models/messages'
 import { call } from '../../services/background'
 import { browserInfo } from '../../utils/browser'
+import { relayAddressOk } from '../../utils/relay'
 
 const { status, error, reload } = useStatus(() => undefined)
 // Safari grants website access in its own settings: permissions.request shows nothing there.
@@ -60,13 +61,8 @@ async function grantAccess() {
 }
 
 function saveRelay() {
-  try {
-    const url = new URL(relay.value.trim())
-    if (url.protocol !== 'https:' && url.hostname !== '127.0.0.1' && url.hostname !== 'localhost') {
-      throw new Error('https')
-    }
-  } catch {
-    feedback.value = { section: 'relay', ok: false, text: t('optRelayHelp') }
+  if (!relayAddressOk(relay.value)) {
+    feedback.value = { section: 'relay', ok: false, text: t('optRelayHttps') }
     return
   }
   void act('relay', { type: 'settings.set', patch: { relay: relay.value.trim() } })

@@ -97,6 +97,7 @@
   "optAdvanced": "Avancerat",
   "optRelay": "Reläadress",
   "optRelayHelp": "Reläet skickar krypterade meddelanden mellan den här webbläsaren och din iPhone. Ändra det bara om du har ett eget relä.",
+  "optRelayHttps": "Skriv en adress som börjar med https://. Vanlig http:// fungerar bara för ett relä på den här datorn.",
   "optRelaySave": "Spara relä",
   "optSaved": "Sparat.",
   "loading": "Laddar",

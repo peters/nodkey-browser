@@ -97,6 +97,7 @@
   "optAdvanced": "高级",
   "optRelay": "中继地址",
   "optRelayHelp": "中继在这个浏览器和你的 iPhone 之间转发加密消息。只有在你运行自己的中继时才需要更改。",
+  "optRelayHttps": "请输入以 https:// 开头的地址。普通 http:// 仅适用于这台电脑上的中继。",
   "optRelaySave": "保存中继",
   "optSaved": "已保存。",
   "loading": "正在载入",

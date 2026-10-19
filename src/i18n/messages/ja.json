@@ -97,6 +97,7 @@
   "optAdvanced": "詳細",
   "optRelay": "リレーのアドレス",
   "optRelayHelp": "リレーは、このブラウザと iPhone の間で暗号化されたメッセージを転送します。自分のリレーを運用している場合だけ変更してください。",
+  "optRelayHttps": "https:// で始まるアドレスを入力してください。http:// が使えるのは、このコンピュータ上のリレーだけです。",
   "optRelaySave": "リレーを保存",
   "optSaved": "保存しました。",
   "loading": "読み込み中",
