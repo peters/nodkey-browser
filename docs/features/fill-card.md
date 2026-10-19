@@ -107,8 +107,13 @@ run has a stand-in provider on `https://js.pay.example:<port>` (ADR-0013).
 ## Also check
 
 - Set `setup: false` (`PUT /_fake/cards`) and do steps 9 to 11. Result:
-  "Adding cards for later payments is off for this browser. Turn it on under
-  Agents in Nodkey on your iPhone." The frame stays empty.
+  "Adding cards for later payments is off for this browser. In Nodkey on your
+  iPhone, open Agents, then this browser, and turn on “Add cards for later
+  payments”." The frame stays empty.
+- Set `PUT /_fake/passcode` to `false` and do steps 1 to 4, or 9 to 11.
+  Result: "Your iPhone has no passcode, so Nodkey gives out no cards. You can
+  set one in Settings → Face ID & Passcode." The fields stay empty. Set it to
+  `true` again.
 - Set the limit to 100 NOK (`PUT /_fake/cards`). Do steps 1 to 4. Result: "The
   amount is above your limit for this browser. Your iPhone said no without
   asking you." The fields stay empty.

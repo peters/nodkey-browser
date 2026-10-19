@@ -210,6 +210,31 @@ describe('payment cards against the fake phone', () => {
       totalSource: 'user',
     })
     expect(activity()?.message).toContain('Adding cards for later payments is off')
+    expect(activity()?.message).toContain('turn on “Add cards for later payments”')
+  })
+
+  it('says calmly that a phone without a passcode gives no cards', async () => {
+    const cards = await import('../../src/background/cards')
+    await control('/_fake/passcode', false)
+    try {
+      const setup: FillMsg = {
+        type: 'card.fill',
+        purpose: 'setup',
+        amount: null,
+        pageTotal: null,
+        totalSource: 'user',
+      }
+      for (const msg of [fillMsg('499'), setup]) {
+        await cards.fill(tab, 0, SHOP, msg)
+        expect(activity()?.state).toBe('denied')
+        expect(activity()?.message).toBe(
+          'Your iPhone has no passcode, so Nodkey gives out no cards. You can set one in Settings → Face ID & Passcode.',
+        )
+      }
+      expect(toPage.some((m) => m.type === 'card.fill')).toBe(false)
+    } finally {
+      await control('/_fake/passcode', true)
+    }
   })
 
   it('pays into a payment frame of another site, named as via, from the top page', async () => {

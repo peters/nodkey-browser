@@ -42,10 +42,12 @@ payments" in `docs/agent-protocol.md`, peters/nodkey-cli#29). On the phone,
    own. After the fill, the background sends the expiry, the CVC and the name
    (never the number) to the frames of the tab. Only frames of the same origin
    fill them.
-6. Refusals: `setup_off` gives "Adding cards for later payments is off for this
-   browser. Turn it on under Agents in Nodkey on your iPhone." An app made
-   before `setup` refuses it as `amount_missing`; the extension then says
-   "Update Nodkey on your iPhone to add cards for later payments."
+6. Refusals: `setup_off` tells the person where to turn the setting on (Agents,
+   this browser, "Add cards for later payments"). An app made before `setup`
+   refuses it as `amount_missing`; the extension then says "Update Nodkey on
+   your iPhone to add cards for later payments." A phone without a passcode
+   gives no cards, for a payment or for later (`no_passcode`,
+   peters/nodkey#126); the extension says so and where to set a passcode.
 
 ## Consequences
 

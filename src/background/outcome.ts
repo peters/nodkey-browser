@@ -93,6 +93,8 @@ export function cardRefusal(answer: Answer | null, setup = false): Shown {
     unsupported_version: { state: 'error', message: t('actOldProtocol') },
     unsupported_kind: { state: 'error', message: t('actOldProtocol') },
     cards_off: { state: 'denied', message: t('cardOff') },
+    // A phone without a passcode gives no cards, for a payment or for later (peters/nodkey#126).
+    no_passcode: { state: 'denied', message: t('cardNoPasscode') },
     no_card: { state: 'denied', message: t('cardNone') },
     over_limit: { state: 'denied', message: t('cardOverLimit') },
     total_mismatch: { state: 'denied', message: t('cardTotalHigher') },
