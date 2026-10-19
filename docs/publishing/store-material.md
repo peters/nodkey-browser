@@ -89,6 +89,9 @@ review before the first public listing.
 
 Check `description` and the disclosures against this list for each release.
 Everything goes end-to-end encrypted to the person's iPhone, through the relay.
+The relay itself sees the IP address that the browser connects from. It keeps
+that address and its country with each request (2 minutes, up to 6 for an SMS
+code), so the iPhone can show where the request came from.
 
 | Request | When | What it holds |
 |---|---|---|

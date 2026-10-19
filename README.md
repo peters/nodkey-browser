@@ -64,7 +64,10 @@ your phone, and nothing leaves it until you approve with Face ID.
 The extension is an agent, like the `nodkey` command line. It pairs once with
 your iPhone and shows there with its own name, for example "Firefox on Linux".
 Requests go through the Nodkey relay, encrypted end to end. The relay sees no
-site, user name, password or code.
+site, user name, password or code. It sees the IP address that the browser
+connects from: it keeps that address and its country with the request, so your
+iPhone can show where the request came from, and deletes them with the request
+(after 2 minutes, up to 6 for an SMS code).
 
 The extension's private keys are browser keys that cannot be copied out. The
 protocol code is the same Rust code the `nodkey` command line uses, compiled to

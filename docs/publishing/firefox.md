@@ -144,7 +144,7 @@ the public listing.
      browser extension part of the privacy policy and the link
      `https://kh-labs.dev/nodkey/#privacy` (the source is
      `site/i18n/en.json` in the `kh-labs` repository, keys
-     `nkPrivacySummary`, `nkPBrowser` and `nkPCards`).
+     `nkPrivacySummary`, `nkPAgents`, `nkPBrowser` and `nkPCards`).
    - Notes to Reviewer: use the text below. Change the commit and the version.
 
      ```text
