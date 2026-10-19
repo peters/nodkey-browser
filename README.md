@@ -53,6 +53,11 @@ your phone, and nothing leaves it until you approve with Face ID.
   only if the total is still the same, and it leaves the fields again if the
   total goes up. Nodkey never clicks Pay. A card you type yourself can be saved
   in Nodkey.
+- **Add a card for later.** On a billing page with no total, Nodkey can add your
+  card for later payments, without an amount. This also works when the card
+  fields come from a payment provider such as Stripe: Nodkey shows the shop
+  from the address bar and the provider as "via". You turn this on for the
+  browser in Nodkey on your iPhone, and you approve each card with Face ID.
 - **See what you approve.** The notification on your iPhone can show a picture
   of the page. It is encrypted so that only your iPhone can see it.
 - **Save new passwords.** When you sign up or change a password, the extension
@@ -68,6 +73,12 @@ site, user name, password or code. It sees the IP address that the browser
 connects from: it keeps that address and its country with the request, so your
 iPhone can show where the request came from, and deletes them with the request
 (after 2 minutes, up to 6 for an SMS code).
+
+When you pair, the browser and your iPhone each show a six-digit check number.
+You confirm on both that the numbers are the same, so nobody on the way can put
+their own keys in between. After that, every request and every answer is signed,
+and the extension uses no answer that your iPhone did not sign. Pairing needs a
+current version of Nodkey on the iPhone.
 
 The extension's private keys are browser keys that cannot be copied out. The
 protocol code is the same Rust code the `nodkey` command line uses, compiled to
