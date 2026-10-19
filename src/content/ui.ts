@@ -63,9 +63,43 @@ ${payCss}
 @media (prefers-reduced-motion: reduce) { .spinner { animation: none; border-top-color: var(--accent); } }
 `
 
+/** How long the Nodkey button must be in place before a click counts (ms). */
+const SETTLE_MS = 250
+
+/** The host's own look, which the page's styles cannot change (inline and important). */
+const HOST_STYLE = [
+  'position:fixed',
+  'inset:0',
+  'pointer-events:none',
+  'z-index:2147483647',
+  'display:block',
+  'opacity:1',
+  'visibility:visible',
+  'filter:none',
+  'transform:none',
+  'clip-path:none',
+  'mask:none',
+  'mix-blend-mode:normal',
+]
+  .map((d) => `${d} !important`)
+  .join(';')
+
+/**
+ * Whether the browser can tell if an element is covered (IntersectionObserver v2, Chromium).
+ * Firefox cannot; there the click position and the styles are checked.
+ */
+const canTrackVisibility =
+  typeof IntersectionObserverEntry !== 'undefined' &&
+  'isVisible' in IntersectionObserverEntry.prototype
+
 export class PageUi {
   private readonly root: HTMLDivElement
+  private readonly host: HTMLElement
   private key: HTMLButtonElement | null = null
+  /** When the button came to its place (`performance.now()`). */
+  private keySince = 0
+  /** The latest visibility of the button from IntersectionObserver v2, where the browser has it. */
+  private keyVisible: boolean | null = null
   private keyTarget: HTMLInputElement | null = null
   /** The element the button sits by: the field, or the last box of a row of code boxes. */
   private keyAnchor: HTMLElement | null = null
@@ -74,8 +108,8 @@ export class PageUi {
 
   constructor(private readonly onKey: (field: HTMLInputElement) => void) {
     const host = document.createElement('nodkey-ui')
-    host.style.cssText =
-      'position:fixed;inset:0;pointer-events:none;z-index:2147483647;display:block'
+    host.style.cssText = HOST_STYLE
+    this.host = host
     const shadow = host.attachShadow({ mode: 'closed' })
     const style = document.createElement('style')
     style.textContent = CSS
@@ -109,17 +143,71 @@ export class PageUi {
         e.preventDefault()
       })
       key.addEventListener('click', (e) => {
-        if (e.isTrusted && this.keyTarget) this.onKey(this.keyTarget)
+        if (!e.isTrusted || !this.keyTarget) return
+        if (!this.seen(e, this.keySince, this.keyVisible)) {
+          this.covered()
+          return
+        }
+        this.onKey(this.keyTarget)
       })
       this.root.append(key)
       this.key = key
+      this.watchVisibility(key)
     }
     this.key.title = label
     this.key.setAttribute('aria-label', label)
+    if (this.keyTarget !== field || this.key.hidden) this.keySince = performance.now()
     this.keyTarget = field
     this.keyAnchor = anchor
     this.key.hidden = false
     this.placeKey()
+  }
+
+  /** Follows whether anything of the page covers the button (Chromium only). */
+  private watchVisibility(key: HTMLElement): void {
+    if (!canTrackVisibility) return
+    const observer = new IntersectionObserver(
+      (entries) => {
+        // `isVisible` is not in the DOM types yet.
+        const last = entries.at(-1)
+        const visible: unknown = last ? Reflect.get(last, 'isVisible') : undefined
+        if (typeof visible === 'boolean') this.keyVisible = visible
+      },
+      { trackVisibility: true, delay: 100 } as IntersectionObserverInit,
+    )
+    observer.observe(key)
+  }
+
+  /**
+   * Whether the person could see the Nodkey button they clicked (issue #9): it was in place for a
+   * moment, the page's styles do not hide Nodkey's layer, nothing of the page is over the button
+   * at the click, and (in Chromium) the browser does not report it as covered.
+   */
+  private seen(e: MouseEvent, since: number, visible: boolean | null): boolean {
+    if (performance.now() - since < SETTLE_MS) return false
+    if (visible === false) return false
+    for (let el: Element | null = this.host; el; el = el.parentElement) {
+      const style = getComputedStyle(el)
+      if (style.display === 'none' || style.visibility !== 'visible') return false
+      if (Number(style.opacity) < 1) return false
+    }
+    const own = getComputedStyle(this.host)
+    if (own.filter !== 'none' || own.transform !== 'none' || own.clipPath !== 'none') return false
+    // A click from the keyboard has no position.
+    if (e.detail === 0) return true
+    return document.elementFromPoint(e.clientX, e.clientY) === this.host
+  }
+
+  /** A click on a button that the page covered or hid: nothing is asked, and the person reads why. */
+  private covered(): void {
+    this.hideKey()
+    this.showActivity({
+      kind: 'login',
+      state: 'error',
+      site: location.hostname,
+      message: t('keyCovered'),
+      at: Date.now(),
+    })
   }
 
   hideKey(): void {
@@ -139,8 +227,14 @@ export class PageUi {
     const size = inside ? Math.min(28, Math.max(20, r.height - 8)) : 28
     this.key.style.width = `${size}px`
     this.key.style.height = `${size}px`
-    this.key.style.left = `${inside ? r.right - size - 6 : r.right + 8}px`
-    this.key.style.top = `${r.top + (r.height - size) / 2}px`
+    const left = `${inside ? r.right - size - 6 : r.right + 8}px`
+    const top = `${r.top + (r.height - size) / 2}px`
+    // A button that moves under the pointer must be in place a moment before a click counts.
+    if (this.key.style.left !== left || this.key.style.top !== top) {
+      this.keySince = performance.now()
+    }
+    this.key.style.left = left
+    this.key.style.top = top
   }
 
   private newCard(label: string, className = ''): HTMLDivElement {
@@ -244,8 +338,15 @@ export class PageUi {
     key.innerHTML = LOGO
     key.title = label
     key.setAttribute('aria-label', label)
+    const since = performance.now()
     key.addEventListener('click', (e) => {
-      if (e.isTrusted) onClick()
+      if (!e.isTrusted) return
+      if (!this.seen(e, since, null)) {
+        this.hideStepKey()
+        this.covered()
+        return
+      }
+      onClick()
     })
     this.root.append(key)
     this.stepKey = key

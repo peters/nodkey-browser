@@ -35,7 +35,9 @@ website. Thus the page must not choose the origin.
    - a frame that is not the top frame, unless the frame and all its
      ancestors have the origin of the top frame,
    - an `rpId` that is not the host or a parent domain of the host, or that
-     has no dot (`localhost` is the exception).
+     has no dot (`localhost` is the exception),
+   - an `rpId` that is a public suffix (`co.uk`, `github.io`), from the
+     Public Suffix List in `nodkey-proto` (added 2026-10-19, issue #11).
 5. A conditional request (`mediation: "conditional"`) never goes to the phone.
    It waits until the page aborts it. Thus a page load cannot send a request
    to the phone. A silent request is refused.
@@ -67,6 +69,13 @@ website. Thus the page must not choose the origin.
     authenticator without PRF. The person approves two times. A PRF answer
     with a lease other than `once` is refused. The outputs are secret keys: the
     extension does not keep or log them.
+11. User activation (added 2026-10-19, issue #11): the bridge sends a
+    `create` or a modal `get` to the background only while the page has
+    transient user activation (`navigator.userActivation.isActive`: a click
+    or a key press in the last seconds). Else the page gets `NotAllowedError`
+    and nothing goes to the phone. The bridge reads this in the isolated
+    world of the content script. A page script cannot change it, and a page
+    that sends the request event itself gets the same check.
 
 ## Consequences
 
@@ -77,8 +86,8 @@ website. Thus the page must not choose the origin.
   `NotAllowedError`. `excluded` gives `InvalidStateError`.
 - The relay has no way to cancel a request. When the page aborts, the phone
   can still show the request. The extension ignores a late answer.
-- The bridge has no public suffix list. An `rpId` such as `co.uk` passes the
-  extension. The passkey is then only usable on that `rpId`, and the phone
-  shows the origin.
+- A page cannot ask the phone for a passkey when it loads. A site that starts
+  a modal sign-in by itself gets `NotAllowedError`; the person then clicks its
+  passkey button.
 - While the setting is on, the passkeys of the browser and of other
   extensions do not get the `publicKey` requests of pages.

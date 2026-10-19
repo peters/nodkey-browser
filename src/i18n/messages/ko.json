@@ -26,6 +26,7 @@
   "fillLogin": "로그인 입력",
   "fillCode": "코드 입력",
   "fieldButton": "Nodkey로 입력",
+  "keyCovered": "이 페이지의 무언가가 버튼을 가리고 있어서 Nodkey가 아무것도 하지 않았어요. 대신 도구 모음의 Nodkey 버튼을 클릭하세요.",
   "actWaiting": "iPhone에서 승인하세요",
   "actWaitingHint": "요청은 최대 2분 동안 기다려요.",
   "actFilledLogin": "$1 로그인을 입력했어요.",

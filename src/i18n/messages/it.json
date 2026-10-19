@@ -26,6 +26,7 @@
   "fillLogin": "Inserisci credenziali",
   "fillCode": "Inserisci codice",
   "fieldButton": "Inserisci con Nodkey",
+  "keyCovered": "Nodkey non ha fatto nulla: qualcosa in questa pagina copriva il suo pulsante. Fai clic sul pulsante Nodkey nella barra degli strumenti.",
   "actWaiting": "Approva sul tuo iPhone",
   "actWaitingHint": "La richiesta attende fino a due minuti.",
   "actFilledLogin": "Credenziali di $1 inserite.",

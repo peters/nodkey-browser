@@ -26,6 +26,7 @@
   "fillLogin": "Fill login",
   "fillCode": "Fill code",
   "fieldButton": "Fill with Nodkey",
+  "keyCovered": "Nodkey did nothing: something on this page was over its button. Click the Nodkey button in the toolbar instead.",
   "actWaiting": "Approve on your iPhone",
   "actWaitingHint": "The request waits up to two minutes.",
   "actFilledLogin": "Filled the login for $1.",

@@ -36,11 +36,11 @@ export function noteClick(e: MouseEvent, send: Send): void {
   if (provider) void send({ type: 'signin.clicked', provider })
 }
 
-function askRemember(offer: MethodOffer, ui: PageUi, send: Send): void {
+function askRemember(offer: MethodOffer, ui: () => PageUi, send: Send): void {
   // Still on the sign-in page: the sign-in with the provider did not finish.
   if (providerButtons(document).some((b) => b.provider === offer.provider)) return
   if (findLogin(document)?.password) return
-  ui.askSave(
+  ui().askSave(
     { site: offer.site, username: '' },
     (choice) => {
       if (choice === 'save') {
@@ -55,13 +55,16 @@ function askRemember(offer: MethodOffer, ui: PageUi, send: Send): void {
   )
 }
 
-/** On a page load (top frame): the question after a provider sign-in, or the provider hint. */
-export async function pageLoaded(ui: PageUi, send: Send): Promise<boolean> {
+/**
+ * On a page load (top frame): the question after a provider sign-in, or the provider hint. `ui`
+ * makes Nodkey's layer in the page only when there is something to show.
+ */
+export async function pageLoaded(ui: () => PageUi, send: Send): Promise<boolean> {
   const info = await send<SigninPage>({ type: 'signin.page' })
   // The code page after Nodkey chose a code at a second step.
   if (info?.fillCode && findOtp(document).length > 0) void send({ type: 'fill.code' })
   if (info?.via) {
-    ui.showActivity({
+    ui().showActivity({
       kind: 'login',
       state: 'approved',
       site: info.via.site,

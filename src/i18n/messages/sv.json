@@ -26,6 +26,7 @@
   "fillLogin": "Fyll i inloggning",
   "fillCode": "Fyll i kod",
   "fieldButton": "Fyll i med Nodkey",
+  "keyCovered": "Nodkey gjorde ingenting: något på sidan låg över knappen. Klicka på Nodkey-knappen i verktygsfältet i stället.",
   "actWaiting": "Godkänn på din iPhone",
   "actWaitingHint": "Förfrågan väntar i upp till två minuter.",
   "actFilledLogin": "Fyllde i inloggningen för $1.",

@@ -38,7 +38,9 @@ synthetic test site. It does not use the real relay or a real phone.
       the right of the last box.
    5. Opens `/signup`, types a new user name and password and submits. Then it
       answers Save in the save question with the Enter key. The fake phone
-      opens the sealed password, and the script compares it.
+      opens the sealed password, and the script compares it. Then it does
+      [A covered button](covered-button.md) on `/covered` (the box over the
+      button in Chromium only).
    6. Does [Sign-in methods](sign-in-methods.md): "Sign in with Google" on
       `/federated`, the Google login on the stand-in Google pages, the Nodkey
       button at "Check your phone" and the question to remember the method on
@@ -52,8 +54,8 @@ synthetic test site. It does not use the real relay or a real phone.
       card. The fake phone opens the sealed card number, and the script
       compares it.
    8. Opens `/passkey` and does [Passkeys](passkeys.md): a conditional request
-      that must not reach the phone, Create a passkey and Sign in with a
-      passkey, then the same with PRF. The server of the test site examines
+      and a request without a click, which must not reach the phone, Create a
+      passkey and Sign in with a passkey, then the same with PRF. The server of the test site examines
       the passkey, the ES256 signature and the PRF output. In Chromium, the script then turns the passkey setting off and
       makes sure that the page has the passkeys of the browser again.
 

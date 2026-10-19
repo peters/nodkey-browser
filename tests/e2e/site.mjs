@@ -137,6 +137,33 @@ const PAGES = {
     <button id="create">Create account</button></form>`,
   ),
   '/welcome': page('Welcome', '<p>You are signed in to the test site.</p>'),
+  // A sign-in page that hides Nodkey's button when the password field gets the focus:
+  // ?mode=fade makes Nodkey's layer transparent, ?mode=cover lays an element over the button that
+  // lets clicks through (docs/features/covered-button.md).
+  '/covered': page(
+    'Sign in',
+    `<form method="post" action="/welcome">
+    <label for="email">E-mail</label><input id="email" name="email" type="email" autocomplete="username">
+    <label for="password">Password</label><input id="password" name="password" type="password" autocomplete="current-password">
+    <button>Sign in</button></form>
+    <script>
+    const mode = new URLSearchParams(location.search).get('mode')
+    document.getElementById('password').addEventListener('focus', () => setTimeout(() => {
+      const layer = document.querySelector('nodkey-ui')
+      if (mode === 'fade' && layer) layer.style.setProperty('opacity', '0', 'important')
+      if (mode === 'cover') {
+        const r = document.getElementById('password').getBoundingClientRect()
+        const d = document.createElement('div')
+        d.id = 'cover'
+        d.textContent = 'Free gift'
+        Object.assign(d.style, { position: 'fixed', left: r.right - 70 + 'px', top: r.top - 6 + 'px',
+          width: '90px', height: r.height + 12 + 'px', background: '#ffcc00', zIndex: '2147483647',
+          pointerEvents: 'none' })
+        document.documentElement.append(d)
+      }
+    }, 100))
+    </script>`,
+  ),
   // A checkout in Norwegian ("kr" is NOK): the total, a button that raises it, and card fields.
   '/checkout': page(
     'Kasse',

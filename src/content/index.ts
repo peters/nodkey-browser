@@ -15,6 +15,10 @@ import { PageUi } from './ui'
 
 let ui: PageUi | null = null
 
+/**
+ * Nodkey's layer in the page. It is made only when there is something to show (a field got the
+ * focus, a card or a question), so a page cannot see from a load alone that Nodkey is installed.
+ */
 function page(): PageUi {
   ui ??= new PageUi((field) => {
     if (isCardField(field)) {
@@ -141,7 +145,7 @@ async function offerSave(): Promise<void> {
     askCardSave(card, page(), send)
     return
   }
-  await pageLoaded(page(), send)
+  await pageLoaded(page, send)
 }
 
 let lastSubmit = 0

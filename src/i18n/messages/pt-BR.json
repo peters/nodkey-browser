@@ -26,6 +26,7 @@
   "fillLogin": "Preencher login",
   "fillCode": "Preencher código",
   "fieldButton": "Preencher com o Nodkey",
+  "keyCovered": "O Nodkey não fez nada: algo nesta página estava sobre o botão. Clique no botão do Nodkey na barra de ferramentas.",
   "actWaiting": "Aprove no seu iPhone",
   "actWaitingHint": "A solicitação espera até dois minutos.",
   "actFilledLogin": "Login de $1 preenchido.",

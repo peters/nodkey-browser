@@ -16,6 +16,7 @@ and it needs the owner.
 | [Pairing in Chromium](pairing-chromium.md) | Pair from the popup; compare the check number | All |
 | [Pairing in Firefox](pairing-firefox.md) | First-run page; set the relay; pair by hand | None |
 | [Fill a login](fill-login.md) | The Nodkey button in a sign-in field; the fill; the status card | All |
+| [A covered button](covered-button.md) | No Nodkey layer before a focus; no request from a hidden or covered button | All |
 | [Fill a code](fill-code.md) | One code field and a row of six boxes | All |
 | [Save a new login](save-login.md) | The save question, Save, and the sealed password | All |
 | [Passkeys](passkeys.md) | Create a passkey and sign in with it; the server examines the signature; PRF | All |

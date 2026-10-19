@@ -26,6 +26,7 @@
   "fillLogin": "ログインを入力",
   "fillCode": "コードを入力",
   "fieldButton": "Nodkey で入力",
+  "keyCovered": "このページの何かがボタンに重なっていたため、Nodkey は何もしませんでした。代わりにツールバーの Nodkey ボタンをクリックしてください。",
   "actWaiting": "iPhone で承認してください",
   "actWaitingHint": "リクエストは最大 2 分間待ちます。",
   "actFilledLogin": "$1 のログインを入力しました。",

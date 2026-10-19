@@ -1,7 +1,8 @@
 /**
  * The passkey bridge (content script, document start): carries the page script's calls to the
- * background on a `passkey` port and the answers back. A closed port cancels the request, also
- * when the page goes away. One call at a time per frame.
+ * background on a `passkey` port and the answers back, only after a click or a key press on the
+ * page. A closed port cancels the request, also when the page goes away. One call at a time per
+ * frame.
  */
 
 import {
@@ -41,10 +42,29 @@ function sameOriginAncestors(): boolean {
   }
 }
 
+/**
+ * True right after the person clicked or typed on the page (transient user activation). This
+ * world reads the browser's own state; the page script cannot change it, and the page could
+ * send the request event without its script.
+ */
+function activated(): boolean {
+  return (navigator.userActivation as UserActivation | undefined)?.isActive === true
+}
+
 window.addEventListener(PAGE_REQUEST, (e) => {
   const msg = parse(e)
   if (!msg) return
   const { id } = msg
+  // Only create and modal get come here (a conditional get waits in the page). Each needs a click
+  // or a key press on the page, so a page cannot ask the phone by itself (issue #11).
+  if (!activated()) {
+    reply(id, {
+      ok: false,
+      name: 'NotAllowedError',
+      message: 'a passkey request needs a click or a key press on the page',
+    })
+    return
+  }
   if (open.size > 0) {
     reply(id, { ok: false, name: 'NotAllowedError', message: 'a passkey request is pending' })
     return

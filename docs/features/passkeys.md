@@ -19,36 +19,42 @@ makes ES256 passkeys and signs as the app does.
    Result: `isConditionalMediationAvailable()` is `false`. The request stops
    with `AbortError`. The fake relay (`/_fake/seen`) has no passkey request.
 
-3. Click "Create a passkey".
+3. In the console of the page, wait 6 seconds, then call
+   `navigator.credentials.create` without a click on the page.
+
+   Result: The call stops with `NotAllowedError`. No card shows. The fake
+   relay has no passkey request.
+
+4. Click "Create a passkey".
 
    Result: A card shows at the top right: "Approve on your iPhone". Then the
    status shows "Registered" and the user name. The card shows "Saved a new
    passkey for localhost in Nodkey." (screenshot)
 
-4. Click "Sign in with a passkey".
+5. Click "Sign in with a passkey".
 
    Result: The status shows "Signed in as" and the user name. The server of the
    test site examined `clientDataJSON`, the authenticator data and the ES256
-   signature with the public key from step 3. (screenshot)
+   signature with the public key from step 4. (screenshot)
 
-5. Examine the passkey requests in `/_fake/seen`.
+6. Examine the passkey requests in `/_fake/seen`.
 
    Result: The `origin` in each `client_data_json` is the origin of the test
    site.
 
-6. Click "Create a passkey with PRF".
+7. Click "Create a passkey with PRF".
 
    Result: The page asks for a new passkey with `extensions.prf` and an input.
    The status shows "PRF enabled for" and the user name. The server of the test
    site examined the PRF output: it is HMAC-SHA256 of the fixed `credRandom` of
    the fake phone (the nodkey-proto vectors) and the salt of the input.
 
-7. Click "Unlock with PRF".
+8. Click "Unlock with PRF".
 
    Result: The status shows "PRF key for" and the user name. The output is the
-   same as in step 6. The request in `/_fake/seen` has `prf.eval.first`.
+   same as in step 7. The request in `/_fake/seen` has `prf.eval.first`.
 
-8. In the settings page, turn off "Use passkeys from Nodkey". Load `/passkey`
+9. In the settings page, turn off "Use passkeys from Nodkey". Load `/passkey`
    again.
 
    Result: `navigator.credentials.get` is the function of the browser

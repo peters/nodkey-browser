@@ -26,6 +26,7 @@
   "fillLogin": "Rellenar acceso",
   "fillCode": "Rellenar código",
   "fieldButton": "Rellenar con Nodkey",
+  "keyCovered": "Nodkey no hizo nada: algo de esta página estaba encima de su botón. Haz clic en el botón de Nodkey de la barra de herramientas.",
   "actWaiting": "Aprueba en tu iPhone",
   "actWaitingHint": "La solicitud espera hasta dos minutos.",
   "actFilledLogin": "Acceso de $1 rellenado.",

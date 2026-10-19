@@ -26,6 +26,7 @@
   "fillLogin": "Udfyld login",
   "fillCode": "Udfyld kode",
   "fieldButton": "Udfyld med Nodkey",
+  "keyCovered": "Nodkey gjorde ingenting: noget på siden lå over knappen. Klik på Nodkey-knappen i værktøjslinjen i stedet.",
   "actWaiting": "Godkend på din iPhone",
   "actWaitingHint": "Anmodningen venter i op til to minutter.",
   "actFilledLogin": "Udfyldte login for $1.",

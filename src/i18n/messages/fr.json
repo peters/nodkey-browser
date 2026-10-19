@@ -26,6 +26,7 @@
   "fillLogin": "Remplir l’identifiant",
   "fillCode": "Remplir le code",
   "fieldButton": "Remplir avec Nodkey",
+  "keyCovered": "Nodkey n’a rien fait : un élément de cette page recouvrait son bouton. Clique plutôt sur le bouton Nodkey dans la barre d’outils.",
   "actWaiting": "Approuve sur ton iPhone",
   "actWaitingHint": "La demande attend jusqu’à deux minutes.",
   "actFilledLogin": "Identifiant de $1 rempli.",

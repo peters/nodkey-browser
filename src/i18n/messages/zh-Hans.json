@@ -26,6 +26,7 @@
   "fillLogin": "填写登录信息",
   "fillCode": "填写验证码",
   "fieldButton": "用 Nodkey 填写",
+  "keyCovered": "这个页面上有内容盖住了按钮，所以 Nodkey 没有执行任何操作。请改为点击工具栏中的 Nodkey 按钮。",
   "actWaiting": "请在 iPhone 上批准",
   "actWaitingHint": "请求最多等待两分钟。",
   "actFilledLogin": "已填写 $1 的登录信息。",

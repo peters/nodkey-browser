@@ -14,6 +14,7 @@ import { homedir } from 'node:os'
 import { join, resolve } from 'node:path'
 import puppeteer from 'puppeteer-core'
 import { cardFlow } from './cards.mjs'
+import { coveredFlow } from './covered.mjs'
 import { findVnc, startDesktop } from './desktop.mjs'
 import { startGoogle } from './provider.mjs'
 import { startRelayProxy } from './relayproxy.mjs'
@@ -80,7 +81,8 @@ async function extensionPage(browser, url) {
  */
 async function clickKey(page, selector, anchor = selector) {
   await page.click(selector)
-  await sleep(300)
+  // The button takes a click only after it was in place for a moment (issue #9).
+  await sleep(600)
   const r = await page.$eval(anchor, (el) => {
     const b = el.getBoundingClientRect()
     return { right: b.right, top: b.top, width: b.width, height: b.height }
@@ -245,6 +247,28 @@ async function passkeyFlow(name, browser, relay, site) {
     throw new Error(`conditional request: ${JSON.stringify(conditional)}`)
   }
   if ((await seen()).length !== before) throw new Error('a conditional request reached the phone')
+
+  // The driver's own call counts as a click: wait until that activation is over (5 s).
+  log(name, 'a passkey request without a click: refused before the phone')
+  const unasked = await tab.evaluate(async () => {
+    await new Promise((r) => setTimeout(r, 6000))
+    return navigator.credentials
+      .create({
+        publicKey: {
+          rp: { name: 'Test site' },
+          user: { id: new Uint8Array(16), name: 'alex@example.com', displayName: 'Alex' },
+          challenge: new Uint8Array(32),
+          pubKeyCredParams: [{ type: 'public-key', alg: -7 }],
+        },
+      })
+      .then(
+        () => 'resolved',
+        (e) => e.name,
+      )
+  })
+  if (unasked !== 'NotAllowedError') throw new Error(`request without a click: ${unasked}`)
+  if ((await seen()).length !== before)
+    throw new Error('a request without a click reached the phone')
 
   log(name, 'create a passkey')
   await tab.$eval('#email', (el, v) => (el.value = v), user)
@@ -430,7 +454,10 @@ async function main() {
       const c = await chromium(desktop.env, site.base, relay)
       open.push(c.browser)
       const name = await pairByDriver('Chromium', c.browser, c.base, relay)
-      if (!only) await flow('Chromium', c.browser, relay, site.base, name)
+      if (!only) {
+        await flow('Chromium', c.browser, relay, site.base, name)
+        await coveredFlow('Chromium', c.browser, relay, site.base, helpers, true)
+      }
       if (!only || signinOnly) {
         await signinFlow('Chromium', c.browser, relay, site.base, name, helpers, c.activities)
       }
@@ -444,7 +471,10 @@ async function main() {
       const f = await firefox(desktop.env)
       open.push(f.browser)
       const name = await pairByHand('Firefox', relay)
-      if (!only) await flow('Firefox', f.browser, relay, site.base, name)
+      if (!only) {
+        await flow('Firefox', f.browser, relay, site.base, name)
+        await coveredFlow('Firefox', f.browser, relay, site.base, helpers, false)
+      }
       if (!only || signinOnly) {
         await signinFlow('Firefox', f.browser, relay, site.base, name, helpers, null)
       }

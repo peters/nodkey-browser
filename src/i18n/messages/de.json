@@ -26,6 +26,7 @@
   "fillLogin": "Login ausfüllen",
   "fillCode": "Code ausfüllen",
   "fieldButton": "Mit Nodkey ausfüllen",
+  "keyCovered": "Nodkey hat nichts getan: Etwas auf dieser Seite lag über der Schaltfläche. Klicke stattdessen auf die Nodkey-Schaltfläche in der Symbolleiste.",
   "actWaiting": "Bestätige auf deinem iPhone",
   "actWaitingHint": "Die Anfrage wartet bis zu zwei Minuten.",
   "actFilledLogin": "Login für $1 ausgefüllt.",
