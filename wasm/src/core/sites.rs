@@ -41,6 +41,13 @@ pub fn may_fill(page: &str, sites_json: &str) -> Result<bool, String> {
     Ok(site::may_fill(page, &sites))
 }
 
+/// Whether two URLs or hosts are the same website: equal registrable domains (or, without one,
+/// equal hosts). `login.example.com` and `example.com` are; `example.com` and `example.org` are
+/// not.
+pub fn same_site(a: &str, b: &str) -> bool {
+    site::same_site(a, b)
+}
+
 /// Whether `host` is a public suffix: an ending such as `co.uk` or a shared hosting domain such as
 /// `github.io` (`localhost` counts as one; the caller allows it for passkeys).
 pub fn is_public_suffix(host: &str) -> bool {

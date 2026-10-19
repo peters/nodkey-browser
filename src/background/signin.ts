@@ -5,7 +5,7 @@
  * sign-in?" after a sign-in with a provider.
  */
 
-import { may_fill_via, second_step_pick, signin_site } from '../wasm/nodkey.js'
+import { may_fill_via, same_site, second_step_pick, signin_site } from '../wasm/nodkey.js'
 import type { MethodOffer, SigninPage, ToContent, ViaHint } from '../models/messages'
 import type { Answer, SecondStep, SecondStepOrder, SignInMethod, Via } from '../models/protocol'
 import { t } from '../i18n/t'
@@ -223,7 +223,7 @@ export async function page(tab: chrome.tabs.Tab, frameUrl: string): Promise<Sign
   const out: SigninPage = { offer: null, via: null, fillCode: false }
   const host = siteOf(frameUrl)
   if (tab.id === undefined || !host) return out
-  out.fillCode = takeCodeNext(tab.id)
+  out.fillCode = takeCodeNext(tab.id, frameUrl)
   const h = live(tab.id)
   if (h && !h.hinted && viaAllowed(host, h)) {
     h.hinted = true
@@ -339,18 +339,25 @@ export async function stepPick(
   const pick = (second_step_pick(JSON.stringify(order), JSON.stringify(offered)) ??
     null) as SecondStep | null
   // The code page may load as a new page: it fills the code when it comes.
-  if (pick === 'totp') codeNext.set(tabId, Date.now())
+  if (pick === 'totp') codeNext.set(tabId, { at: Date.now(), url: frameUrl })
   return pick
 }
 
-/** Tabs where Nodkey chose a code at a second step, for the code page that follows. */
-const codeNext = new Map<number, number>()
+/**
+ * Tabs where Nodkey chose a code at a second step, with the page of the choice, for the code
+ * page that follows.
+ */
+const codeNext = new Map<number, { at: number; url: string }>()
 
-/** Whether the page that loaded should fill a code now (once, within 30 seconds of the choice). */
-function takeCodeNext(tabId: number): boolean {
-  const at = codeNext.get(tabId)
+/**
+ * Whether the page that loaded at `frameUrl` should fill a code now: once, within 30 seconds of
+ * the choice, and only on the website of the choice. A page of another site that loads in the
+ * tab in that time does not ask (issue #10).
+ */
+function takeCodeNext(tabId: number, frameUrl: string): boolean {
+  const choice = codeNext.get(tabId)
   codeNext.delete(tabId)
-  return at !== undefined && Date.now() - at < 30_000
+  return choice !== undefined && Date.now() - choice.at < 30_000 && same_site(choice.url, frameUrl)
 }
 
 /** A code fill started: the choice is done. */

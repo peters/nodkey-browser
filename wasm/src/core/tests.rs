@@ -461,4 +461,17 @@ fn fills_only_on_the_answered_accounts_website() {
         r#"["vg.no"]"#
     );
     assert_eq!(sites::fill_only_on("vg.no", "{}").unwrap(), "[]");
+    // The same website for a code fill after a second-step choice.
+    assert!(sites::same_site(
+        "https://accounts.example.com/step",
+        "https://example.com/code"
+    ));
+    assert!(!sites::same_site(
+        "https://example.com/step",
+        "https://example.org/code"
+    ));
+    assert!(!sites::same_site(
+        "https://alice.github.io/",
+        "https://bob.github.io/"
+    ));
 }

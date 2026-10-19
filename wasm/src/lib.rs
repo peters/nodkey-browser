@@ -218,6 +218,11 @@ pub fn may_fill(page: &str, sites_json: &str) -> Result<bool, JsError> {
 }
 
 #[wasm_bindgen]
+pub fn same_site(a: &str, b: &str) -> bool {
+    core::sites::same_site(a, b)
+}
+
+#[wasm_bindgen]
 pub fn is_public_suffix(host: &str) -> bool {
     core::sites::is_public_suffix(host)
 }

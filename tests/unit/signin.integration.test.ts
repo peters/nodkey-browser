@@ -189,6 +189,21 @@ describe('sign-in methods against the fake phone', () => {
     expect(await signin.stepPick(8, vg.url ?? '', ['app_prompt', 'sms'])).toBeNull()
   })
 
+  it('fills the code after a choice only on the website of the choice', async () => {
+    const actions = await import('../../src/background/actions')
+    const signin = await import('../../src/background/signin')
+    const vg = tabAt('https://www.vg.no/login', 9)
+    await actions.fill('login', vg, 0, undefined, vg.url)
+    expect(await signin.stepPick(9, vg.url ?? '', ['sms', 'totp'])).toBe('totp')
+    // Another site loads in the tab within the 30 seconds: it does not ask (issue #10).
+    const other = tabAt('https://vg.example/code', 9)
+    expect((await signin.page(other, other.url ?? '')).fillCode).toBe(false)
+    // The choice is used up; a new choice and the code page of the same website fill.
+    expect((await signin.page(vg, 'https://login.vg.no/code')).fillCode).toBe(false)
+    expect(await signin.stepPick(9, vg.url ?? '', ['sms', 'totp'])).toBe('totp')
+    expect((await signin.page(vg, 'https://login.vg.no/code')).fillCode).toBe(true)
+  })
+
   it('asks to remember a sign-in with a provider and sends only the site and provider', async () => {
     const signin = await import('../../src/background/signin')
     const site = tabAt('https://tools.example.com/login', 9)
