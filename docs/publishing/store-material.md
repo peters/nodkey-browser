@@ -91,7 +91,8 @@ Check `description` and the disclosures against this list for each release.
 Everything goes end-to-end encrypted to the person's iPhone, through the relay.
 The relay itself sees the IP address that the browser connects from. It keeps
 that address and its country with each request (2 minutes, up to 6 for an SMS
-code), so the iPhone can show where the request came from.
+code), so the iPhone can show where the request came from. The disclosures
+declare this as "Location" (Chrome) and `locationInfo` (Firefox), from 0.3.0.
 
 | Request | When | What it holds |
 |---|---|---|

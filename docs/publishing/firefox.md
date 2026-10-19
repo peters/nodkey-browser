@@ -110,6 +110,12 @@ Status on 2026-10-16: version 0.2.2 is the first listed version. Its status is
 The add-on had only unlisted versions before. The first listed version makes
 the public listing.
 
+Version 0.3.0 adds `locationInfo` to `data_collection_permissions`: the relay
+keeps the IP address that the browser connects from and its country with each
+request (2 minutes, up to 6 for an SMS code), so the iPhone can show where the
+request came from. The owner decided this on 2026-10-19. With the 0.3.0
+upload, also replace the privacy policy text of the listing (step 10).
+
 1. Do [Prepare a release](README.md#prepare-a-release).
 
 2. Open "My Add-ons", the add-on, and "Upload New Version".
@@ -197,6 +203,12 @@ the public listing.
 
 9. Open "Describe Add-on" and "Images" again with "Edit", and make sure that
    all eleven languages have a description and six captions.
+
+10. If the privacy policy changed (for example for 0.3.0): open "Edit Product
+    Page" and find the privacy policy text. Replace it with the current text
+    of the four keys in step 5 (`nkPrivacySummary`, `nkPAgents`, `nkPBrowser`
+    and `nkPCards` in `site/i18n/en.json` of the `kh-labs` repository).
+    Do this only after kh-labs.dev shows the same text. Click "Save Changes".
 
 ## Problems
 

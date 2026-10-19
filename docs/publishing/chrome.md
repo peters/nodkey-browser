@@ -79,13 +79,20 @@ contact e-mail nodkey@kh-labs.dev.
    - Remote code: "No, I am not using remote code". The WebAssembly is in the
      package.
    - Data usage: select "Authentication information", "Financial and payment
-     information" (card fill, from 0.2.0), "Web history" and "Website content".
+     information" (card fill, from 0.2.0), "Location" (from 0.3.0), "Web
+     history" and "Website content".
      "Web history" applies because each request sends the site of the current
      page to the iPhone, end-to-end encrypted, only when the person asks for a
      login, a code, a card or a passkey, or accepts "Remember that <site> uses
      <provider> sign-in?" (that suggestion holds only the site and the name of
      the provider). Firefox declares the same as
-     `websiteActivity`. The owner decided this on 2026-10-14. Select the three
+     `websiteActivity`. The owner decided this on 2026-10-14.
+     "Location" (region and IP address in the Chrome form) applies because the
+     relay keeps the IP address that the browser connects from and its
+     country with each request (2 minutes, up to 6 for an SMS code), so the
+     iPhone can show where the request came from. The relay can read these two
+     values; they are not end-to-end encrypted. Firefox declares the same as
+     `locationInfo`. The owner decided this on 2026-10-19. Select the three
      certifications.
    - Privacy policy: `https://kh-labs.dev/nodkey/#privacy`. Make sure that it
      tells about the browser extension.
@@ -115,8 +122,9 @@ contact e-mail nodkey@kh-labs.dev.
 2. Open the item, then "Package", then "Upload new package". Select
    `dist/nodkey-chromium-<version>.zip`.
 
-3. Look at "Privacy" again if the permissions changed. Each new permission
-   needs a justification.
+3. Look at "Privacy" again if the permissions or the data usage changed. Each
+   new permission needs a justification. For 0.3.0: select "Location" in
+   "Data usage" (see step 4 of the first submission).
 
 4. Click "Submit for review".
 

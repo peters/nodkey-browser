@@ -62,11 +62,14 @@ const targets = {
         id: 'nodkey@kh-labs.dev',
         strict_min_version: '140.0',
         // What leaves the browser, end to end encrypted to the person's own iPhone: logins (fill and
-        // save), the site of each request and, when the setting is on, a picture of the page.
+        // save), the site of each request and, when the setting is on, a picture of the page. Not
+        // encrypted: the relay keeps the browser's IP address and country with each request (2 to
+        // 6 minutes) so the iPhone can show where it came from (locationInfo, from 0.3.0).
         data_collection_permissions: {
           required: [
             'authenticationInfo',
             'financialAndPaymentInfo',
+            'locationInfo',
             'websiteActivity',
             'websiteContent',
           ],
