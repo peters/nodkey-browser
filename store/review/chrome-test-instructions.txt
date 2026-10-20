@@ -1,0 +1,26 @@
+No user name or password: Nodkey has no account. The extension needs an iPhone with the free Nodkey app from the App Store (version 1.3 or later).
+
+1. Click the Nodkey icon in the toolbar, then "Get a code".
+2. On the iPhone, open Nodkey, then Agents > Add agent, and type the code.
+3. The browser and the iPhone show the same check number. Click "Same number" in the browser and confirm it on the iPhone.
+4. Open a sign-in page of a site that is saved in Nodkey and click the Nodkey button in the password field. Approve on the iPhone. The extension fills in the user name and the password.
+
+More to try:
+- A two-step code field: the Nodkey button fills in a code from Nodkey.
+- A checkout with a total: "Pay with Nodkey" fills in a card from Nodkey for that total. First add a test card in Nodkey, then open Agents, this browser, turn on "May use cards" and pick the card. For a billing page with no total, also turn on "Add cards for later payments".
+- A site with passkeys (for example webauthn.io): the iPhone makes and uses the passkey. With Nodkey 1.3.0, approve a passkey sign-in from the Nodkey notification (keep Nodkey in the background, touch and hold the notification, then "Approve once"). In 1.3.0 the approval screen inside the open app shows only Deny for a passkey sign-in; Nodkey 1.3.1 adds Approve there.
+
+New in {version}:
+- Pairing: a check number on both screens, and every request and answer is signed.
+- Sign-in methods: "Sign in with Google" (and Apple, GitHub, Microsoft, Facebook) is filled only on the provider's own pages. The extension can ask to remember the method; that sends only the site and the provider's name.
+- SMS codes: the iPhone gives a code that came by SMS, with a Shortcuts automation.
+- The agent limit: after many new logins and codes in a day, the iPhone can ask with a notice or pause the browser. The extension shows a short note.
+- Passkeys with PRF.
+- Cards for later payments on a billing page with no total, and card fields in a payment provider's frame (shown as "via <provider>").
+- An iPhone without a passcode gives no cards and no verified passkey sign-in; the extension says where to set a passcode.
+- Security: a login or code is filled only on the site it belongs to, the in-page button works only when it is visible, a passkey request needs a click, and the relay must use https.
+
+No new permissions. Data usage adds "Location": the relay keeps the IP address that the browser connects from and its country with each request for a few minutes, so the iPhone can show where the request came from.
+
+Source: https://github.com/peters/nodkey-browser (commit {commit}).
+Contact: nodkey@kh-labs.dev

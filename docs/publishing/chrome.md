@@ -16,6 +16,9 @@ publish automatically after the review). The item ID is
 `gpgbjekgcppmdjjppnochkjjhppgkdpl`. The publisher is "KH Labs" (non-trader),
 contact e-mail nodkey@kh-labs.dev.
 
+For 0.3.0 (the owner said yes on 2026-10-20): do [Cancel a review](#cancel-a-review)
+for 0.2.2, then [New version of the item](#new-version-of-the-item) with 0.3.0.
+
 ## One time: the developer account
 
 1. Open `https://chrome.google.com/webstore/devconsole` and sign in with the
@@ -97,11 +100,14 @@ contact e-mail nodkey@kh-labs.dev.
    - Privacy policy: `https://kh-labs.dev/nodkey/#privacy`. Make sure that it
      tells about the browser extension.
 
-5. "Test instructions" (under "Access"): no user name or password. Tell the
-   reviewer to pair with "Get a code" and Agents > Add agent in Nodkey, to
-   confirm the same check number in the browser and on the iPhone (0.3.0
-   needs the newest Nodkey from the App Store), then to click the Nodkey button in a sign-in
-   field.
+5. "Test instructions" (under "Access"): no user name or password. Paste
+   `store/out/chrome/test-instructions.txt` into the field for more
+   instructions. `npm run store` makes it from
+   `store/review/chrome-test-instructions.txt` with the version and the
+   commit. It tells the reviewer to pair with "Get a code" and Agents > Add
+   agent in Nodkey, to confirm the same check number in the browser and on
+   the iPhone (0.3.0 needs Nodkey 1.3 or later from the App Store), then to
+   click the Nodkey button in a sign-in field.
 
 6. "Distribution": select the visibility that the owner chose (see the top of
    this page) and the regions (all).
@@ -128,13 +134,34 @@ contact e-mail nodkey@kh-labs.dev.
    new permission needs a justification. For 0.3.0: select "Location" in
    "Data usage" (see step 4 of the first submission). The permissions did not
    change in 0.3.0. Update "Test instructions" (step 5 of the first
-   submission) and the description of each language from `listing.txt`. The
+   submission) and the description of each language from `listing.txt`
+   (step 3 of the first submission; the screenshots stay). The
    Chrome Web Store has no field for version notes.
 
 4. Click "Submit for review".
 
    Result: Users keep the old version until the review approves the new one.
    Then Chrome updates the extension.
+
+## Cancel a review
+
+Do this to replace a version that is in review with a newer version. The
+store shows "Cancel review" only while the status is "Pending review".
+
+1. Open the item in the developer dashboard, then "Store listing".
+
+2. Click the "View more" menu (⋮) at the top of the page and select "Cancel
+   review".
+
+3. In the dialog, click "Cancel review".
+
+   Result: The status is "Draft". The version in review is not published.
+
+4. Make sure that "Store listing", "Privacy" and "Distribution" still have
+   their values.
+
+5. Do [New version of the item](#new-version-of-the-item) with the new
+   package. The new version number must be higher than the cancelled one.
 
 ## Problems
 

@@ -115,6 +115,13 @@ keeps the IP address that the browser connects from and its country with each
 request (2 minutes, up to 6 for an SMS code), so the iPhone can show where the
 request came from. The owner decided this on 2026-10-19. With the 0.3.0
 upload, also replace the privacy policy text of the listing (step 10).
+kh-labs.dev shows that text since 2026-10-20.
+
+A listed upload disables the older listed versions that wait for review
+(`disable_old_files` in addons-server). Thus the 0.3.0 upload replaces 0.2.2
+in the review queue. After step 7, make sure that "Manage Status & Versions"
+shows 0.2.2 as disabled (the label can be "Disabled by Mozilla": that is the
+status this rule sets) and 0.3.0 as "Awaiting Review".
 
 1. Do [Prepare a release](README.md#prepare-a-release).
 
@@ -135,7 +142,7 @@ upload, also replace the privacy policy text of the listing (step 10).
    version of a listed add-on shows only "Release notes" and "Notes to
    Reviewer": paste the version notes of each language from "Version notes"
    in `store/out/firefox/<AMO locale>/listing.txt`, and the notes to the
-   reviewer below. On the first version, fill in:
+   reviewer (the last item of this step). On the first version, fill in:
    - Name and summary: AMO takes them from `_locales` in the package. AMO has
      no field for a language that it gets in another code. Thus add Norwegian
      Bokmål (`nb-NO`) by hand from `store/out/firefox/nb-NO/listing.txt`.
@@ -154,34 +161,11 @@ upload, also replace the privacy policy text of the listing (step 10).
      `https://kh-labs.dev/nodkey/#privacy` (the source is
      `site/i18n/en.json` in the `kh-labs` repository, keys
      `nkPrivacySummary`, `nkPAgents`, `nkPBrowser` and `nkPCards`).
-   - Notes to Reviewer: use the text below. Change the commit and the version.
-
-     ```text
-     Nodkey needs an iPhone with the free Nodkey app (App Store). There is no
-     account and no login.
-
-     To test:
-     1. Click the toolbar icon, then "Get a code".
-     2. In Nodkey on the iPhone: Agents > Add agent, type the code. The
-        browser and the iPhone show the same check number: confirm it on
-        both (version 0.3.0 needs the newest Nodkey from the App Store).
-     3. Open a sign-in page and click the Nodkey button in the field.
-        Approve on the iPhone.
-
-     Source: https://github.com/peters/nodkey-browser (commit <sha>). The
-     source package is attached.
-     Build: Node 24.21 (.nvmrc), Rust with wasm32-unknown-unknown and
-     wasm-bindgen-cli (version in Cargo.lock). npm ci && npm run build.
-     The package is dist/nodkey-firefox-<version>.zip.
-     The protocol code (WebAssembly) comes from
-     https://github.com/peters/nodkey-cli at the revision in Cargo.toml.
-
-     The innerHTML warnings: content.js sets a constant SVG icon string that
-     is built into the package; the other uses are in the Vue runtime. No
-     page or remote content goes into innerHTML.
-
-     Contact: nodkey@kh-labs.dev
-     ```
+   - Notes to Reviewer: paste `store/out/firefox/notes-to-reviewer.txt`.
+     `npm run store` makes it from `store/review/firefox-notes-to-reviewer.txt`
+     with the version, the commit and the nodkey-cli revision. Run it after
+     the release commit, so that the text names that commit. Change the
+     section "New in" of the source file for each version.
 
 6. Click "Submit Version".
 

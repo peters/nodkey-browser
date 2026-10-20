@@ -6,7 +6,10 @@
 //   store/out/firefox/<amo locale>/01-sign-in.png … 05-one-place.png and listing.txt
 //   store/out/chrome/<chrome locale>/01-sign-in.png … 05-one-place.png, promo-440x280.png,
 //   marquee-1400x560.png and listing.txt
+//   store/out/firefox/notes-to-reviewer.txt and store/out/chrome/test-instructions.txt (English,
+//   from store/review/ with the version and the commit)
 // Needs Chromium: NODKEY_STORE_CHROMIUM, else /snap/bin/chromium.
+import { execFileSync } from 'node:child_process'
 import { createServer } from 'node:http'
 import { mkdirSync, readFileSync, readdirSync, rmSync, writeFileSync } from 'node:fs'
 import { extname, join, resolve } from 'node:path'
@@ -197,6 +200,28 @@ if (!only) {
     .replace('__CHROME_SHOTS__', JSON.stringify(CHROME_SHOTS))
   writeFileSync(join(outRoot, 'index.html'), page)
   console.log('review page: store/out/index.html')
+
+  // The texts for the reviewers (English only in both stores), with this commit and version.
+  const fill = {
+    version: JSON.parse(readFileSync(join(root, 'package.json'), 'utf8')).version,
+    commit: execFileSync('git', ['rev-parse', 'HEAD'], { cwd: root }).toString().trim(),
+    proto: /nodkey-proto = .*rev = "([0-9a-f]+)"/.exec(
+      readFileSync(join(root, 'Cargo.toml'), 'utf8'),
+    )?.[1],
+  }
+  const dirty = execFileSync('git', ['status', '--porcelain'], { cwd: root }).toString().trim()
+  for (const { source, out } of [
+    { source: 'firefox-notes-to-reviewer.txt', out: 'firefox/notes-to-reviewer.txt' },
+    { source: 'chrome-test-instructions.txt', out: 'chrome/test-instructions.txt' },
+  ]) {
+    const text = readFileSync(join(root, 'store/review', source), 'utf8').replace(
+      /\{(version|commit|proto)\}/g,
+      (_, key) => fill[/** @type {'version' | 'commit' | 'proto'} */ (key)] ?? '',
+    )
+    writeFileSync(join(outRoot, out), text)
+    console.log(`reviewer text: store/out/${out}`)
+  }
+  if (dirty) console.log(`note: the work tree has changes; the texts name commit ${fill.commit}`)
 }
 if (problems.length) {
   console.error(problems.join('\n'))

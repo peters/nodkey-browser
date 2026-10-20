@@ -10,6 +10,7 @@ extension does or how it looks.
 | `store/scenes.html` | The images: six screenshots (1280×800), a small promo tile (440×280) and a marquee (1400×560) |
 | `store/assets/phone/<lang>.jpg` | The Passwords screen of the iPhone app in that language, from `peters/nodkey` `marketing/raw/<lang>/passwords.png` (sample data only) |
 | `store/preview.html` | The review page that `scripts/store.mjs` fills in |
+| `store/review/*.txt` | The notes to the AMO reviewer and the Chrome Web Store test instructions (English only), with `{version}`, `{commit}` and `{proto}` |
 | `scripts/store.mjs` | Checks the texts and renders everything into `store/out/` (not in Git) |
 
 The name and the summary come from `src/i18n/messages/<lang>.json`
@@ -40,7 +41,8 @@ review before the first public listing.
 
 1. Change the texts in `store/listing/<lang>.json` for all twelve languages.
    Keep the same keys in all files. Write `notes` new for each version: what
-   is new, in short lines that start with "•".
+   is new, in short lines that start with "•". Write the section "New in" of
+   the two files in `store/review/` new too.
 
 2. If the iPhone app looks different now, copy the new Passwords screens from
    `peters/nodkey` (`marketing/raw/<lang>/passwords.png`, 520 px wide, JPEG,
@@ -68,6 +70,10 @@ review before the first public listing.
    Store takes at most five: `03-save.png` is left out), `listing.txt`,
    `promo-440x280.png` and `marquee-1400x560.png`. The script stops with a
    message when a caption does not fit above the browser window.
+   `store/out/firefox/notes-to-reviewer.txt` and
+   `store/out/chrome/test-instructions.txt` have the version, the commit and
+   the nodkey-cli revision of the work tree. Run the script after the release
+   commit, so that the texts name that commit.
 
 5. Open `store/out/index.html` (the review page: every language and store with
    its texts and images). Look at the images of at least English, Norwegian,

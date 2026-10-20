@@ -108,24 +108,37 @@ submission. It thinks that they publish something or send a password.
 
 ## Version 0.3.0
 
-Status on 2026-10-19: the code, the texts and the disclosures are ready in
-`main` (version 0.3.0 in `package.json`). Nothing is uploaded. Version 0.3.0
-goes to the stores after the Nodkey app with the pairing check (peters/nodkey
-`cc6e54a`, the 1.3 batch) is on the App Store: a pairing needs the phone's
-commitment (ADR-0012). An iPhone with an older app gets "Update Nodkey on your
-iPhone, then pair again." Cards for later payments also need the app part of
-peters/nodkey#125; an older app gets "Update Nodkey on your iPhone to add
-cards for later payments."
+Status on 2026-10-20: the code, the texts and the disclosures are ready in
+`main` (version 0.3.0 in `package.json`). The Nodkey app 1.3 with the pairing
+check (ADR-0012) and cards for later payments is on the App Store. The owner
+said yes on 2026-10-20 to these submissions:
+
+- Firefox: 0.3.0 as a listed version. The upload disables the version 0.2.2
+  that waits for review (see [Firefox](firefox.md)).
+- Chrome: cancel the review of 0.2.2, then submit 0.3.0 (see
+  [Chrome](chrome.md)).
+
+Nothing is uploaded yet. An iPhone with an app older than 1.3 gets "Update
+Nodkey on your iPhone, then pair again." Cards for later payments need the
+app part of peters/nodkey#125 too; an older app gets "Update Nodkey on your
+iPhone to add cards for later payments."
+
+Nodkey 1.3.0 on the iPhone cannot approve a passkey sign-in in the approval
+screen inside the app: that screen shows only Deny. Approve once in the
+notification works. Nodkey 1.3.1 adds Approve to the screen. The texts for
+the reviewers tell this (`store/review/`).
 
 What changes for the stores:
 
 - Firefox: `locationInfo` in `data_collection_permissions` (in the package),
-  the version notes, the notes to the reviewer (the check number on both
-  screens) and the privacy policy text (step 10 of the listed version).
-- Chrome: "Location" in "Data usage", the test instructions and the
-  descriptions. No new permission.
+  the version notes, the notes to the reviewer
+  (`store/out/firefox/notes-to-reviewer.txt`) and the privacy policy text
+  (step 10 of the listed version).
+- Chrome: "Location" in "Data usage", the test instructions
+  (`store/out/chrome/test-instructions.txt`) and the descriptions. No new
+  permission.
 - Both: the description of each language (cards for later payments, payment
-  frames, the check number, the relay and the IP address). The screenshots
-  did not change.
+  frames, PRF, the check number, the relay and the IP address). The
+  screenshots did not change.
 - The texts are machine translations: get a native review before the public
   listing.
