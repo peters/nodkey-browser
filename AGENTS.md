@@ -73,6 +73,13 @@ extension needs it, and keep the store texts and the data disclosures true
 The repository is public. Do not publish to the Chrome Web Store or
 addons.mozilla.org or share a package without the owner's explicit yes.
 
+Version numbers (the owner's decision, 2026-10-21): the iPhone app (peters/nodkey), nodkey-cli and the browser
+extension (peters/nodkey-browser) share MAJOR.MINOR. Version 1.4.x of each belongs together: the same features and
+protocol. The PATCH number is per repository: a fix in one part becomes X.Y.(Z+1) there only. A feature release
+raises MINOR in all three at the same time and goes out together with, or after, the App Store version. A CLI or
+extension X.Y needs the iPhone app X.Y or later (an older app answers `unsupported_kind`). The switch: nodkey-cli
+0.4.1 is the last 0.x; the next CLI and extension releases are 1.4.0, together with the app's 1.4.
+
 The steps for each store are in [docs/publishing](docs/publishing/README.md)
 (ASD-STE100). Use the `horizon:horizon-browser` skill for the store pages when
 it is available, and the `nodkey` skill for the logins.
