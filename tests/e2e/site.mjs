@@ -1,5 +1,5 @@
 // A synthetic test site with the forms Nodkey fills: a sign-in, a one-time code page, a row of
-// code boxes, a sign-up, a checkout with card fields, and a passkey page whose server checks the passkeys as a real website
+// code boxes, a sign-up (also in two steps), a password change, a checkout with card fields, and a passkey page whose server checks the passkeys as a real website
 // does. Invented data only.
 import { createHash, createHmac } from 'node:crypto'
 import { createServer } from 'node:http'
@@ -136,6 +136,35 @@ const PAGES = {
     <label for="new">Password</label><input id="new" name="password" type="password" autocomplete="new-password">
     <label for="repeat">Repeat the password</label><input id="repeat" name="repeat" type="password" autocomplete="new-password">
     <button id="create">Create account</button></form>`,
+  ),
+  // A sign-up in two steps as Google makes it: the user name first, then "Create a strong
+  // password" with a repeat field, the page's rules and no autocomplete hints.
+  '/join': page(
+    'Create your account',
+    `<form method="get" action="/join/password">
+    <label for="username">Choose your user name</label><input id="username" name="Username">
+    <button id="next">Next</button></form>`,
+  ),
+  '/join/password': page(
+    'Create a strong password',
+    `<p>Create a strong password with a mix of letters, numbers and symbols</p>
+    <form method="post" action="/welcome">
+    <div><div><input id="passwd" name="Passwd" type="password" aria-label="Password" minlength="12" maxlength="40"
+      passwordrules="minlength: 12; maxlength: 40; required: lower; required: upper; required: digit; allowed: [-_.!]"></div>
+    <div aria-hidden="true">Password</div></div>
+    <div><div><input id="again" name="PasswdAgain" type="password" aria-label="Confirm"></div>
+    <div aria-hidden="true">Confirm</div></div>
+    <button id="create">Next</button></form>`,
+  ),
+  // A password change: the current password, the new one and its repeat field.
+  '/change': page(
+    'Change your password',
+    `<form method="post" action="/welcome">
+    <input type="hidden" autocomplete="username" value="alex@example.com">
+    <label for="current">Current password</label><input id="current" name="current" type="password">
+    <label for="fresh">New password</label><input id="fresh" name="fresh" type="password">
+    <label for="confirm">Confirm new password</label><input id="confirm" name="confirm" type="password">
+    <button id="change">Change password</button></form>`,
   ),
   '/welcome': page('Welcome', '<p>You are signed in to the test site.</p>'),
   // A sign-in page that hides Nodkey's button when the password field gets the focus:

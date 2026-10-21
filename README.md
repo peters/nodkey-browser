@@ -60,6 +60,11 @@ your phone, and nothing leaves it until you approve with Face ID.
   browser in Nodkey on your iPhone, and you approve each card with Face ID.
 - **See what you approve.** The notification on your iPhone can show a picture
   of the page. It is encrypted so that only your iPhone can see it.
+- **Make a strong password.** On a sign-up or change-password page, the Nodkey
+  button offers "Make a strong password". Your iPhone asks you with Face ID,
+  makes a password that fits the page's rules, saves it first, and the
+  extension fills it into both password fields. If a change fails on the site,
+  your iPhone keeps the old password for 30 days.
 - **Save new passwords.** When you sign up or change a password, the extension
   offers to save it in Nodkey. The password is locked for your iPhone at once:
   the extension never keeps it in readable form.

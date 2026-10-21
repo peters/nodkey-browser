@@ -47,6 +47,9 @@ synthetic test site. It does not use the real relay or a real phone.
       `/learn`. Then [Codes sent by SMS](sms-code.md) on `/sms` and
       [The agent limit](agent-limit.md) on `/login`. In Chromium, the script
       also reads the activity of the tab (the text of the card and the popup).
+      Then it does [Make a strong password](generate-password.md): the sign-up
+      in two steps on `/join`, the change form on `/change`, "Use a saved
+      login" in the menu, and a refusal.
    7. Opens `/checkout` and does [Pay with a card](fill-card.md): it fills the
       test card for the total of 499,00 kr, makes sure that the fake phone saw
       the amount, the total and the origin, raises the total and waits for the
@@ -74,6 +77,8 @@ synthetic test site. It does not use the real relay or a real phone.
 
 - `--passkeys-only` pairs and then does only step 8. `--cards-only` pairs and
   then does only step 7. `--signin-only` pairs and then does only step 6.
+  `--generate-only` pairs and then does only "Make a strong password" of
+  step 6.
 - The run starts a stand-in payment provider on `https://js.pay.example:<port>`
   in the same way. Its frames tell the test page where their fields are and
   what they hold (`postMessage`), because the driver cannot always read frames

@@ -1,10 +1,11 @@
 // Runs the extension in real Chromium and Firefox on an isolated desktop, against nodkey-cli's
 // fake relay and phone and a synthetic test site: pair, fill a login, fill a code (one field and a
-// row of boxes), save a new login, and create and use a passkey that the site's server checks.
+// row of boxes), save a new login, make a strong password, and create and use a passkey that the
+// site's server checks.
 // See docs/features/browser-e2e.md.
 //
 //   node tests/e2e/run.mjs [--browser chromium|firefox|both] [--keep] [--display :N]
-//                          [--passkeys-only | --cards-only | --signin-only]
+//                          [--passkeys-only | --cards-only | --signin-only | --generate-only]
 //
 // Without --display it starts its own Xvfb + x11vnc (set NODKEY_E2E_TOOLS to an unpacked tools
 // root when x11vnc is not installed) and prints the VNC address for a Horizon Device panel.
@@ -17,6 +18,7 @@ import { cardFrameFlow } from './cardframes.mjs'
 import { cardFlow } from './cards.mjs'
 import { coveredFlow } from './covered.mjs'
 import { findVnc, startDesktop } from './desktop.mjs'
+import { generateFlow } from './generate.mjs'
 import { PAY_HOST, startPayFrames } from './payframe.mjs'
 import { startGoogle } from './provider.mjs'
 import { startRelayProxy } from './relayproxy.mjs'
@@ -33,7 +35,8 @@ const keep = args.includes('--keep')
 const passkeysOnly = args.includes('--passkeys-only')
 const cardsOnly = args.includes('--cards-only')
 const signinOnly = args.includes('--signin-only')
-const only = passkeysOnly || cardsOnly || signinOnly
+const generateOnly = args.includes('--generate-only')
+const only = passkeysOnly || cardsOnly || signinOnly || generateOnly
 const root = resolve(import.meta.dirname, '../..')
 const run = `run-${Date.now()}`
 // Snap Chromium can only read under ~/snap/chromium; Firefox and logs use a private cache folder.
@@ -465,6 +468,9 @@ async function main() {
       if (!only || signinOnly) {
         await signinFlow('Chromium', c.browser, relay, site.base, name, helpers, c.activities)
       }
+      if (!only || generateOnly) {
+        await generateFlow('Chromium', c.browser, relay, site.base, name, helpers, c.activities)
+      }
       if (!only || cardsOnly) {
         await cardFlow('Chromium', c.browser, relay, site.base, name, helpers)
         await cardFrameFlow('Chromium', c.browser, relay, site.base, pay.base, helpers)
@@ -484,6 +490,9 @@ async function main() {
       }
       if (!only || signinOnly) {
         await signinFlow('Firefox', f.browser, relay, site.base, name, helpers, null)
+      }
+      if (!only || generateOnly) {
+        await generateFlow('Firefox', f.browser, relay, site.base, name, helpers, null)
       }
       if (!only || cardsOnly) {
         await cardFlow('Firefox', f.browser, relay, site.base, name, helpers)

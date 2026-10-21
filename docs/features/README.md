@@ -19,6 +19,7 @@ and it needs the owner.
 | [A covered button](covered-button.md) | No Nodkey layer before a focus; no request from a hidden or covered button | All |
 | [Fill a code](fill-code.md) | One code field and a row of six boxes | All |
 | [Save a new login](save-login.md) | The save question, Save, and the sealed password | All |
+| [Make a strong password](generate-password.md) | The menu in a new-password field, the password the phone makes and saves, the fill of both fields, no save question | All |
 | [Passkeys](passkeys.md) | Create a passkey and sign in with it; the server examines the signature; PRF | All |
 | [Sign-in methods](sign-in-methods.md) | "Sign in with Google": the method card, the Google login on Google only, the Nodkey button at "Check your phone", the question to remember the method | All |
 | [Codes sent by SMS](sms-code.md) | The code field asks for the SMS code; the hint when no SMS comes | All |

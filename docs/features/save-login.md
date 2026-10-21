@@ -39,3 +39,6 @@ The browser is paired with the fake phone. The fake phone mode is `approve`.
   because Nodkey filled that login.
 - Sign in with two steps (user name page, then password page). Result: The
   question shows the user name from the first page.
+- Make a password with Nodkey ([Make a strong password](generate-password.md))
+  and submit the form. Result: No save question shows, because the phone saved
+  that password already.
