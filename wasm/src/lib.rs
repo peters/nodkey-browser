@@ -218,6 +218,16 @@ pub fn may_fill(page: &str, sites_json: &str) -> Result<bool, JsError> {
 }
 
 #[wasm_bindgen]
+pub fn generate_page(site: &str) -> Result<Option<String>, JsError> {
+    js(core::generate::generate_page(site))
+}
+
+#[wasm_bindgen]
+pub fn generate_fill_only_on(target: &str) -> Result<String, JsError> {
+    js(core::generate::generate_fill_only_on(target))
+}
+
+#[wasm_bindgen]
 pub fn same_site(a: &str, b: &str) -> bool {
     core::sites::same_site(a, b)
 }

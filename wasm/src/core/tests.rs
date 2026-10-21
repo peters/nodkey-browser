@@ -475,3 +475,48 @@ fn fills_only_on_the_answered_accounts_website() {
         "https://bob.github.io/"
     ));
 }
+
+#[test]
+fn generate_requests_follow_the_vectors() {
+    let (agent, phone) = (KeyPair::generate(), KeyPair::generate());
+    // Every request of the shared checks: sealed when it passes, refused when it does not.
+    for c in vectors()["generate"]["checks"].as_array().unwrap() {
+        let draft = json!({"kind": "generate", "target": c["target"], "reason": "Sign up",
+                           "agent": "Test browser", "generate": c["generate"]});
+        let sealed = seal(&draft, &agent, "agent", &phone, "phone", &[]);
+        assert_eq!(sealed.is_ok(), c["error"].is_null(), "{c}");
+        if let Ok(sealed) = sealed {
+            let request = phone_opens(&sealed, &agent, "agent", &phone, "phone");
+            assert_eq!(request.kind, Kind::Generate);
+            assert_eq!(
+                serde_json::to_value(&request.generate).unwrap(),
+                c["generate"],
+                "{c}"
+            );
+        }
+    }
+    // A generate request needs its page.
+    let bare = json!({"kind": "generate", "target": "example.com", "reason": "Sign up",
+                      "agent": "Test browser"});
+    assert!(seal(&bare, &agent, "agent", &phone, "phone", &[]).is_err());
+    for f in vectors()["generate"]["fill_only_on"].as_array().unwrap() {
+        let sites = generate::generate_fill_only_on(s(f, "target")).unwrap();
+        assert_eq!(
+            serde_json::from_str::<Value>(&sites).unwrap(),
+            f["fill_only_on"],
+            "{f}"
+        );
+    }
+    let page = generate::generate_page("https://Accounts.Example.com:8443/signup?flow=x#a")
+        .unwrap()
+        .unwrap();
+    assert_eq!(
+        serde_json::from_str::<Value>(&page).unwrap(),
+        json!({"target": "accounts.example.com", "url": "https://Accounts.Example.com:8443/signup"})
+    );
+    assert_eq!(
+        generate::generate_page("localhost").unwrap().as_deref(),
+        Some(r#"{"target":"localhost"}"#)
+    );
+    assert_eq!(generate::generate_page("not a site").unwrap(), None);
+}

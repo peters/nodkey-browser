@@ -10,9 +10,9 @@
 //! `wasm32-unknown-unknown`.
 
 use nodkey_proto::{
-    CardRequest, ClientInfo, ImageType, Kind, PasskeyAnswer, PasskeyOp, PasskeyRequest, PublicKeys,
-    Purpose, Request, SaveCard, SaveLogin, SealedBox, Suggestion, VERSION, auth, b64u, client,
-    code, dh, passkey, webauthn,
+    CardRequest, ClientInfo, GenerateRequest, ImageType, Kind, PasskeyAnswer, PasskeyOp,
+    PasskeyRequest, PublicKeys, Purpose, Request, SaveCard, SaveLogin, SealedBox, Suggestion,
+    VERSION, auth, b64u, client, code, dh, passkey, webauthn,
 };
 use serde::{Deserialize, Serialize};
 use zeroize::Zeroizing;
@@ -105,6 +105,8 @@ struct Draft {
     suggest: Option<Suggestion>,
     #[serde(default)]
     wait_seconds: Option<u32>,
+    #[serde(default)]
+    generate: Option<GenerateRequest>,
 }
 
 /// A request to sign: the extension signs `message` with its Ed25519 key in WebCrypto and gives
@@ -134,7 +136,7 @@ fn to_sign(request: &Request, agent_id: &str, phone_id: &str) -> Result<ToSign, 
 
 /// Checks a request and makes it ready to sign. `draft_json` is
 /// `{kind, target, reason, agent, caption?, save?, passkey?, card?, save_card?, client?, suggest?,
-/// wait_seconds?}`; `image` is the picture that goes with it (empty for none): the request then
+/// wait_seconds?, generate?}`; `image` is the picture that goes with it (empty for none): the request then
 /// says its type, size and SHA-256. Returns `{request_id, body, message}`.
 pub fn request_to_sign(
     draft_json: &str,
@@ -172,6 +174,8 @@ pub fn request_to_sign(
         save_secret: None,
         project: None,
         nonce: None,
+        import: None,
+        generate: d.generate,
     };
     serde_json::to_string(&to_sign(&request, agent_id, phone_id)?).map_err(js)
 }
@@ -331,6 +335,7 @@ pub(crate) fn coded(e: nodkey_proto::Error) -> String {
 }
 
 pub mod cards;
+pub mod generate;
 pub mod pairing;
 pub mod signin;
 pub mod sites;
