@@ -171,5 +171,22 @@
   "smsButton": "Nodkey로 SMS 코드 받기",
   "smsWaiting": "SMS를 기다리는 중이에요. 도착하면 iPhone에서 승인하세요.",
   "smsExpired": "제시간에 Nodkey에 SMS 코드가 오지 않았어요. iPhone에서 코드를 Nodkey로 보내는 단축어 자동화를 확인하세요.",
-  "reasonSms": "$2에서 $1의 SMS 코드"
+  "reasonSms": "$2에서 $1의 SMS 코드",
+  "genButton": "Nodkey로 강력한 비밀번호 만들기",
+  "genMake": "강력한 비밀번호 만들기",
+  "genMakeDetail": "iPhone이 만들고 먼저 저장해요",
+  "genUseSaved": "저장된 로그인 사용",
+  "genWaiting": "iPhone에서 새 비밀번호를 승인하세요",
+  "genSaved": "Nodkey에 저장했어요. 새 비밀번호를 입력했어요.",
+  "genUpdated": "새 비밀번호로 Nodkey에 저장했어요. 이 페이지에서 변경을 마치세요. iPhone이 이전 비밀번호를 30일 동안 보관해요.",
+  "genNoField": "Nodkey에 저장했지만 이 페이지에서 입력할 칸을 찾지 못했어요. 비밀번호는 iPhone의 Nodkey에 있어요.",
+  "genDenied": "비밀번호를 만들지 않았어요. iPhone에서 거부했어요.",
+  "genExpired": "iPhone이 제시간에 응답하지 않았어요. 비밀번호를 만들지 않았어요.",
+  "genNoPasscode": "iPhone에 암호가 없어서 Nodkey가 여기서 비밀번호를 만들 수 없어요. 설정 → Face ID 및 암호에서 설정할 수 있어요.",
+  "genBadRules": "Nodkey가 이 페이지의 규칙에 맞는 비밀번호를 만들 수 없어요. 직접 입력하면 Nodkey가 저장을 제안해요.",
+  "genOldApp": "이 브라우저에서 새 비밀번호를 만들려면 iPhone의 Nodkey를 업데이트하세요.",
+  "reasonGenerate": "$2에서 $1의 새 비밀번호 만들기",
+  "genNotAllowed": "iPhone의 Nodkey가 이 브라우저에 코드만 주도록 되어 있어서 여기서는 비밀번호를 만들지 않아요.",
+  "genBadRequest": "Nodkey가 이 페이지의 비밀번호를 만들지 못했어요. 직접 입력하면 Nodkey가 저장을 제안해요.",
+  "genSaveFailed": "iPhone이 새 비밀번호를 저장하지 못해서 만들지 않았어요. 다시 시도하세요."
 }

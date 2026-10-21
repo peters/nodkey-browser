@@ -19,6 +19,7 @@ import {
 } from './pay'
 import { fillCode, setValue } from './fill'
 import { findLogin, findOtp, isOtpField, submission } from './forms'
+import { fillNew, newFormOf, openMenu } from './generate'
 import { smsPage } from './signin'
 import { noteClick, pageLoaded, showMethod, watchPrompt } from './steps'
 import { PageUi } from './ui'
@@ -43,11 +44,21 @@ function page(): PageUi {
       void send({ type: smsPage(document) ? 'fill.sms' : 'fill.code' })
       return
     }
-    // A user name already in the form (typed, or filled by the browser) names the account.
-    const username = findLogin(document)?.username?.value.trim()
-    void send(username ? { type: 'fill.login', username } : { type: 'fill.login' })
+    // A field for a new password: make one on the phone, or (second) use a saved login.
+    const form = newFormOf(field)
+    if (form) {
+      openMenu(form, page(), send, fillLogin)
+      return
+    }
+    fillLogin()
   })
   return ui
+}
+
+/** Asks for a saved login. A user name already in the form (typed or filled) names the account. */
+function fillLogin(): void {
+  const username = findLogin(document)?.username?.value.trim()
+  void send(username ? { type: 'fill.login', username } : { type: 'fill.login' })
 }
 
 async function send<T>(msg: ToBackground): Promise<T | null> {
@@ -79,6 +90,10 @@ function focused(target: EventTarget | null): void {
   if (isCardField(target) && mayFill(location.href)) {
     page().showKey(target, target, t('cardButton'))
   } else if (isLoginField(target) && mayFill(location.href)) {
+    if (newFormOf(target)) {
+      page().showKey(target, target, t('genButton'), true)
+      return
+    }
     const code = isOtpField(target) || boxRow(target) !== null
     const label = code && smsPage(document) ? t('smsButton') : t('fieldButton')
     page().showKey(target, boxRow(target)?.at(-1) ?? target, label)
@@ -101,6 +116,8 @@ document.addEventListener(
     // Later, so a click on the button still finds its field.
     window.setTimeout(() => {
       const active = document.activeElement
+      // The menu of the Nodkey button has the focus: it stays.
+      if (ui?.menuHasFocus()) return
       if (!isLoginField(active) && !isCardField(active)) ui?.hideKey()
     }, 250)
   },
@@ -133,6 +150,11 @@ chrome.runtime.onMessage.addListener((msg: ToContent, sender, sendResponse) => {
   if (sender.id !== chrome.runtime.id) return false
   if (msg.type === 'fill') {
     if (!fill(msg)) return false // Let a frame that has the fields answer.
+    sendResponse(true)
+    return false
+  }
+  if (msg.type === 'fill.new') {
+    if (!fillNew(msg)) return false // Only the frame that asked fills.
     sendResponse(true)
     return false
   }

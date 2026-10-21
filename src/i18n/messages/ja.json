@@ -171,5 +171,22 @@
   "smsButton": "Nodkey で SMS コードを取得",
   "smsWaiting": "SMS を待っています。届いたら iPhone で承認してください。",
   "smsExpired": "時間内に SMS コードが Nodkey に届きませんでした。iPhone で、コードを Nodkey に送るショートカットのオートメーションを確認してください。",
-  "reasonSms": "$2 での $1 の SMS コード"
+  "reasonSms": "$2 での $1 の SMS コード",
+  "genButton": "Nodkey で強力なパスワードを作成",
+  "genMake": "強力なパスワードを作成",
+  "genMakeDetail": "iPhone が作成し、先に保存します",
+  "genUseSaved": "保存したログインを使う",
+  "genWaiting": "iPhone で新しいパスワードを承認してください",
+  "genSaved": "Nodkey に保存しました。新しいパスワードを入力しました。",
+  "genUpdated": "新しいパスワードとして Nodkey に保存しました。このページで変更を完了してください。古いパスワードは iPhone に 30 日間残ります。",
+  "genNoField": "Nodkey に保存しましたが、このページに入力する欄が見つかりませんでした。パスワードは iPhone の Nodkey にあります。",
+  "genDenied": "パスワードは作成されませんでした。iPhone で拒否されました。",
+  "genExpired": "iPhone から時間内に応答がありませんでした。パスワードは作成されませんでした。",
+  "genNoPasscode": "iPhone にパスコードがないため、Nodkey はここでパスワードを作成できません。設定 →「Face ID とパスコード」で設定できます。",
+  "genBadRules": "このページのルールに合うパスワードを Nodkey は作成できません。ご自身で入力すると、Nodkey が保存を提案します。",
+  "genOldApp": "このブラウザから新しいパスワードを作成するには、iPhone の Nodkey をアップデートしてください。",
+  "reasonGenerate": "$2 で $1 の新しいパスワードを作成",
+  "genNotAllowed": "iPhone の Nodkey はこのブラウザにコードだけを渡す設定のため、ここではパスワードを作成しません。",
+  "genBadRequest": "このページのパスワードを Nodkey は作成できませんでした。ご自身で入力すると、Nodkey が保存を提案します。",
+  "genSaveFailed": "iPhone が新しいパスワードを保存できなかったため、作成しませんでした。もう一度お試しください。"
 }

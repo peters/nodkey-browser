@@ -6,7 +6,10 @@
 
 import type { Activity, CardOffer, SaveOffer } from '../models/messages'
 import { t } from '../i18n/t'
+import { type MenuItem, buildMenu, menuCss } from './menuui'
 import { type PayChoice, type PayView, buildPayCard, payCss } from './payui'
+
+export type { MenuItem }
 
 const LOGO = `<svg viewBox="0 0 64 64" aria-hidden="true" focusable="false"><g transform="rotate(-20 32 32)"><rect x="30" y="27.5" width="25" height="9" rx="4.5" fill="currentColor"/><rect x="45" y="33" width="6" height="10" rx="3" fill="currentColor"/><circle cx="23" cy="32" r="13" fill="#ff7a59"/><path d="M17 32.5l4.2 4.2 8-8.4" fill="none" stroke="#fff" stroke-width="3.6" stroke-linecap="round" stroke-linejoin="round"/></g></svg>`
 
@@ -60,6 +63,7 @@ button.close {
 .error .text { color: var(--low); }
 @keyframes spin { to { transform: rotate(360deg); } }
 ${payCss}
+${menuCss}
 @media (prefers-reduced-motion: reduce) { .spinner { animation: none; border-top-color: var(--accent); } }
 `
 
@@ -105,6 +109,7 @@ export class PageUi {
   private keyAnchor: HTMLElement | null = null
   private card: HTMLDivElement | null = null
   private hideTimer = 0
+  private menu: HTMLDivElement | null = null
 
   constructor(private readonly onKey: (field: HTMLInputElement) => void) {
     const host = document.createElement('nodkey-ui')
@@ -119,18 +124,37 @@ export class PageUi {
     document.documentElement.append(host)
     const place = () => {
       this.placeKey()
+      this.placeMenu()
       this.placeRing()
       this.placeStepKey()
     }
     window.addEventListener('scroll', place, { passive: true, capture: true })
     window.addEventListener('resize', place, { passive: true })
+    // A click anywhere else in the page closes the menu.
+    window.addEventListener(
+      'pointerdown',
+      (e) => {
+        if (this.menu && e.target !== this.host) this.hideMenu()
+      },
+      { capture: true },
+    )
+  }
+
+  /** True while the menu of the Nodkey button is open and has the focus. */
+  menuHasFocus(): boolean {
+    return this.menu !== null && document.activeElement === this.host
   }
 
   /**
    * Shows the Nodkey button inside the right edge of `anchor` (the field itself), or just right of
    * it when it is too narrow, as one box of a row of code boxes is.
    */
-  showKey(field: HTMLInputElement, anchor: HTMLElement = field, label = t('fieldButton')): void {
+  showKey(
+    field: HTMLInputElement,
+    anchor: HTMLElement = field,
+    label = t('fieldButton'),
+    menu = false,
+  ): void {
     if (!this.key) {
       const key = document.createElement('button')
       key.type = 'button'
@@ -156,6 +180,13 @@ export class PageUi {
     }
     this.key.title = label
     this.key.setAttribute('aria-label', label)
+    if (menu) {
+      this.key.setAttribute('aria-haspopup', 'menu')
+      this.key.setAttribute('aria-expanded', String(this.menu !== null))
+    } else {
+      this.key.removeAttribute('aria-haspopup')
+      this.key.removeAttribute('aria-expanded')
+    }
     if (this.keyTarget !== field || this.key.hidden) this.keySince = performance.now()
     this.keyTarget = field
     this.keyAnchor = anchor
@@ -211,9 +242,61 @@ export class PageUi {
   }
 
   hideKey(): void {
+    this.hideMenu()
     if (this.key) this.key.hidden = true
     this.keyTarget = null
     this.keyAnchor = null
+  }
+
+  /**
+   * Opens the choices of the Nodkey button below it, the first one focused, so that the keyboard
+   * and screen readers can use them too. Escape closes the menu and gives the focus back to the
+   * field.
+   */
+  showMenu(items: MenuItem[]): void {
+    this.hideMenu()
+    const field = this.keyTarget
+    if (!this.key || !field) return
+    const since = performance.now()
+    const { menu, first } = buildMenu(
+      items,
+      (item, e) => {
+        if (!this.seen(e, since, null)) {
+          this.covered()
+          return
+        }
+        this.hideMenu()
+        field.focus({ preventScroll: true })
+        item.run()
+      },
+      () => {
+        this.hideMenu()
+        field.focus({ preventScroll: true })
+      },
+    )
+    this.root.append(menu)
+    this.menu = menu
+    this.key.setAttribute('aria-expanded', 'true')
+    this.placeMenu()
+    first?.focus({ preventScroll: true })
+  }
+
+  hideMenu(): void {
+    this.menu?.remove()
+    this.menu = null
+    if (this.key?.hasAttribute('aria-haspopup')) this.key.setAttribute('aria-expanded', 'false')
+  }
+
+  private placeMenu(): void {
+    if (!this.menu || !this.key || this.key.hidden) return
+    const k = this.key.getBoundingClientRect()
+    const width = this.menu.offsetWidth || 280
+    const height = this.menu.offsetHeight || 110
+    const left = Math.max(8, Math.min(k.right - width, window.innerWidth - width - 8))
+    const below = k.bottom + 6
+    const top = below + height > window.innerHeight - 8 ? k.top - height - 6 : below
+    this.menu.style.left = `${left}px`
+    this.menu.style.top = `${Math.max(8, top)}px`
   }
 
   private placeKey(): void {

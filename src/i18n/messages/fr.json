@@ -171,5 +171,22 @@
   "smsButton": "Obtenir le code SMS avec Nodkey",
   "smsWaiting": "En attente du SMS. Quand il arrive, approuve sur ton iPhone.",
   "smsExpired": "Aucun code SMS n'est arrivé à Nodkey à temps. Sur ton iPhone, vérifie l'automatisation Raccourcis qui envoie les codes à Nodkey.",
-  "reasonSms": "Code SMS pour $1 dans $2"
+  "reasonSms": "Code SMS pour $1 dans $2",
+  "genButton": "Créer un mot de passe fort avec Nodkey",
+  "genMake": "Créer un mot de passe fort",
+  "genMakeDetail": "Ton iPhone le crée et l’enregistre d’abord",
+  "genUseSaved": "Utiliser un identifiant enregistré",
+  "genWaiting": "Approuve le nouveau mot de passe sur ton iPhone",
+  "genSaved": "Enregistré dans Nodkey. Le nouveau mot de passe est rempli.",
+  "genUpdated": "Enregistré dans Nodkey comme nouveau mot de passe. Termine le changement sur cette page. Ton iPhone garde l’ancien mot de passe pendant 30 jours.",
+  "genNoField": "Enregistré dans Nodkey, mais Nodkey n’a trouvé aucun champ pour lui sur cette page. Le mot de passe est dans Nodkey sur ton iPhone.",
+  "genDenied": "Aucun mot de passe n’a été créé. Tu as refusé sur ton iPhone.",
+  "genExpired": "Ton iPhone n’a pas répondu à temps. Aucun mot de passe n’a été créé.",
+  "genNoPasscode": "Ton iPhone n’a pas de code, donc Nodkey ne peut pas créer de mot de passe ici. Tu peux en définir un dans Réglages → Face ID et code.",
+  "genBadRules": "Nodkey ne peut pas créer de mot de passe conforme aux règles de cette page. Saisis-en un toi-même, et Nodkey te propose de l’enregistrer.",
+  "genOldApp": "Mets à jour Nodkey sur ton iPhone pour créer de nouveaux mots de passe depuis ce navigateur.",
+  "reasonGenerate": "Créer un nouveau mot de passe pour $1 dans $2",
+  "genNotAllowed": "Nodkey sur ton iPhone ne donne que des codes à ce navigateur, donc il ne crée pas de mot de passe ici.",
+  "genBadRequest": "Nodkey n’a pas pu créer de mot de passe pour cette page. Saisis-en un toi-même, et Nodkey te propose de l’enregistrer.",
+  "genSaveFailed": "Ton iPhone n’a pas pu enregistrer de nouveau mot de passe, donc il n’en a créé aucun. Réessaie."
 }

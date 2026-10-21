@@ -171,5 +171,22 @@
   "smsButton": "SMS-Code mit Nodkey holen",
   "smsWaiting": "Warte auf die SMS. Wenn sie ankommt, bestätige auf deinem iPhone.",
   "smsExpired": "Kein SMS-Code hat Nodkey rechtzeitig erreicht. Prüfe auf deinem iPhone die Kurzbefehle-Automation, die Codes an Nodkey sendet.",
-  "reasonSms": "SMS-Code für $1 in $2"
+  "reasonSms": "SMS-Code für $1 in $2",
+  "genButton": "Mit Nodkey ein starkes Passwort erstellen",
+  "genMake": "Starkes Passwort erstellen",
+  "genMakeDetail": "Dein iPhone erstellt es und speichert es zuerst",
+  "genUseSaved": "Gespeichertes Login verwenden",
+  "genWaiting": "Bestätige das neue Passwort auf deinem iPhone",
+  "genSaved": "In Nodkey gespeichert. Das neue Passwort ist eingetragen.",
+  "genUpdated": "Als neues Passwort in Nodkey gespeichert. Schließe die Änderung auf dieser Seite ab. Dein iPhone behält das alte Passwort 30 Tage lang.",
+  "genNoField": "In Nodkey gespeichert, aber Nodkey hat auf dieser Seite kein Feld dafür gefunden. Das Passwort ist in Nodkey auf deinem iPhone.",
+  "genDenied": "Es wurde kein Passwort erstellt. Du hast auf deinem iPhone abgelehnt.",
+  "genExpired": "Dein iPhone hat nicht rechtzeitig geantwortet. Es wurde kein Passwort erstellt.",
+  "genNoPasscode": "Dein iPhone hat keinen Code, deshalb kann Nodkey hier kein Passwort erstellen. Du kannst einen festlegen unter Einstellungen → Face ID & Code.",
+  "genBadRules": "Nodkey kann kein Passwort erstellen, das zu den Regeln dieser Seite passt. Gib selbst eins ein, dann bietet Nodkey an, es zu speichern.",
+  "genOldApp": "Aktualisiere Nodkey auf deinem iPhone, um neue Passwörter aus diesem Browser zu erstellen.",
+  "reasonGenerate": "Neues Passwort für $1 in $2 erstellen",
+  "genNotAllowed": "Nodkey auf deinem iPhone gibt diesem Browser nur Codes, deshalb erstellt er hier keine Passwörter.",
+  "genBadRequest": "Nodkey konnte für diese Seite kein Passwort erstellen. Gib selbst eins ein, dann bietet Nodkey an, es zu speichern.",
+  "genSaveFailed": "Dein iPhone konnte kein neues Passwort speichern, deshalb hat es keins erstellt. Versuche es noch einmal."
 }

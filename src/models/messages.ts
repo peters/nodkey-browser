@@ -3,10 +3,11 @@
  * state the background publishes in `chrome.storage.session` for the pages to show.
  */
 
-import type { Money, Phone, Saved, SealedBox, SecondStep } from './protocol'
+import type { Money, PasswordRules, Phone, Saved, SealedBox, SecondStep } from './protocol'
 
 /** What a request is about, as the person sees it. */
-export type ActivityKind = 'login' | 'code' | 'save' | 'passkey' | 'card' | 'suggest' | 'sms'
+export type ActivityKind =
+  'login' | 'code' | 'save' | 'passkey' | 'card' | 'suggest' | 'sms' | 'generate'
 
 export type ActivityState = 'waiting' | 'approved' | 'denied' | 'expired' | 'error'
 
@@ -135,6 +136,14 @@ export type ToBackground =
   | { type: 'fill.login'; tabId?: number; username?: string }
   | { type: 'fill.code'; tabId?: number }
   | { type: 'fill.sms' }
+  /** Make a strong password on the phone for a sign-up or a change, saved there first. */
+  | {
+      type: 'generate'
+      username?: string
+      title?: string
+      rules: PasswordRules
+      change: boolean
+    }
   | { type: 'signin.clicked'; provider: string }
   | { type: 'signin.page' }
   | { type: 'signin.suggest'; site: string; provider: string }
@@ -179,6 +188,8 @@ export type ToBackground =
 /** Requests from the background to a content script. */
 export type ToContent =
   | { type: 'fill'; site: string; username?: string; password?: string; code?: string }
+  /** The new password the phone made and saved: into the new and the repeat field. */
+  | { type: 'fill.new'; site: string; password: string; username?: string }
   | { type: 'activity'; activity: Activity }
   | { type: 'save.prompt'; offer: SaveOffer }
   /** Fill the card into this frame, when it is still on `origin`. No `approved` for `setup`. */

@@ -221,6 +221,9 @@ export async function candidate(
     }
   }
   if (!username) return
+  // The phone made and saved this password for the sign-up or change (peters/nodkey#131).
+  const made = await store.generated(tabId)
+  if (made && (made.site === site || belongsTo(frameUrl, made.site))) return
   const settings = await store.settings()
   if (!settings.offerSave || settings.neverSave.includes(site)) return
   const [agent, phone] = [await store.agent(), await store.currentPhone()]

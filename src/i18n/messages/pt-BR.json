@@ -171,5 +171,22 @@
   "smsButton": "Obter o código SMS com o Nodkey",
   "smsWaiting": "Aguardando o SMS. Quando ele chegar, aprove no seu iPhone.",
   "smsExpired": "Nenhum código SMS chegou ao Nodkey a tempo. No seu iPhone, verifique a automação do Atalhos que envia códigos para o Nodkey.",
-  "reasonSms": "Código SMS para $1 no $2"
+  "reasonSms": "Código SMS para $1 no $2",
+  "genButton": "Criar uma senha forte com o Nodkey",
+  "genMake": "Criar uma senha forte",
+  "genMakeDetail": "Seu iPhone cria e salva a senha primeiro",
+  "genUseSaved": "Usar um login salvo",
+  "genWaiting": "Aprove a nova senha no seu iPhone",
+  "genSaved": "Salva no Nodkey. A nova senha está preenchida.",
+  "genUpdated": "Salva no Nodkey como a nova senha. Conclua a troca nesta página. Seu iPhone guarda a senha antiga por 30 dias.",
+  "genNoField": "Salva no Nodkey, mas o Nodkey não encontrou um campo para ela nesta página. A senha está no Nodkey do seu iPhone.",
+  "genDenied": "Nenhuma senha foi criada. Você disse não no seu iPhone.",
+  "genExpired": "Seu iPhone não respondeu a tempo. Nenhuma senha foi criada.",
+  "genNoPasscode": "Seu iPhone não tem código, então o Nodkey não pode criar uma senha aqui. Você pode definir um em Ajustes → Face ID e Código.",
+  "genBadRules": "O Nodkey não consegue criar uma senha que siga as regras desta página. Digite uma você mesmo, e o Nodkey oferece salvá-la.",
+  "genOldApp": "Atualize o Nodkey no seu iPhone para criar novas senhas a partir deste navegador.",
+  "reasonGenerate": "Criar uma nova senha para $1 no $2",
+  "genNotAllowed": "O Nodkey do seu iPhone dá a este navegador apenas códigos, então ele não cria senhas aqui.",
+  "genBadRequest": "O Nodkey não conseguiu criar uma senha para esta página. Digite uma você mesmo, e o Nodkey oferece salvá-la.",
+  "genSaveFailed": "Seu iPhone não conseguiu salvar uma nova senha, então não criou nenhuma. Tente de novo."
 }

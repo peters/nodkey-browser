@@ -15,6 +15,7 @@ export type Kind =
   | 'card'
   | 'suggest'
   | 'sms_code'
+  | 'generate'
 /** `queued` and `rejected` come only for `suggest`. */
 export type Decision = 'approved' | 'denied' | 'expired' | 'queued' | 'rejected'
 export type LeaseKind = 'once' | 'day' | 'week' | 'always' | 'session'
@@ -98,6 +99,16 @@ export interface Answer {
   quota?: Quota
   /** The phone's nonce, in its answer to the pairing check. */
   nonce?: string
+}
+
+/** A web page's rules for a new password (`rules` of a password the phone makes). */
+export interface PasswordRules {
+  /** The page's `passwordrules` attribute (Apple's password rules language), as written. */
+  passwordrules?: string
+  min_length?: number
+  max_length?: number
+  /** The field's `pattern` (an HTML pattern: a JavaScript regular expression for the whole value). */
+  pattern?: string
 }
 
 /** An amount: a decimal string with a dot and an ISO 4217 code (`docs/agent-protocol.md`). */

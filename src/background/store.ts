@@ -128,6 +128,24 @@ export async function setUsernameHint(tabId: number, h: UsernameHint): Promise<v
   await chrome.storage.session.set({ [`username:${tabId}`]: h })
 }
 
+/**
+ * A password the phone made and saved for a sign-up or a change in a tab: the save question does
+ * not come for that site in the next 10 minutes. No secret.
+ */
+export interface Generated {
+  site: string
+  at: number
+}
+
+export async function generated(tabId: number): Promise<Generated | null> {
+  const g = await getSession<Generated>(`generated:${tabId}`)
+  return g && Date.now() - g.at < 10 * 60_000 ? g : null
+}
+
+export async function setGenerated(tabId: number, g: Generated): Promise<void> {
+  await chrome.storage.session.set({ [`generated:${tabId}`]: g })
+}
+
 /** The card save offer for a tab (its number and CVC sealed to the phone), for a few minutes. */
 export async function cardOffer(tabId: number): Promise<CardOffer | null> {
   const o = await getSession<CardOffer>(`cardOffer:${tabId}`)

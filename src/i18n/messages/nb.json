@@ -171,5 +171,22 @@
   "smsButton": "Hent SMS-koden med Nodkey",
   "smsWaiting": "Venter på SMS-en. Når den kommer, godkjenner du på iPhonen.",
   "smsExpired": "Ingen SMS-kode kom til Nodkey i tide. Sjekk snarveiautomasjonen som sender koder til Nodkey, på iPhonen.",
-  "reasonSms": "SMS-kode for $1 i $2"
+  "reasonSms": "SMS-kode for $1 i $2",
+  "genButton": "Lag et sterkt passord med Nodkey",
+  "genMake": "Lag et sterkt passord",
+  "genMakeDetail": "iPhonen lager det og lagrer det først",
+  "genUseSaved": "Bruk en lagret innlogging",
+  "genWaiting": "Godkjenn det nye passordet på iPhonen",
+  "genSaved": "Lagret i Nodkey. Det nye passordet er fylt inn.",
+  "genUpdated": "Lagret i Nodkey som det nye passordet. Fullfør endringen på denne siden. iPhonen tar vare på det gamle passordet i 30 dager.",
+  "genNoField": "Lagret i Nodkey, men Nodkey fant ikke noe felt for det på denne siden. Passordet ligger i Nodkey på iPhonen.",
+  "genDenied": "Det ble ikke laget noe passord. Du sa nei på iPhonen.",
+  "genExpired": "iPhonen svarte ikke i tide. Det ble ikke laget noe passord.",
+  "genNoPasscode": "iPhonen din har ingen kode, så Nodkey kan ikke lage et passord her. Du kan legge inn en i Innstillinger → Face ID og kode.",
+  "genBadRules": "Nodkey kan ikke lage et passord som passer reglene på denne siden. Skriv inn et selv, så tilbyr Nodkey å lagre det.",
+  "genOldApp": "Oppdater Nodkey på iPhonen for å lage nye passord fra denne nettleseren.",
+  "reasonGenerate": "Lag et nytt passord for $1 i $2",
+  "genNotAllowed": "Nodkey på iPhonen gir denne nettleseren bare koder, så den lager ingen passord her.",
+  "genBadRequest": "Nodkey kunne ikke lage et passord for denne siden. Skriv inn et selv, så tilbyr Nodkey å lagre det.",
+  "genSaveFailed": "iPhonen kunne ikke lagre et nytt passord, så den laget ikke noe. Prøv igjen."
 }

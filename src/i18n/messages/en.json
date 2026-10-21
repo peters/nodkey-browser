@@ -171,5 +171,22 @@
   "smsButton": "Get the SMS code with Nodkey",
   "smsWaiting": "Waiting for the SMS. When it arrives, approve on your iPhone.",
   "smsExpired": "No SMS code reached Nodkey in time. On your iPhone, check the Shortcuts automation that sends codes to Nodkey.",
-  "reasonSms": "SMS code for $1 in $2"
+  "reasonSms": "SMS code for $1 in $2",
+  "genButton": "Make a strong password with Nodkey",
+  "genMake": "Make a strong password",
+  "genMakeDetail": "Your iPhone makes it and saves it first",
+  "genUseSaved": "Use a saved login",
+  "genWaiting": "Approve the new password on your iPhone",
+  "genSaved": "Saved in Nodkey. The new password is filled in.",
+  "genUpdated": "Saved in Nodkey as the new password. Finish the change on this page. Your iPhone keeps the old password for 30 days.",
+  "genNoField": "Saved in Nodkey, but Nodkey found no field for it on this page. The password is in Nodkey on your iPhone.",
+  "genDenied": "No password was made. You said no on your iPhone.",
+  "genExpired": "Your iPhone did not answer in time. No password was made.",
+  "genNoPasscode": "Your iPhone has no passcode, so Nodkey cannot make a password here. You can set one in Settings → Face ID & Passcode.",
+  "genBadRules": "Nodkey cannot make a password that fits the rules of this page. Type one yourself, and Nodkey offers to save it.",
+  "genOldApp": "Update Nodkey on your iPhone to make new passwords from this browser.",
+  "reasonGenerate": "Make a new password for $1 in $2",
+  "genNotAllowed": "Nodkey on your iPhone lets this browser get codes only, so it makes no passwords here.",
+  "genBadRequest": "Nodkey could not make a password for this page. Type one yourself, and Nodkey offers to save it.",
+  "genSaveFailed": "Your iPhone could not save a new password, so it made none. Try again."
 }

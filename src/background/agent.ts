@@ -18,6 +18,7 @@ import {
 import {
   type Answer,
   type Kind,
+  type PasswordRules,
   type Phone,
   type SealedBox,
   type SealedRequest,
@@ -252,6 +253,14 @@ export interface Ask {
   saveCard?: Record<string, unknown>
   /** The `suggest` object of a suggestion: a sign-in method and what happened. No secret. */
   suggest?: Record<string, unknown>
+  /** The `generate` object of a request to make and save a new password. No secret. */
+  generate?: {
+    url?: string
+    username?: string
+    title?: string
+    change?: boolean
+    rules?: PasswordRules
+  }
   /** `sms_code`: how long the phone waits for the SMS, in seconds (30 to 300). */
   waitSeconds?: number
   client: ClientInfo
@@ -282,6 +291,7 @@ export async function ask(a: Ask, phone: Phone, signal?: AbortSignal): Promise<O
   if (a.card) draft.card = a.card
   if (a.saveCard) draft.save_card = a.saveCard
   if (a.suggest) draft.suggest = a.suggest
+  if (a.generate) draft.generate = a.generate
   if (a.waitSeconds !== undefined) draft.wait_seconds = a.waitSeconds
   const nowSeconds = Math.floor(Date.now() / 1000)
   // The request says the picture's type, size and SHA-256; the phone shows only that picture.

@@ -9,6 +9,7 @@ import { relayAddressOk } from '../utils/relay'
 import { t } from '../i18n/t'
 import * as actions from './actions'
 import * as cards from './cards'
+import { generate } from './generate'
 import { PairingError, finishPairing, leave, rememberPhone, startPairing, unpair } from './agent'
 import { failed } from './outcome'
 import { answer as answerPasskey, syncPasskeyScripts } from './passkeys'
@@ -152,6 +153,12 @@ async function handle(msg: ToBackground, sender: chrome.runtime.MessageSender): 
     case 'fill.sms':
       if (sender.tab && !isExtensionPage(sender)) {
         void actions.fill('sms', sender.tab, sender.frameId, undefined, sender.url)
+      }
+      return null
+    case 'generate':
+      // Only from a page; the result arrives as the tab's activity.
+      if (sender.tab && !isExtensionPage(sender)) {
+        void generate(sender.tab, sender.frameId, sender.url, msg)
       }
       return null
     case 'signin.clicked':
@@ -314,6 +321,7 @@ chrome.tabs.onRemoved.addListener((tabId) => {
     `offer:${tabId}`,
     `username:${tabId}`,
     `cardOffer:${tabId}`,
+    `generated:${tabId}`,
   ])
 })
 

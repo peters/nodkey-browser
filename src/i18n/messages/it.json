@@ -171,5 +171,22 @@
   "smsButton": "Ottieni il codice SMS con Nodkey",
   "smsWaiting": "In attesa dell'SMS. Quando arriva, approva sul tuo iPhone.",
   "smsExpired": "Nessun codice SMS è arrivato a Nodkey in tempo. Sul tuo iPhone, controlla l'automazione di Comandi Rapidi che invia i codici a Nodkey.",
-  "reasonSms": "Codice SMS per $1 in $2"
+  "reasonSms": "Codice SMS per $1 in $2",
+  "genButton": "Crea una password sicura con Nodkey",
+  "genMake": "Crea una password sicura",
+  "genMakeDetail": "Il tuo iPhone la crea e la salva prima",
+  "genUseSaved": "Usa credenziali salvate",
+  "genWaiting": "Approva la nuova password sul tuo iPhone",
+  "genSaved": "Salvata in Nodkey. La nuova password è inserita.",
+  "genUpdated": "Salvata in Nodkey come nuova password. Completa la modifica in questa pagina. Il tuo iPhone conserva la vecchia password per 30 giorni.",
+  "genNoField": "Salvata in Nodkey, ma Nodkey non ha trovato un campo per lei in questa pagina. La password è in Nodkey sul tuo iPhone.",
+  "genDenied": "Nessuna password creata. Hai detto di no sul tuo iPhone.",
+  "genExpired": "Il tuo iPhone non ha risposto in tempo. Nessuna password creata.",
+  "genNoPasscode": "Il tuo iPhone non ha un codice, quindi Nodkey non può creare una password qui. Puoi impostarlo in Impostazioni → Face ID e codice.",
+  "genBadRules": "Nodkey non può creare una password che rispetti le regole di questa pagina. Scrivine una tu, e Nodkey ti propone di salvarla.",
+  "genOldApp": "Aggiorna Nodkey sul tuo iPhone per creare nuove password da questo browser.",
+  "reasonGenerate": "Crea una nuova password per $1 in $2",
+  "genNotAllowed": "Nodkey sul tuo iPhone dà a questo browser solo codici, quindi qui non crea password.",
+  "genBadRequest": "Nodkey non è riuscito a creare una password per questa pagina. Scrivine una tu, e Nodkey ti propone di salvarla.",
+  "genSaveFailed": "Il tuo iPhone non è riuscito a salvare una nuova password, quindi non ne ha creata nessuna. Riprova."
 }

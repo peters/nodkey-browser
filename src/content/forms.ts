@@ -12,17 +12,18 @@ export function layoutVisible(el: HTMLElement): boolean {
   return style.visibility !== 'hidden' && style.display !== 'none' && Number(style.opacity) > 0.05
 }
 
-function usable(el: HTMLInputElement, isVisible: Visible): boolean {
+export function usable(el: HTMLInputElement, isVisible: Visible): boolean {
   return !el.disabled && !el.readOnly && isVisible(el)
 }
 
-const USERNAME_HINT = /user|login|email|e-mail|mail|account|konto|brukernavn|identifier|phone/i
+export const USERNAME_HINT =
+  /user|login|email|e-mail|mail|account|konto|brukernavn|identifier|phone/i
 const OTP_HINT = /otp|one.?time|2fa|mfa|totp|token|verif|security.?code|auth.?code|\bcode\b|kode/i
 /** Short fields that are not one-time codes. */
 const NOT_OTP =
   /zip|postal|post.?code|postnummer|promo|coupon|voucher|discount|gift|country|area|phone/i
 
-function hint(el: HTMLInputElement): string {
+export function hint(el: HTMLInputElement): string {
   return [
     el.name,
     el.id,
@@ -32,11 +33,11 @@ function hint(el: HTMLInputElement): string {
   ].join(' ')
 }
 
-function inputs(root: ParentNode): HTMLInputElement[] {
+export function inputs(root: ParentNode): HTMLInputElement[] {
   return Array.from(root.querySelectorAll('input'))
 }
 
-function isTextLike(el: HTMLInputElement): boolean {
+export function isTextLike(el: HTMLInputElement): boolean {
   return ['text', 'email', 'tel', ''].includes(el.type)
 }
 

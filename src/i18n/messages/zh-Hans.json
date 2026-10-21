@@ -171,5 +171,22 @@
   "smsButton": "用 Nodkey 获取短信验证码",
   "smsWaiting": "正在等待短信。短信到达后，请在 iPhone 上批准。",
   "smsExpired": "没有短信验证码及时到达 Nodkey。请在 iPhone 上检查把验证码发送到 Nodkey 的快捷指令自动化。",
-  "reasonSms": "在 $2 中获取 $1 的短信验证码"
+  "reasonSms": "在 $2 中获取 $1 的短信验证码",
+  "genButton": "用 Nodkey 生成强密码",
+  "genMake": "生成强密码",
+  "genMakeDetail": "由你的 iPhone 生成并先保存",
+  "genUseSaved": "使用已保存的登录信息",
+  "genWaiting": "请在 iPhone 上批准新密码",
+  "genSaved": "已保存到 Nodkey。新密码已填写。",
+  "genUpdated": "已作为新密码保存到 Nodkey。请在此页面上完成修改。你的 iPhone 会将旧密码保留 30 天。",
+  "genNoField": "已保存到 Nodkey，但 Nodkey 在此页面上没有找到可填写的字段。密码在你 iPhone 上的 Nodkey 中。",
+  "genDenied": "没有生成密码。你在 iPhone 上拒绝了。",
+  "genExpired": "你的 iPhone 没有及时回应。没有生成密码。",
+  "genNoPasscode": "你的 iPhone 没有设置密码，所以 Nodkey 无法在这里生成密码。你可以在“设置”→“面容 ID 与密码”中设置。",
+  "genBadRules": "Nodkey 无法生成符合此页面规则的密码。请自己输入一个，Nodkey 会提议保存它。",
+  "genOldApp": "请更新 iPhone 上的 Nodkey，以便从这个浏览器生成新密码。",
+  "reasonGenerate": "在 $2 中为 $1 生成新密码",
+  "genNotAllowed": "你 iPhone 上的 Nodkey 只给这个浏览器提供验证码，所以这里不生成密码。",
+  "genBadRequest": "Nodkey 无法为此页面生成密码。请自己输入一个，Nodkey 会提议保存它。",
+  "genSaveFailed": "你的 iPhone 无法保存新密码，所以没有生成密码。请重试。"
 }
