@@ -75,4 +75,12 @@ describe('make a strong password', () => {
     expect(fillNew({ ...msg, username: 'alex.typed@example.com' })).toBe(true)
     expect(field('e').value).toBe('alex.typed@example.com')
   })
+
+  it('puts the user name that the person corrected on the phone into the form', () => {
+    menu('p').items[0]?.run()
+    const msg = { type: 'fill.new', site: 'localhost', password: 'Synthetic-4' } as const
+    expect(fillNew({ ...msg, username: 'alex.k@example.com' })).toBe(true)
+    expect(field('e').value).toBe('alex.k@example.com')
+    expect([field('p').value, field('c').value]).toEqual(['Synthetic-4', 'Synthetic-4'])
+  })
 })

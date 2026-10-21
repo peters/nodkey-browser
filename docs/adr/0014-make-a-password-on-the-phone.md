@@ -41,7 +41,10 @@ confirmed, the saved login and `saved: added` or `updated`.
 3. The request has `target` (the host of the page), `generate.url` (without
    query and fragment), the title of the page, `change`, and the rules of the
    field (`passwordrules`, `minlength`, `maxlength`, `pattern`). A rule that
-   breaks a limit of the protocol is left out.
+   breaks a limit of the protocol is left out. When no password can meet the
+   rules (`Rules::check`, WebAssembly: `generate_rules_problem`), the card says
+   so at once and nothing goes to the phone. The phone finds the rest (for
+   example a `pattern` that no password matches) and answers `bad_rules`.
 4. The user name is the one in the form. When the form has none, it is the
    user name from an earlier step of the same sign-up in this tab (Google asks
    for it on an earlier page). That user name is kept in `chrome.storage.session`
@@ -54,8 +57,9 @@ confirmed, the saved login and `saved: added` or `updated`.
    (`same_site`, the `fill_only_on` rule of the protocol), and the content
    script fills only in the frame that asked, in the last 3 minutes, on the
    site of the answer, never on plain HTTP on the internet. It fills the new
-   field and the repeat field, and an empty user name field with the user name
-   from the phone.
+   field and the repeat field. A visible user name field of the form gets the
+   user name that the person confirmed on the phone, so that the site and
+   Nodkey have the same one.
 6. After an approved answer, the tab keeps a marker (site and time, no secret)
    for 10 minutes. The save question does not come for that site in that tab:
    the phone saved the password already.

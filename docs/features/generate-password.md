@@ -62,6 +62,9 @@ The browser is paired with the fake phone. The fake phone mode is `approve`.
   Result: No menu. The login is filled as in [Fill a login](fill-login.md).
 - Set the fake phone mode to `deny`. Make a password. Result: The card shows
   "No password was made. You said no on your iPhone."
-- The fake phone refuses with `no_passcode` and `bad_rules` (see the unit test
-  `tests/unit/generate.integration.test.ts`). Result: The card shows a calm
-  text for each one, and nothing is filled.
+- The fake phone refuses with `no_passcode`, `not_allowed` and `save_failed`
+  (see the unit test `tests/unit/generate.integration.test.ts`). Result: The
+  card shows a calm text for each one, and nothing is filled.
+- A field with rules that no password can meet (for example `minlength="40"
+  maxlength="8"`). Result: The card says at once that Nodkey cannot make a
+  password for these rules. No request goes to the phone.

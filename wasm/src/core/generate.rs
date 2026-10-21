@@ -28,3 +28,11 @@ pub fn generate_page(site: &str) -> Result<Option<String>, String> {
 pub fn generate_fill_only_on(target: &str) -> Result<String, String> {
     serde_json::to_string(&generate::fill_only_on(target)).map_err(js)
 }
+
+/// Whether some password can meet `rules_json` (a `generate::Rules`): `None` when it can, else
+/// why not (`Rules::check`, the phone's `bad_rules`). The extension asks the phone only when
+/// they can be met.
+pub fn generate_rules_problem(rules_json: &str) -> Result<Option<String>, String> {
+    let rules: generate::Rules = serde_json::from_str(rules_json).map_err(js)?;
+    Ok(rules.check().err())
+}

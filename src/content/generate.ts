@@ -57,8 +57,9 @@ function makePassword(form: NewPasswordForm, send: Send): void {
 
 /**
  * Fills the new password the phone made and saved into the field and its repeat field: only in
- * the frame that asked, only on the site the phone answered for, never over plain HTTP. An empty
- * user name field of the form gets the user name the person gave on the phone.
+ * the frame that asked, only on the site the phone answered for, never over plain HTTP. The
+ * form's user name field gets the user name the person confirmed on the phone, so that the site
+ * and Nodkey have the same one.
  */
 export function fillNew(msg: Extract<ToContent, { type: 'fill.new' }>): boolean {
   if (!asked || Date.now() - asked.at > ASK_MS) return false
@@ -67,11 +68,11 @@ export function fillNew(msg: Extract<ToContent, { type: 'fill.new' }>): boolean 
   const form = asked.form.password.isConnected ? asked.form : findNewPassword(document)
   if (!form) return false
   asked = null
-  setValue(form.password, msg.password)
-  if (form.confirm) setValue(form.confirm, msg.password)
   const user = form.username
-  if (msg.username && user && user.type !== 'hidden' && user.value.trim() === '') {
+  if (msg.username && user && user.type !== 'hidden' && user.value.trim() !== msg.username) {
     setValue(user, msg.username)
   }
+  setValue(form.password, msg.password)
+  if (form.confirm) setValue(form.confirm, msg.password)
   return true
 }

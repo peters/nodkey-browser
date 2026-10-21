@@ -5,7 +5,12 @@
  * password field and its repeat field and does not ask to save it again.
  */
 
-import { generate_fill_only_on, generate_page, may_fill } from '../wasm/nodkey.js'
+import {
+  generate_fill_only_on,
+  generate_page,
+  generate_rules_problem,
+  may_fill,
+} from '../wasm/nodkey.js'
 import type { ToBackground, ToContent } from '../models/messages'
 import type { Answer, PasswordRules } from '../models/protocol'
 import { t } from '../i18n/t'
@@ -108,6 +113,11 @@ export async function generate(
   if (!named) return publish(tabId, kind, site, 'error', t('siteNone'), frameId)
   const page = JSON.parse(named) as { target: string; url?: string }
   const target = page.target
+  // Rules that no password can meet (`Rules::check`): said at once, nothing goes to the phone.
+  const rules = requestRules(req.rules)
+  if (generate_rules_problem(JSON.stringify(rules))) {
+    return publish(tabId, kind, site, 'error', t('genBadRules'), frameId)
+  }
   const phone = await store.currentPhone()
   if (!phone) return publish(tabId, kind, site, 'error', t('actNeedsPairing'), frameId)
 
@@ -126,7 +136,6 @@ export async function generate(
     const title = text(req.title?.slice(0, MAX_TITLE), MAX_TITLE)
     if (title) generate.title = title
     if (req.change) generate.change = true
-    const rules = requestRules(req.rules)
     if (Object.keys(rules).length > 0) generate.rules = rules
     const settings = await store.settings()
     const request: Ask = {

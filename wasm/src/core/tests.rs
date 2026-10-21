@@ -519,4 +519,9 @@ fn generate_requests_follow_the_vectors() {
         Some(r#"{"target":"localhost"}"#)
     );
     assert_eq!(generate::generate_page("not a site").unwrap(), None);
+    // Rules no password can meet are found before anything is sent, as the phone finds them.
+    for r in vectors()["generate"]["rules"].as_array().unwrap() {
+        let problem = generate::generate_rules_problem(&r["rules"].to_string()).unwrap();
+        assert_eq!(problem.is_none(), r["error"].is_null(), "{r}");
+    }
 }

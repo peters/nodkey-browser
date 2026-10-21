@@ -260,10 +260,13 @@ describe('refusals', () => {
     expect(session.get('generated:7')).toBeUndefined()
   })
 
-  it('rules that no password can meet', async () => {
+  it('rules that no password can meet: said at once, nothing goes to the phone', async () => {
     const { generate } = await import('../../src/background/generate')
     const page = tabAt('https://accounts.example.com/signup')
+    const before = await lastRequest()
     await generate(page, 0, page.url, ask({ rules: { min_length: 40, max_length: 8 } }))
+    await generate(page, 0, page.url, ask({ rules: { passwordrules: 'allowed: [ ];' } }))
+    expect(await lastRequest()).toEqual(before)
     expect(activity()).toMatchObject({
       state: 'error',
       message:
