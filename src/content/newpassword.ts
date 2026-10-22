@@ -227,6 +227,29 @@ export function newPasswordForm(
   return isNew(a) || pageSaysNew() ? form(a, null, null) : null
 }
 
+/** A sign-up address: `/signup/username`, `/register`, `/create-account`. */
+const SIGN_UP_PATH = /sign-?up|regist|create-?account|new-?account/i
+
+/**
+ * A sign-up step that only chooses a user name (Google's "Choose your Gmail address"): no
+ * password field on the page, and its address or its headings say sign-up. The name is a new one,
+ * so the Nodkey button offers no saved login there; the name goes on to the password step.
+ */
+export function signUpNameStep(
+  field: HTMLInputElement,
+  root: Document = field.ownerDocument,
+  isVisible: Visible = layoutVisible,
+): boolean {
+  if (field.type === 'password') return false
+  if (inputs(root).some((el) => el.type === 'password' && usable(el, isVisible))) return false
+  if (SIGN_UP_PATH.test(root.defaultView?.location.pathname ?? '')) return true
+  const shown = Array.from(root.querySelectorAll(HEADINGS))
+    .filter((h) => h instanceof HTMLElement && isVisible(h))
+    .map((h) => plainText(h))
+  const headings = `${root.title} ${shown.join(' ')}`
+  return SIGN_UP.test(headings) && !SIGN_IN.test(headings)
+}
+
 /** The longest `passwordrules` and `pattern` the protocol takes (`MAX_RULES`, `MAX_PATTERN`). */
 const MAX_RULES = 300
 

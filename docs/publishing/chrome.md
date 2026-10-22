@@ -106,8 +106,9 @@ for 0.2.2, then [New version of the item](#new-version-of-the-item) with 0.3.0.
    `store/review/chrome-test-instructions.txt` with the version and the
    commit. It tells the reviewer to pair with "Get a code" and Agents > Add
    agent in Nodkey, to confirm the same check number in the browser and on
-   the iPhone (0.3.0 needs Nodkey 1.3 or later from the App Store), then to
-   click the Nodkey button in a sign-in field.
+   the iPhone (extension X.Y needs Nodkey X.Y or later from the App Store), then
+   to click the Nodkey button in a sign-in field. The store takes at most 500
+   characters; `npm run store` stops when the text is longer.
 
 6. "Distribution": select the visibility that the owner chose (see the top of
    this page) and the regions (all).

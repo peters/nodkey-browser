@@ -145,6 +145,20 @@ const PAGES = {
     <label for="username">Choose your user name</label><input id="username" name="Username">
     <button id="next">Next</button></form>`,
   ),
+  // Google's "Choose your Gmail address" (its address has "signup"): suggested names as styled
+  // radio buttons (the inputs themselves are transparent), and "Create your own" with a text field.
+  '/signup/username': page(
+    'Choose your address',
+    `<form method="get" action="/join/password"><div role="radiogroup">
+    <div><input type="radio" name="pick" id="pick1" value="alex.new2026" style="opacity:0;width:auto">
+      <div>alex.new2026@example.com</div></div>
+    <div><input type="radio" name="pick" id="pick2" value="newalex26" style="opacity:0;width:auto">
+      <div>newalex26@example.com</div></div>
+    <div><input type="radio" name="pick" id="own" value="custom" style="width:auto">
+      <div>Create your own address</div></div></div>
+    <label for="custom">Your own address</label><input id="custom" name="Username">
+    <button id="next">Next</button></form>`,
+  ),
   '/join/password': page(
     'Create a strong password',
     `<p>Create a strong password with a mix of letters, numbers and symbols</p>

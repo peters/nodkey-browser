@@ -134,7 +134,8 @@ export function submission(
       (el) =>
         isTextLike(el) && el.value.trim() !== '' && isVisible(el) && USERNAME_HINT.test(hint(el)),
     )
-    return user ? { username: user.value.trim(), password: '' } : null
+    const username = user?.value.trim() ?? chosenName(scope, isVisible)
+    return username ? { username, password: '' } : null
   }
   // Sign-up and change-password forms ask for the new password (twice); it is the one to keep.
   const fresh = passwords.filter((el) => el.autocomplete === 'new-password').at(-1)
@@ -142,4 +143,35 @@ export function submission(
   const password = fresh?.value ?? (repeated ? last.value : first.value)
   const username = usernameFor(first, isVisible)?.value.trim() ?? ''
   return { username, password }
+}
+
+/**
+ * The user name the person picked from the page's suggestions (Google's "Choose your Gmail
+ * address"): a checked radio button whose label shows its value. "Create your own" shows no value,
+ * so its text field gives the name instead.
+ */
+export function chosenName(scope: ParentNode, isVisible: Visible = layoutVisible): string | null {
+  for (const el of inputs(scope)) {
+    if (el.type !== 'radio' || !el.checked || el.disabled) continue
+    const value = el.value.trim()
+    if (!value || value === 'on' || value.length > 200 || /\s/.test(value)) continue
+    // Styled radio buttons hide the input itself and draw their own circle next to it.
+    if (!isVisible(el) && !isVisible(el.parentElement ?? el)) continue
+    // A name, not an answer such as "yes": its field says so, or it has a digit, a dot or an @.
+    const nameLike = USERNAME_HINT.test(hint(el)) || /[\d.@]/.test(value)
+    if (nameLike && labelText(el).includes(value)) return value
+  }
+  return null
+}
+
+/** The text of a radio button's label: its labels, else its nearest part of the page alone. */
+function labelText(el: HTMLInputElement): string {
+  const labels = Array.from(el.labels ?? [], (l) => l.textContent).join(' ')
+  if (labels.trim()) return labels
+  let around: Element | null = null
+  for (let p = el.parentElement, depth = 0; p && depth < 4; p = p.parentElement, depth++) {
+    if (p.querySelectorAll('input[type=radio]').length > 1) break
+    around = p
+  }
+  return around?.textContent ?? el.getAttribute('aria-label') ?? ''
 }

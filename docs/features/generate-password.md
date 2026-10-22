@@ -51,6 +51,11 @@ The browser is paired with the fake phone. The fake phone mode is `approve`.
   same password. The request has `generate.change: true` and the user name
   `alex@example.com` from the hidden user name field. The card says that the
   iPhone keeps the old password for 30 days.
+- Open `/signup/username` (a step that only chooses a user name, as Google's
+  "Choose your Gmail address"). Click in "Your own address". Result: No Nodkey
+  button shows. Select the suggested name `alex.new2026`, click "Next", and
+  make a strong password. Result: `generate.username` is `alex.new2026`
+  (issue #14).
 - On `/change`, click in "Current password". Result: The usual button "Fill
   with Nodkey" shows, without a menu.
 - On `/join/password`, open the menu with the keyboard (focus the button, push

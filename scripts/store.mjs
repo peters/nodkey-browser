@@ -71,6 +71,31 @@ for (const l of listings) {
   })
   for (const k of keys) if (!l.ui?.[k]) problems.push(`${l.lang}.ui.${k} is missing`)
 }
+
+// The texts for the reviewers (English only in both stores), with this commit and version. AMO
+// takes at most 3000 characters (approval_notes), the Chrome Web Store 500 (test instructions).
+const fill = {
+  version: JSON.parse(readFileSync(join(root, 'package.json'), 'utf8')).version,
+  commit: execFileSync('git', ['rev-parse', 'HEAD'], { cwd: root }).toString().trim(),
+  proto: /nodkey-proto = .*rev = "([0-9a-f]+)"/.exec(
+    readFileSync(join(root, 'Cargo.toml'), 'utf8'),
+  )?.[1],
+}
+const reviewTexts = [
+  { source: 'firefox-notes-to-reviewer.txt', out: 'firefox/notes-to-reviewer.txt', limit: 3000 },
+  { source: 'chrome-test-instructions.txt', out: 'chrome/test-instructions.txt', limit: 500 },
+].map(({ source, out, limit }) => {
+  const text = readFileSync(join(root, 'store/review', source), 'utf8')
+    .replace(
+      /\{(version|commit|proto)\}/g,
+      (_, key) => fill[/** @type {'version' | 'commit' | 'proto'} */ (key)] ?? '',
+    )
+    .trimEnd()
+  // A form sends each line break as two characters (CR LF).
+  const length = text.replace(/\n/g, '\r\n').length
+  if (length > limit) problems.push(`store/review/${source}: ${length} > ${limit}`)
+  return { out, text: `${text}\n` }
+})
 if (problems.length) {
   console.error(problems.join('\n'))
   process.exit(1)
@@ -201,23 +226,8 @@ if (!only) {
   writeFileSync(join(outRoot, 'index.html'), page)
   console.log('review page: store/out/index.html')
 
-  // The texts for the reviewers (English only in both stores), with this commit and version.
-  const fill = {
-    version: JSON.parse(readFileSync(join(root, 'package.json'), 'utf8')).version,
-    commit: execFileSync('git', ['rev-parse', 'HEAD'], { cwd: root }).toString().trim(),
-    proto: /nodkey-proto = .*rev = "([0-9a-f]+)"/.exec(
-      readFileSync(join(root, 'Cargo.toml'), 'utf8'),
-    )?.[1],
-  }
   const dirty = execFileSync('git', ['status', '--porcelain'], { cwd: root }).toString().trim()
-  for (const { source, out } of [
-    { source: 'firefox-notes-to-reviewer.txt', out: 'firefox/notes-to-reviewer.txt' },
-    { source: 'chrome-test-instructions.txt', out: 'chrome/test-instructions.txt' },
-  ]) {
-    const text = readFileSync(join(root, 'store/review', source), 'utf8').replace(
-      /\{(version|commit|proto)\}/g,
-      (_, key) => fill[/** @type {'version' | 'commit' | 'proto'} */ (key)] ?? '',
-    )
+  for (const { out, text } of reviewTexts) {
     writeFileSync(join(outRoot, out), text)
     console.log(`reviewer text: store/out/${out}`)
   }

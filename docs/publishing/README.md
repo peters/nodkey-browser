@@ -106,7 +106,37 @@ submission. It thinks that they publish something or send a password.
    works: `git tag v<version>` and `git push origin v<version>`. Do not push
    a tag before that.
 
-## Version 0.3.0
+## Version 1.4.0
+
+Status on 2026-10-22: the code and the texts are ready in `main` (version
+1.4.0 in `package.json`). Nothing is uploaded and nothing is tagged. Version
+0.3.0 is live on AMO and waits for review in the Chrome Web Store.
+
+The version number follows the iPhone app (see `AGENTS.md`, "Publishing").
+Upload 1.4.0 only after the App Store approves Nodkey 1.4, and only after the
+owner says yes. An iPhone with an app older than 1.4 answers
+`unsupported_kind` to "Make a strong password", and the extension shows
+"Update Nodkey on your iPhone to make new passwords from this browser."
+
+nodkey-proto and the fake relay are at nodkey-cli 384d837 (release 1.4.0).
+The protocol code did not change after 03c8504.
+
+What changes for the stores:
+
+- Both: "Make a strong password" (peters/nodkey#131) in the description of
+  each language, the version notes, and the notes to the reviewers
+  (`store/out/firefox/notes-to-reviewer.txt`, at most 3000 characters, and
+  `store/out/chrome/test-instructions.txt`, at most 500 characters).
+- No new permission and no new data disclosure. The `generate` request holds
+  authentication information, website activity and website content, which
+  are declared already.
+- The screenshots did not change.
+- Chrome: if 0.3.0 still waits for review, do [Cancel a review](chrome.md#cancel-a-review)
+  first, then [New version of the item](chrome.md#new-version-of-the-item)
+  with 1.4.0.
+- The texts are machine translations: get a native review before the upload.
+
+## Version 0.3.0 (history)
 
 Status on 2026-10-20: the code, the texts and the disclosures are ready in
 `main` (version 0.3.0 in `package.json`). The Nodkey app 1.3 with the pairing

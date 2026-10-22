@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { labelOf, newPasswordForm, rulesOf } from './newpassword'
+import { labelOf, newPasswordForm, rulesOf, signUpNameStep } from './newpassword'
 
 const visible = () => true
 
@@ -220,5 +220,30 @@ describe('labelOf', () => {
     expect(text).toContain('Repeat it')
     expect(text).toContain('Password')
     expect(text).not.toContain('Forgot')
+  })
+})
+
+describe('signUpNameStep', () => {
+  it('finds a step that chooses a user name by the headings', () => {
+    page(`<h1>Create your account</h1><form><input id="u" name="Username"></form>`, 'Join')
+    expect(signUpNameStep(field('u'), document, visible)).toBe(true)
+  })
+
+  it('finds it by the address of the page', () => {
+    window.history.pushState({}, '', '/lifecycle/steps/signup/username')
+    try {
+      page(`<h1>Choose your address</h1><form><input id="u" name="Username"></form>`, 'Accounts')
+      expect(signUpNameStep(field('u'), document, visible)).toBe(true)
+    } finally {
+      window.history.pushState({}, '', '/')
+    }
+  })
+
+  it('keeps the button on a sign-in step and on a page with a password field', () => {
+    page(`<h1>Sign in or create an account</h1><form><input id="u" type="email"></form>`)
+    expect(signUpNameStep(field('u'), document, visible)).toBe(false)
+    page(`<h1>Create an account</h1><form><input id="u" type="email">
+      <input id="p" type="password"></form>`)
+    expect(signUpNameStep(field('u'), document, visible)).toBe(false)
   })
 })

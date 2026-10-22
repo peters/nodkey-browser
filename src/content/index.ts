@@ -19,7 +19,7 @@ import {
 } from './pay'
 import { fillCode, setValue } from './fill'
 import { findLogin, findOtp, isOtpField, submission } from './forms'
-import { fillNew, newFormOf, openMenu } from './generate'
+import { fillNew, newFormOf, newNameField, openMenu } from './generate'
 import { smsPage } from './signin'
 import { noteClick, pageLoaded, showMethod, watchPrompt } from './steps'
 import { PageUi } from './ui'
@@ -95,6 +95,8 @@ function focused(target: EventTarget | null): void {
       return
     }
     const code = isOtpField(target) || boxRow(target) !== null
+    // A new user name: nothing to fill; the name goes on to the password step (issue #14).
+    if (!code && newNameField(target)) return
     const label = code && smsPage(document) ? t('smsButton') : t('fieldButton')
     page().showKey(target, boxRow(target)?.at(-1) ?? target, label)
   }

@@ -86,6 +86,26 @@ export async function generateFlow(name, browser, relay, site, agentName, helper
   if ((await seen('save')).length !== saves) throw new Error('the save question came')
   log(name, 'no save question after the sign-up')
 
+  log(name, 'a suggested user name: no Nodkey button on the name step, the picked name goes on')
+  await tab.goto(`${site}/signup/username`)
+  const asks = (await seen('login')).length
+  await clickKey(tab, '#custom')
+  await sleep(1500)
+  if ((await seen('login')).length !== asks) throw new Error('the name step asked for a login')
+  await tab.click('#pick1')
+  await Promise.all([tab.waitForNavigation(), tab.click('#next')])
+  await clickKey(tab, '#passwd')
+  await sleep(600)
+  await tab.keyboard.press('Enter')
+  await waitFor('the new password from the suggested name', async () => {
+    const v = await values(tab, 'passwd', 'again')
+    return v[0] && v[0] === v[1] ? v : null
+  })
+  const picked = (await seen('generate')).at(-1)?.request.generate
+  if (picked?.username !== 'alex.new2026')
+    throw new Error(`the phone saw ${JSON.stringify(picked)}`)
+  log(name, 'the phone got the picked name alex.new2026')
+
   log(name, 'make a strong password on a password change')
   await tab.goto(`${site}/change`)
   await clickKey(tab, '#fresh')

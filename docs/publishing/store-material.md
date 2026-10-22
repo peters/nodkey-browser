@@ -56,7 +56,10 @@ review before the first public listing.
    ```
 
    Result: "texts ok (12 languages)". The limits are: name 45, summary 132,
-   version notes 3000, caption title 44 and caption text 90 characters.
+   version notes 3000, caption title 44 and caption text 90 characters. The
+   notes to the AMO reviewer can have 3000 characters and the Chrome Web Store
+   test instructions 500, with the version, the commit and each line break as
+   two characters.
 
 4. Render:
 
@@ -106,7 +109,7 @@ declare this as "Location" (Chrome) and `locationInfo` (Firefox), from 0.3.0.
 | `login`, `code` | The person clicks the Nodkey button or the popup | The site (and the user name when the page has one), the reason, an optional picture of the page |
 | `sms_code` | The person clicks the Nodkey button in the code field of a page that says the code came by SMS | The site and the wait (120 seconds) |
 | `suggest` | The person clicks "Remember" on "Remember that <site> uses <provider> sign-in?" | The site and the name of the provider only (`federated`, `seen`, `extension`) |
-| `generate` | The person clicks "Make a strong password" in the menu of the Nodkey button | The host and the address of the page (no query, no fragment), the page title, the user name when the form or an earlier step of the sign-up has one, whether it is a password change, the rules of the field (`passwordrules`, `minlength`, `maxlength`, `pattern`), an optional picture of the page |
+| `generate` | The person clicks "Make a strong password" in the menu of the Nodkey button | The host and the address of the page (no query, no fragment), the page title, the user name when the form or an earlier step of the sign-up has one (typed, or a suggested name that the person picked), whether it is a password change, the rules of the field (`passwordrules`, `minlength`, `maxlength`, `pattern`), an optional picture of the page |
 | `save`, `save_card` | The person clicks "Save" | The page address, the user name or the card's brand, last digits and expiry; the password, number and CVC sealed for the phone only |
 | `card` | The person clicks "Approve on iPhone" at a checkout, or "Add the card for later payments" on a page without a total | The shop (the site of the top page), the origin of the frame with the card fields, the host of a payment provider's frame (`via`), and for a payment the amount and the total on the page; no amount for a card for later payments (`purpose: setup`) |
 | `pairing_check` | Once, while the person pairs | A random value (nonce) for the check number, nothing else |

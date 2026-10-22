@@ -8,7 +8,13 @@ import type { ToBackground, ToContent } from '../models/messages'
 import { t } from '../i18n/t'
 import { belongsTo, mayFill } from '../utils/site'
 import { setValue } from './fill'
-import { type NewPasswordForm, findNewPassword, newPasswordForm, rulesOf } from './newpassword'
+import {
+  type NewPasswordForm,
+  findNewPassword,
+  newPasswordForm,
+  rulesOf,
+  signUpNameStep,
+} from './newpassword'
 import type { PageUi } from './ui'
 
 type Send = <T>(msg: ToBackground) => Promise<T | null>
@@ -25,6 +31,11 @@ export function newFormOf(field: HTMLInputElement): NewPasswordForm | null {
   if (!mayFill(location.href)) return null
   const form = newPasswordForm(field)
   return form && form.current !== field ? form : null
+}
+
+/** A user name field of a sign-up step without a password field: the Nodkey button stays away. */
+export function newNameField(field: HTMLInputElement): boolean {
+  return mayFill(location.href) && signUpNameStep(field)
 }
 
 /** The menu of the Nodkey button: make a strong password first, a saved login second. */

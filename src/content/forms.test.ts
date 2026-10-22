@@ -101,6 +101,29 @@ describe('submission', () => {
     expect(submission(doc, visible)).toEqual({ username: 'alex', password: '' })
   })
 
+  it('reads a suggested user name the person picked (issue #14)', () => {
+    const doc = page(`<div role="radiogroup">
+      <div><input type="radio" name="suggestion" value="alex.new2026" checked>
+        <div>alex.new2026@example.com</div></div>
+      <div><input type="radio" name="suggestion" value="newalex26"><div>newalex26@example.com</div></div>
+      <div><input type="radio" name="suggestion" value="custom"><div>Create your own address</div></div>
+      </div><input name="Username" value="">`)
+    expect(submission(doc, visible)).toEqual({ username: 'alex.new2026', password: '' })
+  })
+
+  it('prefers the typed name of "Create your own" over its radio button', () => {
+    const doc =
+      page(`<label><input type="radio" name="s" value="custom" checked> Create your own</label>
+      <input name="Username" value="alex.own">`)
+    expect(submission(doc, visible)?.username).toBe('alex.own')
+  })
+
+  it('takes no answer of an unrelated radio button as a user name', () => {
+    const doc = page(`<label><input type="radio" name="color" value="blue" checked> blue</label>
+      <label><input type="radio" name="plan" value="custom" checked> Custom plan</label>`)
+    expect(submission(doc, visible)).toBeNull()
+  })
+
   it('returns nothing without typed values', () => {
     expect(submission(page(`<form><input type="password"></form>`), visible)).toBeNull()
   })

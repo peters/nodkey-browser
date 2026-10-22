@@ -415,7 +415,7 @@ dependencies = [
 
 [[package]]
 name = "fake-relay"
-version = "0.3.0"
+version = "1.4.0"
 dependencies = [
  "nodkey-fake-relay",
 ]
@@ -926,8 +926,8 @@ dependencies = [
 
 [[package]]
 name = "nodkey-fake-relay"
-version = "0.4.0"
-source = "git+https://github.com/peters/nodkey-cli?rev=03c85042003eeafbaacc1cce76e75d82e2574839#03c85042003eeafbaacc1cce76e75d82e2574839"
+version = "1.4.0"
+source = "git+https://github.com/peters/nodkey-cli?rev=384d837236ac361dbd0e13db917488a34fe47b9c#384d837236ac361dbd0e13db917488a34fe47b9c"
 dependencies = [
  "axum",
  "nodkey-proto",
@@ -939,8 +939,8 @@ dependencies = [
 
 [[package]]
 name = "nodkey-proto"
-version = "0.4.0"
-source = "git+https://github.com/peters/nodkey-cli?rev=03c85042003eeafbaacc1cce76e75d82e2574839#03c85042003eeafbaacc1cce76e75d82e2574839"
+version = "1.4.0"
+source = "git+https://github.com/peters/nodkey-cli?rev=384d837236ac361dbd0e13db917488a34fe47b9c#384d837236ac361dbd0e13db917488a34fe47b9c"
 dependencies = [
  "chacha20poly1305",
  "ed25519-dalek",
@@ -957,7 +957,7 @@ dependencies = [
 
 [[package]]
 name = "nodkey-wasm"
-version = "0.3.0"
+version = "1.4.0"
 dependencies = [
  "ed25519-dalek",
  "getrandom 0.4.3",
