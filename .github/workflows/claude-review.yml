@@ -36,7 +36,7 @@ jobs:
       (github.event.action != 'labeled' &&
        !github.event.pull_request.draft &&
        github.event.pull_request.head.repo.full_name == github.repository &&
-       github.event.pull_request.user.type != 'Bot')
+       (github.event.pull_request.user.type != 'Bot' || github.event.pull_request.user.login == 'upkeep-peters[bot]' || github.event.pull_request.user.login == 'dependabot[bot]'))
     runs-on: ubuntu-latest
     timeout-minutes: 30
     concurrency:
@@ -147,6 +147,7 @@ jobs:
         if: steps.rounds.outputs.run == 'true'
         uses: anthropics/claude-code-action@8041f1d17e0e7d2f2cfe35002962e9f26237c0bb # v1.0.263
         with:
+          allowed_bots: upkeep-peters,dependabot
           anthropic_api_key: ${{ secrets.ANTHROPIC_API_KEY }}
           # The Claude app token exchange rejects this event's OIDC token, so
           # Claude comments with the job's own token, as github-actions[bot].
