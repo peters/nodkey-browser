@@ -108,9 +108,10 @@ submission. It thinks that they publish something or send a password.
 
 ## Version 1.4.0
 
-Status on 2026-10-22: the code and the texts are ready in `main` (version
-1.4.0 in `package.json`). Nothing is uploaded and nothing is tagged. Version
-0.3.0 is live on AMO and waits for review in the Chrome Web Store.
+Status on 2026-11-08: the App Store approved Nodkey 1.4. Version 1.4.0 goes
+to AMO (listed) and the Chrome Web Store from commit a0b5cea, with the owner's
+yes. Version 0.3.0 was live on AMO; the Chrome Web Store had 0.3.0 waiting for
+review.
 
 The version number follows the iPhone app (see `AGENTS.md`, "Publishing").
 Upload 1.4.0 only after the App Store approves Nodkey 1.4, and only after the

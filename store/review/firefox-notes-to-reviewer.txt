@@ -5,7 +5,7 @@ No user name or password: Nodkey has no account. The extension needs an iPhone w
 3. The browser and the iPhone show the same check number. Click "Same number" in the browser and confirm it on the iPhone.
 4. Open a sign-in page of a site that is saved in Nodkey and click the Nodkey button in the password field. Approve on the iPhone. The extension fills in the user name and the password.
 
-New in {version}: Make a strong password.
+New in {version}: Make a strong password. Save offers only for new logins and cards, after a real submit.
 - On a sign-up or password change page, click in the new password field, click the Nodkey button, then "Make a strong password". The iPhone asks with Face ID, makes a password that fits the field's rules, saves it in Nodkey and answers. The extension fills it into the new password field and the field that repeats it, and does not offer to save it again.
 - The request holds the host and the page address (no query, no fragment), the page title, the user name of the form or of an earlier step of the same sign-up, whether it is a change, and the field's rules (passwordrules, minlength, maxlength, pattern). The earlier user name is kept in session storage for 5 minutes; it is not a secret. The password comes back end-to-end encrypted and is never stored.
 - Rules that no password can meet are refused in the browser at once; nothing goes to the iPhone.
