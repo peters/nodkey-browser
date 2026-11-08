@@ -52,7 +52,9 @@ your phone, and nothing leaves it until you approve with Face ID.
   and the amount, and you approve with Face ID each time. The card is filled in
   only if the total is still the same, and it leaves the fields again if the
   total goes up. Nodkey never clicks Pay. A card you type yourself can be saved
-  in Nodkey.
+  in Nodkey, with the same rule as a login: the question comes only after a
+  real submit, and not for a card that Nodkey filled, that your iPhone saved or
+  that you said no to.
 - **Add a card for later.** On a billing page with no total, Nodkey can add your
   card for later payments, without an amount. This also works when the card
   fields come from a payment provider such as Stripe: Nodkey shows the shop
@@ -67,7 +69,11 @@ your phone, and nothing leaves it until you approve with Face ID.
   your iPhone keeps the old password for 30 days.
 - **Save new passwords.** When you sign up or change a password, the extension
   offers to save it in Nodkey. The password is locked for your iPhone at once:
-  the extension never keeps it in readable form.
+  the extension never keeps it in readable form. The question comes only after
+  a real submit, and not for a login that Nodkey filled, that your iPhone saved
+  or that you said no to. Your browser then keeps a keyed fingerprint of that
+  login for 180 days, never the password, and it asks again when the password
+  changes.
 
 ## How it works
 

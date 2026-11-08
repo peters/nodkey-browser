@@ -29,6 +29,7 @@ import { formatMoney } from '../utils/money'
 import { belongsTo, mayFill, siteOf } from '../utils/site'
 import { info, client, publish } from './actions'
 import { ask } from './agent'
+import * as known from './known'
 import { cardRefusal, failed } from './outcome'
 import { capture } from './screenshot'
 import * as store from './store'
@@ -51,14 +52,6 @@ export function cardName(brand: string, last4: string): string {
     maestro: 'Maestro',
   }
   return `${names[brand] ?? t('cardGeneric')} ····${last4}`
-}
-
-/** Hashes of card numbers Nodkey filled in the last ten minutes: not offered for saving again. */
-const recentFills = new Map<string, number>()
-
-async function numberKey(number: string): Promise<string> {
-  const digest = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(number))
-  return Array.from(new Uint8Array(digest), (b) => b.toString(16).padStart(2, '0')).join('')
 }
 
 /** A card field in a frame below the top page, waiting for the person's choice in the top page. */
@@ -217,11 +210,19 @@ export async function fill(
     if (c.cvc !== undefined) filled.cvc = c.cvc
     if (c.holder !== undefined) filled.holder = c.holder
     const toFill: ToContent = { type: 'card.fill', origin, card: filled, approved }
-    recentFills.set(await numberKey(c.number), Date.now())
     const result = (await chrome.tabs
       .sendMessage(tabId, toFill, { frameId: into.frameId })
       .catch(() => null)) as CardFillResult | null
     if (result?.filled === true) {
+      // A card Nodkey filled is not offered for saving when the person submits it. A number the
+      // phone did not send in full is no card, and the form refuses it anyway.
+      if (card_luhn(c.number)) {
+        const digits = c.number.replace(/\D/g, '')
+        await known.remember(
+          await known.fingerprint('card', siteOf(into.url) ?? merchant, '', digits),
+          'filled',
+        )
+      }
       if (via) await fillParts(tabId, origin, filled)
       if (approved && msg.ticket !== undefined) {
         framed.set(tabId, origin)
@@ -305,8 +306,9 @@ export async function candidate(tab: chrome.tabs.Tab, frameUrl: string, msg: Can
   if (tabId === undefined || !site || !mayFill(frameUrl) || !card_luhn(msg.number)) return
   const settings = await store.settings()
   if (!settings.offerSave || settings.neverSave.includes(site)) return
-  const filledAt = recentFills.get(await numberKey(msg.number))
-  if (filledAt !== undefined && Date.now() - filledAt < 10 * 60_000) return
+  // Nodkey filled it, the phone saved it, or the person said no to it: no question again.
+  const fp = await known.fingerprint('card', site, '', msg.number.replace(/\D/g, ''))
+  if (await known.isKnown(fp)) return
   const [agent, phone] = [await store.agent(), await store.currentPhone()]
   if (!agent || !phone) return
   const last4 = card_last4(msg.number)
@@ -322,6 +324,7 @@ export async function candidate(tab: chrome.tabs.Tab, frameUrl: string, msg: Can
     exp_month: msg.exp_month,
     exp_year: msg.exp_year,
     number: parseSealedBox(JSON.parse(seal_card_secret(agent.agent_id, phone.kem, msg.number))),
+    fp,
     at: Date.now(),
   }
   if (msg.cvc) {
@@ -372,6 +375,8 @@ export async function acceptOffer(tab: chrome.tabs.Tab, id: string): Promise<voi
       phone,
     )
     if (answer?.decision === 'approved') {
+      // The phone has it now (added, updated or unchanged): no question for it again.
+      await known.remember(offer.fp ?? '', 'saved')
       await say('approved', answer.saved === 'updated' ? t('cardSaveUpdated') : t('cardSaved'))
       return
     }
@@ -392,6 +397,8 @@ export async function dismissOffer(tab: chrome.tabs.Tab, id: string, never: bool
   const offer = await store.cardOffer(tab.id)
   if (offer?.id !== id) return
   await store.setCardOffer(tab.id, null)
+  // Not now and Never for this site: no question for this card again.
+  await known.remember(offer.fp ?? '', 'declined')
   if (never) {
     const settings = await store.settings()
     if (!settings.neverSave.includes(offer.site)) {

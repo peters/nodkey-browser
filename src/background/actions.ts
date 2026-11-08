@@ -10,6 +10,7 @@ import { t } from '../i18n/t'
 import { browserInfo, defaultAgentName } from '../utils/browser'
 import { belongsTo, mayFill, requestTarget, siteOf } from '../utils/site'
 import { type Ask, type ClientInfo, ask } from './agent'
+import * as known from './known'
 import { failed, notApproved, quotaNote, saved } from './outcome'
 import { capture } from './screenshot'
 import * as signin from './signin'
@@ -84,20 +85,9 @@ export function notForThisPage(target: string, answer: Answer, url: string): str
   return savedFor ? t('fillOtherSite', savedFor, page) : t('fillNoSite', page)
 }
 
-/** Logins Nodkey filled in the last two minutes: not offered for saving again. */
-const recentFills = new Map<string, number>()
-
-async function fillKey(site: string, username: string, password: string): Promise<string> {
-  const digest = await crypto.subtle.digest(
-    'SHA-256',
-    new TextEncoder().encode(`${site}\n${username}\n${password}`),
-  )
-  return Array.from(new Uint8Array(digest), (b) => b.toString(16).padStart(2, '0')).join('')
-}
-
 /** A login Nodkey filled on `site`: not offered for saving when the person submits it. */
 export async function noteFill(site: string, username: string, password: string): Promise<void> {
-  recentFills.set(await fillKey(site, username, password), Date.now())
+  await known.remember(await known.fingerprint('login', site, username, password), 'filled')
 }
 
 /**
@@ -177,7 +167,6 @@ export async function fill(
       if (answer.username !== undefined) msg.username = answer.username
       if (answer.password !== undefined) msg.password = answer.password
       if (answer.code !== undefined) msg.code = answer.code
-      if (answer.password) await noteFill(site, answer.username ?? '', answer.password)
     } else if (answer.code !== undefined) {
       msg.code = answer.code
     }
@@ -188,6 +177,10 @@ export async function fill(
     if (filled !== true) {
       await publish(tabId, kind, site, 'error', t('actNoField'), frameId, note)
       return
+    }
+    // The frame that asked holds the login now, so its site is the one a save names.
+    if (kind === 'login' && answer.password) {
+      await noteFill(siteOf(frameUrl ?? url) ?? site, answer.username ?? '', answer.password)
     }
     const done = kind === 'login' ? t('actFilledLogin', site) : t('actFilledCode', site)
     await publish(tabId, kind, site, 'approved', done, frameId, note)
@@ -226,11 +219,11 @@ export async function candidate(
   if (made && (made.site === site || belongsTo(frameUrl, made.site))) return
   const settings = await store.settings()
   if (!settings.offerSave || settings.neverSave.includes(site)) return
+  // Nodkey filled it, the phone saved it, or the person said no to it: no question again.
+  const fp = await known.fingerprint('login', site, username, password)
+  if (await known.isKnown(fp)) return
   const [agent, phone] = [await store.agent(), await store.currentPhone()]
   if (!agent || !phone) return
-  const key = await fillKey(site, username, password)
-  const filledAt = recentFills.get(key)
-  if (filledAt !== undefined && Date.now() - filledAt < 120_000) return
   const box = parseSealedBox(JSON.parse(seal_password(agent.agent_id, phone.kem, password)))
   const page = new URL(frameUrl)
   const offer: SaveOffer = {
@@ -240,6 +233,7 @@ export async function candidate(
     url: page.origin + page.pathname,
     username,
     password: box,
+    fp,
     at: Date.now(),
   }
   if (title) offer.title = title.slice(0, 100)
@@ -292,6 +286,8 @@ async function sendSave(offer: SaveOffer, tabId: number | undefined): Promise<vo
     )
     if (answer?.decision === 'approved') {
       await keep(false)
+      // The phone has it now (added, updated or unchanged): no question for it again.
+      await known.remember(offer.fp ?? '', 'saved')
       const shown = saved(answer)
       await show(shown.state, shown.message)
       return
@@ -320,6 +316,8 @@ export async function dismissOffer(tab: chrome.tabs.Tab, id: string, never: bool
   const offer = await store.offer(tab.id)
   if (offer?.id !== id) return
   await store.setOffer(tab.id, null)
+  // Not now and Never for this site: no question for this login or card again.
+  await known.remember(offer.fp ?? '', 'declined')
   if (never) {
     const settings = await store.settings()
     if (!settings.neverSave.includes(offer.site)) {
