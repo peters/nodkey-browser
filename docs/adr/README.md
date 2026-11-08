@@ -19,6 +19,7 @@ does. Each record uses ASD-STE100 Simplified Technical English (STE).
 | [ADR-0012](0012-pairing-commitment-and-signatures.md) | Pair with the phone's commitment, and sign each request and answer | Accepted |
 | [ADR-0013](0013-cards-for-later-and-payment-frames.md) | Add a card for later payments, and fill payment frames of other sites | Accepted |
 | [ADR-0014](0014-make-a-password-on-the-phone.md) | Make a new password on the phone for a sign-up or a change | Accepted |
+| [ADR-0015](0015-ask-to-save-only-what-is-new.md) | Ask to save only a login or a card that is new | Accepted |
 
 ## Template
 

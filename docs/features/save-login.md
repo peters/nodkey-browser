@@ -1,5 +1,12 @@
 # Save a new login
 
+## What the question needs
+
+The question shows only after a real submit of the form. It does not show for a
+login that Nodkey filled, that the phone saved or that the person said "Not
+now" to. The browser keeps a keyed fingerprint of such a login for 180 days,
+never the password, and it asks again when the password changes (ADR-0015).
+
 ## Preparation
 
 The browser is paired with the fake phone. The fake phone mode is `approve`.
@@ -36,7 +43,13 @@ The browser is paired with the fake phone. The fake phone mode is `approve`.
 - Click "Never for this site". Result: The site shows in the settings under
   "Never offer to save for". No question shows for that site.
 - Fill a login with Nodkey and submit it. Result: No save question shows,
-  because Nodkey filled that login.
+  because Nodkey filled that login. Stop the background first (wait 30 seconds
+  in Chromium) and submit again. Result: Still no question.
+- Type the login again after "Not now" and submit it. Result: No question.
+  Change one character of the password and submit it. Result: The question
+  shows again.
+- Click a custom select, a menu or the button that shows the password. Result:
+  No save question shows, because such a click is not a submit.
 - Sign in with two steps (user name page, then password page). Result: The
   question shows the user name from the first page.
 - Make a password with Nodkey ([Make a strong password](generate-password.md))

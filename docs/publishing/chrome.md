@@ -74,7 +74,7 @@ for 0.2.2, then [New version of the item](#new-version-of-the-item) with 0.3.0.
 
      | Permission | Justification |
      |---|---|
-     | `storage` | Keeps the pairing, the settings and the list of sites where the user does not want a save offer. For the browser session only, it keeps how the user signs in to a site when the iPhone said so (for example "Sign in with Google"; no secret). Never a password, a code or a card number. |
+     | `storage` | Keeps the pairing, the settings, the list of sites where the user does not want a save offer, and a keyed fingerprint of each login and card that the user does not want a question about (180 days; a hash with a local secret, never a password, a card number or a user name). For the browser session only, it keeps how the user signs in to a site when the iPhone said so (for example "Sign in with Google"; no secret). Never a password, a code or a card number. |
      | `activeTab` | Takes a picture of the current page for the approval screen on the iPhone, when the user turns this on, so the user can see which page asks before approving. |
      | `scripting` | Adds the page script (in the package) that sends the passkey requests of a page (navigator.credentials) to Nodkey, so the iPhone can sign them. |
      | Host permission `<all_urls>` | Shows the Nodkey button in sign-in, code and card fields on all websites, and fills only the login, code or card that the user approved on the iPhone. A password manager cannot know in advance which sites the user signs in to. Nothing leaves the page until the user clicks the Nodkey button or accepts an offer to save a new login or to remember a sign-in method. A provider login (for example the Google login) is filled only on the provider's own sign-in pages. |

@@ -128,3 +128,12 @@ run has a stand-in provider on `https://js.pay.example:<port>` (ADR-0013).
   fill in the card."
 - Open the checkout page over plain HTTP on a site that is not local. Result:
   The Nodkey button does not show.
+- Fill the card with Nodkey (steps 1 to 3), then click "Betal". Result: No save
+  question shows, because Nodkey filled that card. Stop the background first
+  (wait 30 seconds in Chromium) and click "Betal" again. Result: Still no
+  question.
+- Type the card again after "Not now" and click "Betal". Result: No question.
+  Type another card and click "Betal". Result: The question shows again.
+- Click the country field far down the page (a custom select or a menu), then
+  push Enter in it, while the card fields hold a card. Result: No save question
+  shows, because a click or an Enter in a picker is not a submit.

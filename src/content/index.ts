@@ -22,6 +22,7 @@ import { findLogin, findOtp, isOtpField, submission } from './forms'
 import { fillNew, newFormOf, newNameField, openMenu } from './generate'
 import { smsPage } from './signin'
 import { noteClick, pageLoaded, showMethod, watchPrompt } from './steps'
+import { isSubmitClick, isSubmitEnter } from './submit'
 import { PageUi } from './ui'
 
 let ui: PageUi | null = null
@@ -239,11 +240,10 @@ document.addEventListener(
   'click',
   (e) => {
     noteClick(e, send)
-    const target =
-      e.target instanceof Element ? e.target.closest('button, input[type=submit]') : null
-    if (!target || !e.isTrusted) return
-    const form = target.closest('form')
-    submitted(form ?? document)
+    if (!e.isTrusted || !(e.target instanceof Element)) return
+    // A picker, a menu, a tab or the button that shows a password is not a submit.
+    if (!isSubmitClick(e.target)) return
+    submitted(e.target.closest('form') ?? document)
   },
   true,
 )
@@ -251,9 +251,11 @@ document.addEventListener(
 document.addEventListener(
   'keydown',
   (e) => {
-    if (e.key === 'Enter' && e.target instanceof HTMLInputElement && e.isTrusted) {
-      submitted(e.target.form ?? document)
-    }
+    if (e.key !== 'Enter' || !e.isTrusted) return
+    if (!(e.target instanceof HTMLInputElement)) return
+    // Enter in a field that searches or picks a value is not a submit either.
+    if (!isSubmitEnter(e.target)) return
+    submitted(e.target.form ?? document)
   },
   true,
 )
