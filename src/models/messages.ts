@@ -63,6 +63,11 @@ export interface SaveOffer {
   username: string
   title?: string
   password: SealedBox
+  /**
+   * The keyed fingerprint of this login (`known.ts`): no question again for it. It is a hash
+   * with a secret salt, never a secret, and it is not part of the save request.
+   */
+  fp?: string
   at: number
   /** The page asked for it once already. */
   shown?: boolean
@@ -81,6 +86,8 @@ export interface CardOffer {
   holder?: string
   number: SealedBox
   cvc?: SealedBox
+  /** The keyed fingerprint of this card (`known.ts`); not part of the save request. */
+  fp?: string
   at: number
   shown?: boolean
 }

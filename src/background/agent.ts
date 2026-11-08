@@ -29,6 +29,7 @@ import {
   parseToSign,
 } from '../models/protocol'
 import * as keys from './keys'
+import * as known from './known'
 import { Relay, RelayError, pollUntil } from './relay'
 import * as store from './store'
 
@@ -236,6 +237,8 @@ export async function unpair(phoneId: string): Promise<void> {
   await store.setPhones((await store.phones()).filter((p) => p.phone_id !== phoneId))
   const pending = await store.pending()
   await store.setPending(pending.filter((o) => o.phoneId !== phoneId))
+  // The logins and cards this browser remembers go with the phone (see `known.ts`).
+  await known.clear()
 }
 
 export interface Ask {
